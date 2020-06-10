@@ -64,7 +64,7 @@ export class ServerResponse {
 
 	end(str: BodyInit) {
 		this.body = str;
-    this.finished = true;
+		this.finished = true;
 	}
 
 	writeHead(int: number, obj?: Record<string, string>) {

@@ -1,6 +1,7 @@
 {
-	"name": "worktop",
+  "name": "worktop",
   "version": "0.0.0",
+  "repository": "lukeed/worktop",
   "main": "index.ts",
   "files": ["*.ts"],
   "author": {
