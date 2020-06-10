@@ -1,9 +1,11 @@
 {
   "name": "worktop",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "repository": "lukeed/worktop",
   "main": "index.ts",
-  "files": ["*.ts"],
+  "files": [
+    "*.ts"
+  ],
   "author": {
     "name": "Luke Edwards",
     "email": "luke.edwards05@gmail.com",
