@@ -1,5 +1,5 @@
-// @ts-ignore
-export const Cache = caches.default;
+/** @type {Cache} */
+export const Cache = /** @type {*} */(caches).default;
 
 /**
  * @param {FetchEvent} event
