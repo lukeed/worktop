@@ -1,3 +1,5 @@
+/// <reference lib="webworker" />
+
 // worktop/cache
 export const Cache: Cache;
 export function isCachable(res: Response): boolean;
@@ -27,8 +29,8 @@ export interface ServerRequest {
 }
 
 // worktop/response
-type ReplyHandler = (event: FetchEvent) => Promise<Response>;
-export function reply(handler: ReplyHandler): (event: FetchEvent) => void;
+export type FetchHandler = (event: FetchEvent) => void;
+export function reply(handler: (event: FetchEvent) => Promise<Response>): FetchHandler;
 
 type HeadersObject = Record<string, string>;
 export declare class ServerResponse {

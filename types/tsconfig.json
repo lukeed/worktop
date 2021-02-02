@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    // tsd does not like "dom.iterable"
+    "lib": ["esnext", "webworker"]
+  }
+}

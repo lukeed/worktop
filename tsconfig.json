@@ -7,14 +7,16 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
-    "lib": ["esnext", "es2017.object", "dom.iterable", "webworker"],
+    "lib": ["esnext", "dom.iterable", "webworker"],
     "strictFunctionTypes": true,
     "strictNullChecks": true,
+    "noImplicitThis": true,
     "noImplicitAny": true,
     "strict": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "types/**/*"
   ],
   "exclude": [
     "node_modules"
