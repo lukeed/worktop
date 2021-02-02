@@ -22,6 +22,9 @@
     "*.d.ts",
     "build.*"
   ],
+  "engines": {
+    "node": ">=12"
+  },
   "scripts": {
     "build": "rollup -c",
     "types": "tsc && tsd types"
