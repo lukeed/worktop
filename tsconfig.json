@@ -2,13 +2,15 @@
   "compilerOptions": {
     "noEmit": true,
     "allowJs": true,
+    "checkJs": true,
     "target": "esnext",
-    "noImplicitAny": true,
+    "skipLibCheck": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext", "es2017.object", "dom.iterable", "webworker"],
-    "module": "esnext",
-    "checkJs": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
     "strict": true
   },
   "include": [
