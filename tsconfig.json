@@ -8,10 +8,11 @@
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext", "es2017.object", "dom.iterable", "webworker"],
     "module": "esnext",
+    "checkJs": true,
     "strict": true
   },
   "include": [
-    "src"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules"
