@@ -29,8 +29,8 @@ import * as utils from './utils';
 
 /** @returns {Router} */
 export function Router() {
-	/** @type {Router} */ let $;
-	/** @type {Tree} */ let tree={};
+	/** @type {Router} */let $;
+	/** @type {Tree} */let tree={};
 
 	return $ = {
 		add(method, route, handler) {
@@ -54,7 +54,7 @@ export function Router() {
 		},
 
 		find(method, pathname) {
-			/** @type {Params} */ let params={};
+			/** @type {Params} */let params={};
 			let tmp, dict, rgx, val, match;
 
 			if (dict = tree[method]) {

@@ -70,7 +70,7 @@ export function ServerResponse(method) {
 	 * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
 	 */
 	this.send = (code, data, headers) => {
-		/** @type {Record<string,string|number>} */ let obj={};
+		/** @type {Record<string,string|number>} */let obj={};
 		for (let key in headers) obj[key.toLowerCase()] = headers[key];
 		let type = obj['content-type'] || this.getHeader('content-type');
 
