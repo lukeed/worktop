@@ -1,15 +1,23 @@
-import { toObj } from './util';
-import type { Method } from './router';
+import { toObject } from './utils';
+// import type { Method } from './router';
 
-type FetchHandler = (event: FetchEvent) => Promise<Response>;
-
-export function reply(handler: FetchHandler): EventListener {
-	return function (event: FetchEvent) {
-		event.respondWith(handler(event));
+/**
+ * @param {(event: FetchEvent) => Response | Promise<Response>} handler
+ * @returns {(event: FetchEvent) => void}
+ */
+export function reply(handler) {
+	return function (event) {
+		event.respondWith(
+			handler(event)
+		);
 	};
 }
 
-export function length(res: Response): Promise<number> {
+/**
+ * @param {Response} res
+ * @returns {Promise<number>}
+ */
+export function length(res) {
 	return res.clone().arrayBuffer().then(x => x.byteLength);
 }
 
@@ -39,7 +47,7 @@ export class ServerResponse {
 	}
 
 	getHeaders(): Record<string, string | string[]> {
-		return toObj<string>(this.headers);
+		return toObject<string>(this.headers);
 	}
 
 	getHeaderNames(): string[] {
