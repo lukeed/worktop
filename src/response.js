@@ -1,6 +1,3 @@
-import { toObject } from './utils';
-// import type { Method } from './router';
-
 /**
  * @param {(event: FetchEvent) => Response | Promise<Response>} handler
  * @returns {(event: FetchEvent) => void}
@@ -13,81 +10,68 @@ export function reply(handler) {
 	};
 }
 
+// /**
+//  * @param {Response} res
+//  * @returns {Promise<number>}
+//  */
+// export function length(res) {
+// 	return res.clone().arrayBuffer().then(x => x.byteLength);
+// }
+
 /**
- * @param {Response} res
- * @returns {Promise<number>}
+ * @template T
+ * @typedef Writable<T>
+ * @type {{ -readonly [P in keyof T]: T[P] }}
  */
-export function length(res) {
-	return res.clone().arrayBuffer().then(x => x.byteLength);
-}
 
-export class ServerResponse {
-	private method: Method;
-	statusCode: number;
-	finished: boolean;
-	headers: Headers;
-	body: BodyInit;
+/**
+ * @typedef {import('..').ServerResponse} SR
+ */
 
-	constructor(method: Method) {
-		this.body = '';
-		this.statusCode = 200;
-		this.headers = new Headers({
-			'Cache-Control': 'private, no-cache'
-		});
-		this.finished = false;
-		this.method = method;
-	}
+/**
+ * @this {Writable<SR>}
+ * @param {string} method
+ * @returns {SR}
+ */
+export function ServerResponse(method) {
+	var hh = this.headers = new Headers({
+		'Cache-Control': 'private, no-cache'
+	});
 
-	get status() {
-		return this.statusCode;
-	}
+	this.body = '';
+	this.statusCode = 0;
+	this.finished = false;
 
-	set status(val) {
-		this.statusCode = val;
-	}
+	this.getHeaders = () => Object.fromEntries(hh);
+	this.getHeaderNames = () => [...hh.keys()];
 
-	getHeaders(): Record<string, string | string[]> {
-		return toObject<string>(this.headers);
-	}
+	this.hasHeader = hh.has.bind(hh);
+	this.getHeader = hh.get.bind(hh);
+	this.removeHeader = hh.delete.bind(hh);
+	this.setHeader = hh.set.bind(hh);
 
-	getHeaderNames(): string[] {
-		return [...this.headers.keys()];
-	}
-
-	getHeader(key: string): string | null {
-		return this.headers.get(key.toLowerCase());
-	}
-
-	setHeader(key: string, value: string): void {
-		this.headers.set(key.toLowerCase(), value);
-	}
-
-	removeHeader(key: string): void {
-		this.headers.delete(key.toLowerCase());
-	}
-
-	hasHeader(key: string): boolean {
-		return this.headers.has(key.toLowerCase());
-	}
-
-	end(str: BodyInit) {
-		this.body = str;
+	/** @type {SR['end']} */
+	this.end = (data) => {
+		this.body = data;
 		this.finished = true;
 	}
 
-	writeHead(int: number, obj?: Record<string, string>) {
-		this.statusCode = int;
-		for (let k in obj) {
-			this.headers.set(k, obj[k]);
+	/** @type {SR['writeHead']} */
+	this.writeHead = (code, heads) => {
+		this.statusCode = code;
+		for (let k in heads) {
+			hh.set(k, heads[k]);
 		}
 	}
 
-	// ---
-
-	send(code: number, data?: unknown, headers: Record<string, string> = {}) {
-		let k, obj: Record<string, string> = {};
-		for (k in headers) obj[k.toLowerCase()] = headers[k];
-
+	/**
+	 * @type {SR['send']}
+	 * @TODO Remove / extract?
+	 * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
+	 */
+	this.send = (code, data, headers) => {
+		/** @type {Record<string,string|number>} */ let obj={};
+		for (let key in headers) obj[key.toLowerCase()] = headers[key];
 		let type = obj['content-type'] || this.getHeader('content-type');
 
 		if (data == null) {
@@ -98,7 +82,7 @@ export class ServerResponse {
 		}
 
 		obj['content-type'] = type || 'text/plain';
-		obj['content-length'] = String((data as string).length);
+		obj['content-length'] = String(data).length;
 		delete obj['content-length'];
 		delete obj['content-type'];
 
@@ -108,11 +92,13 @@ export class ServerResponse {
 			delete obj['content-length'];
 			delete obj['content-type'];
 			data = '';
-		} else if (this.method === 'HEAD') {
+		} else if (method === 'HEAD') {
 			data = '';
 		}
 
 		this.writeHead(code, headers);
-		this.end(data as string);
+		this.end(data);
 	}
+
+	return this;
 }
