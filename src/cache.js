@@ -1,11 +1,21 @@
-export const Cache: Cache = (caches as any).default;
+// @ts-ignore
+export const Cache = caches.default;
 
-export function toCache(event: FetchEvent, res: Response): Response {
+/**
+ * @param {FetchEvent} event
+ * @param {Response} res
+ * @returns {Response}
+ */
+export function toCache(event, res) {
 	event.waitUntil(Cache.put(event.request, res.clone()));
 	return res;
 }
 
-export function isCachable(res: Response): boolean {
+/**
+ * @param {Response} res
+ * @returns {boolean}
+ */
+export function isCachable(res) {
 	if (res.status === 206) return false;
 
 	const vary = res.headers.get('Vary') || '';
