@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
-    "allowJs": false,
+    "noEmit": true,
+    "allowJs": true,
     "target": "esnext",
     "noImplicitAny": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext", "es2017.object", "dom.iterable", "webworker"],
-    "module": "esnext"
+    "module": "esnext",
+    "strict": true
   },
   "include": [
-    "*.ts"
+    "src"
   ],
   "exclude": [
     "node_modules"
