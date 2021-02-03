@@ -40,7 +40,7 @@ export function ServerResponse(method) {
 
 	this.body = '';
 	this.finished = false;
-	this.status = this.statusCode = 0;
+	this.status = this.statusCode = 200;
 
 	this.getHeaders = () => Object.fromEntries(hh);
 	this.getHeaderNames = () => [...hh.keys()];
