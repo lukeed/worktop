@@ -37,9 +37,12 @@ export declare class ServerResponse {
 	constructor(method: string);
 	readonly finished: boolean;
 
-	statusCode: number;
 	headers: Headers;
 	body: BodyInit | null;
+
+	statusCode: number;
+	get status(): number;
+	set status(x: number);
 
 	getHeaders(): HeadersObject;
 	getHeaderNames(): string[];

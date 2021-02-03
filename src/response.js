@@ -39,8 +39,8 @@ export function ServerResponse(method) {
 	});
 
 	this.body = '';
-	this.statusCode = 0;
 	this.finished = false;
+	this.status = this.statusCode = 0;
 
 	this.getHeaders = () => Object.fromEntries(hh);
 	this.getHeaderNames = () => [...hh.keys()];
@@ -49,6 +49,12 @@ export function ServerResponse(method) {
 	this.getHeader = hh.get.bind(hh);
 	this.removeHeader = hh.delete.bind(hh);
 	this.setHeader = hh.set.bind(hh);
+
+	Object.defineProperty(this, 'status', {
+		/** @param {number} x */
+		set: x => { this.statusCode = x },
+		get: () => this.statusCode,
+	});
 
 	/** @type {SR['end']} */
 	this.end = (data) => {
