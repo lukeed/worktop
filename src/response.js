@@ -1,6 +1,6 @@
 /**
- * @param {(event: FetchEvent) => Response | Promise<Response>} handler
- * @returns {(event: FetchEvent) => void}
+ * @param {import('..').ResponseHandler} handler
+ * @returns {import('..').FetchHandler}
  */
 export function reply(handler) {
 	return function (event) {
