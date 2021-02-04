@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "strict": true,
     "noEmit": true,
     "allowJs": true,
     "checkJs": true,
@@ -12,7 +13,11 @@
     "strictNullChecks": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
-    "strict": true
+    "baseUrl": "./src",
+    "paths": {
+      "worktop": ["./index.js"],
+      "worktop/cache": ["./cache.js"]
+    }
   },
   "include": [
     "src/**/*",

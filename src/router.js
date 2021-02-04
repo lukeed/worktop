@@ -1,6 +1,6 @@
 import regexparam from 'regexparam';
+import * as Cache from 'worktop/cache';
 import { ServerResponse } from './response';
-import { isCachable, toCache } from './cache';
 import * as utils from './utils';
 
 /**
@@ -110,9 +110,10 @@ export function Router() {
 
 		listen(event) {
 			event.respondWith(
-				$.run(event.request).then(res => {
-					const isGET = /^(GET|HEAD)$/.test(event.request.method);
-					return isGET && isCachable(res) ? toCache(event, res) : res;
+				Cache.lookup(event).then(prev => {
+					return prev || $.run(event.request).then(res => {
+						return Cache.save(event, res);
+					});
 				})
 			);
 		}
