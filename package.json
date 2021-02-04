@@ -1,6 +1,6 @@
 {
   "name": "worktop",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": "lukeed/worktop",
   "module": "build.mjs",
   "types": "index.d.ts",
