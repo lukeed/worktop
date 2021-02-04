@@ -49,3 +49,23 @@ export function body(req, ctype) {
 	if (ctype.includes('form')) return req.formData();
 	return /text\/*/i.test(ctype) ? req.text() : req.blob();
 }
+
+/**
+ * @param {Response} res
+ * @returns {boolean}
+ */
+export function isCachable(res) {
+	if (res.status === 206) return false;
+
+	const vary = res.headers.get('Vary') || '';
+	if (vary.includes('*')) return false;
+
+	const ccontrol = res.headers.get('Cache-Control') || '';
+	if (/(private|no-cache|no-store)/i.test(ccontrol)) return false;
+
+	if (res.headers.has('Set-Cookie')) {
+		res.headers.append('Cache-Control', 'private=Set-Cookie');
+	}
+
+	return true;
+}

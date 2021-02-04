@@ -1,32 +1,32 @@
+import * as utils from './utils';
+
 /** @type {Cache} */
 export const Cache = /** @type {*} */(caches).default;
 
 /**
  * @param {FetchEvent} event
- * @param {Response} res
- * @returns {Response}
+ * @param {Request|string} [request]
+ * @returns {Promise<Response|void>}
  */
-export function toCache(event, res) {
-	event.waitUntil(Cache.put(event.request, res.clone()));
-	return res;
+export function lookup(event, request) {
+	return Cache.match(request || event.request);
 }
 
 /**
+ * @param {FetchEvent} event
  * @param {Response} res
- * @returns {boolean}
+ * @param {Request|string} [request]
+ * @returns {Response}
  */
-export function isCachable(res) {
-	if (res.status === 206) return false;
+export function save(event, res, request) {
+	const req = request || event.request;
+	const isGET = /^(GET|HEAD)$/.test(
+		typeof req !== 'string' && req.method || event.request.method
+	);
 
-	const vary = res.headers.get('Vary') || '';
-	if (vary.includes('*')) return false;
-
-	const ccontrol = res.headers.get('Cache-Control') || '';
-	if (/(private|no-cache|no-store)/i.test(ccontrol)) return false;
-
-	if (res.headers.has('Set-Cookie')) {
-		res.headers.append('Cache-Control', 'private=Set-Cookie');
+	if (isGET && utils.isCachable(res)) {
+		event.waitUntil(Cache.put(req, res.clone()));
 	}
 
-	return true;
+	return res;
 }
