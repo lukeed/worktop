@@ -2,9 +2,9 @@
   "name": "worktop",
   "version": "0.0.3",
   "repository": "lukeed/worktop",
-  "module": "build.mjs",
+  "module": "build/index.mjs",
+  "main": "build/index.js",
   "types": "index.d.ts",
-  "main": "build.js",
   "license": "MIT",
   "author": {
     "name": "Luke Edwards",
@@ -13,14 +13,19 @@
   },
   "exports": {
     ".": {
-      "import": "./build.mjs",
-      "require": "./build.js"
+      "import": "./build/index.mjs",
+      "require": "./build/index.js"
+    },
+    "./cache": {
+      "import": "./cache/index.mjs",
+      "require": "./cache/index.js"
     },
     "./package.json": "./package.json"
   },
   "files": [
     "*.d.ts",
-    "build.*"
+    "build",
+    "cache"
   ],
   "engines": {
     "node": ">=12"

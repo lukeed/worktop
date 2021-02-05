@@ -1,10 +1,5 @@
 /// <reference lib="webworker" />
 
-// worktop/cache
-export const Cache: Cache;
-export function isCachable(res: Response): boolean;
-export function toCache(event: FetchEvent, res: Response): Response;
-
 // worktop/router
 export type Route = { params: Params; handler: Handler | false };
 export type Handler = (req: ServerRequest, res: ServerResponse) => void | Response | Promise<void | Response>;

@@ -1,6 +1,19 @@
 const Magic = require('magic-string').default;
 const pkg = require('./package.json');
 
+const commons = {
+	external: [
+		'worktop', 'worktop/cache',
+		...Object.keys(pkg.dependencies)
+	],
+	treeshake: {
+		moduleSideEffects: false,
+	},
+	plugins: [
+		comments()
+	]
+};
+
 /**
  * @param {string} file
  * @param {'esm' | 'cjs'} format
@@ -14,21 +27,12 @@ const make = (file, format) => ({
 	strict: false
 });
 
-module.exports = {
-	input: 'src/index.js',
-	output: [
-		make(pkg.exports['.'].import, 'esm'),
-		make(pkg.exports['.'].require, 'cjs'),
-	],
-	external: [
-		...Object.keys(pkg.dependencies)
-	],
-	treeshake: {
-		moduleSideEffects: false,
-	},
-	plugins: [
-		comments()
-	]
+function bundle(input, conds) {
+	let output = [
+		conds.import && make(conds.import, 'esm'),
+		conds.require && make(conds.require, 'cjs'),
+	];
+	return { input, output, ...commons };
 }
 
 /** @returns {import('rollup').Plugin} */
@@ -57,3 +61,8 @@ function comments(options={}) {
 		}
 	}
 }
+
+module.exports = [
+	bundle('src/index.js', pkg.exports['.']),
+	bundle('src/cache.js', pkg.exports['./cache']),
+]
