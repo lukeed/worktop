@@ -20,9 +20,7 @@ export function lookup(event, request) {
  */
 export function save(event, res, request) {
 	const req = request || event.request;
-	const isGET = /^(GET|HEAD)$/.test(
-		typeof req !== 'string' && req.method || event.request.method
-	);
+	const isGET = typeof req === 'string' || /^(GET|HEAD)$/.test(req.method);
 
 	if (isGET && utils.isCachable(res)) {
 		event.waitUntil(Cache.put(req, res.clone()));
