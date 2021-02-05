@@ -1,5 +1,6 @@
 import * as tsd from 'tsd';
-import { reply, Router, ServerResponse, isCachable, toCache } from '..';
+import * as Cache from '../cache';
+import { reply, Router, ServerResponse } from '..';
 import type { Route, FetchHandler, ServerRequest } from '..';
 
 declare function addEventListener(type: 'fetch', handler: FetchHandler): void;
@@ -134,23 +135,30 @@ const request: ServerRequest = {
 
 reply(event => {
 	// @ts-expect-error
-	toCache(event, 123);
+	Cache.save(event, 123);
 	// @ts-expect-error
-	toCache(123, event);
+	Cache.save(123, event);
 	// @ts-expect-error
-	toCache(123);
+	Cache.save(123);
 
 	tsd.expectType<Response>(
-		toCache(event, new Response)
+		Cache.save(event, new Response)
 	);
+
+	tsd.expectType<Response>(
+		Cache.save(event, new Response, '/custom')
+	);
+
+	tsd.expectType<Response>(
+		Cache.save(event, new Response, new Request('/custom'))
+	);
+
+	// @ts-expect-error
+	Cache.lookup(event, new Response);
+
+	Cache.lookup(event, '/custom');
+	Cache.lookup(event, new Request('/custom'));
 
 	// ignore me
 	return fetch(event.request);
 });
-
-// @ts-expect-error
-isCachable(123);
-
-tsd.expectType<boolean>(
-	isCachable(new Response)
-);
