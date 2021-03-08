@@ -20,7 +20,7 @@ export interface ServerRequest {
 	query: URLSearchParams;
 	search: string;
 	headers: Headers;
-	body: any;
+	body<T>(): Promise<T>;
 }
 
 // worktop/response

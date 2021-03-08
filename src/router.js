@@ -86,15 +86,6 @@ export function Router() {
 			const { params, handler } = $.find(req.method, req.path);
 			if (!handler) return new Response('404', { status: 404 });
 
-			if (request.body) {
-				try {
-					const ctype = req.headers.get('content-type');
-					if (ctype) req.body = await utils.body(request, ctype);
-				} catch (err) {
-					return new Response(err.message, { status: 400 });
-				}
-			}
-
 			try {
 				req.params = params;
 				const res = new ServerResponse(req.method);

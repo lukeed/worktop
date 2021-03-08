@@ -32,18 +32,20 @@
  * @returns {ServerRequest}
  */
 export function request(req) {
+	const body = toBody.bind(0, req);
 	const { url, method, headers } = req;
 	const { pathname:path, search, searchParams:query } = new URL(url);
-	return /** @type {ServerRequest} */ ({ url, method, headers, path, query, search, body: null });
+	return /** @type {ServerRequest} */ ({ url, method, headers, path, query, search, body });
 }
 
 /**
  * @TODO Cast `formData` to object again?
  * @param {Request} req
- * @param {string} ctype
  * @returns {Promise<any>}
  */
-export function body(req, ctype) {
+export async function toBody(req) {
+	const ctype = req.headers.get('content-type');
+	if (!req.body || !ctype) return;
 	if (ctype.includes('application/json')) return req.json();
 	if (ctype.includes('application/text')) return req.text();
 	if (ctype.includes('form')) return req.formData();
