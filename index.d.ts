@@ -27,7 +27,7 @@ export interface ServerRequest {
 	search: string;
 	headers: Headers;
 	body<T>(): Promise<T>;
-	defer: FetchEvent['waitUntil'];
+	extend: FetchEvent['waitUntil'];
 }
 
 // worktop/response

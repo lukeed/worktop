@@ -41,7 +41,7 @@ export function request(event) {
 		path: pathname,
 		search, query: searchParams,
 		body: body.bind(0, request, ctype),
-		defer: waitUntil
+		extend: waitUntil
 	});
 }
 
