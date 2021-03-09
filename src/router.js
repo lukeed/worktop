@@ -81,8 +81,8 @@ export function Router() {
 			return { params, handler: false };
 		},
 
-		async run(request) {
-			const req = utils.request(request);
+		async run(event) {
+			const req = utils.request(event);
 			const { params, handler } = $.find(req.method, req.path);
 			if (!handler) return new Response('404', { status: 404 });
 
@@ -102,7 +102,7 @@ export function Router() {
 		listen(event) {
 			event.respondWith(
 				Cache.lookup(event).then(prev => {
-					return prev || $.run(event.request).then(res => {
+					return prev || $.run(event).then(res => {
 						return Cache.save(event, res);
 					});
 				})

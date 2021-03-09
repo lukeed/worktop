@@ -7,20 +7,21 @@ export type Params = Record<string, string>;
 export declare class Router {
 	add(method: string, route: RegExp | string, handler: Handler): void;
 	find(method: string, pathname: string): Route;
-	run(request: Request): Promise<Response>;
+	run(event: FetchEvent): Promise<Response>;
 	listen(event: FetchEvent): void;
 }
 
 // worktop/request
 export interface ServerRequest {
-	method: string;
 	url: string;
+	method: string;
 	path: string;
 	params: Params;
 	query: URLSearchParams;
 	search: string;
 	headers: Headers;
 	body<T>(): Promise<T>;
+	defer: FetchEvent['waitUntil'];
 }
 
 // worktop/response

@@ -28,23 +28,30 @@
 
 /**
  * @TODO Cast `query` as object again?
- * @param {Request} req
+ * @param {FetchEvent} event
  * @returns {ServerRequest}
  */
-export function request(req) {
-	const body = toBody.bind(0, req);
-	const { url, method, headers } = req;
-	const { pathname:path, search, searchParams:query } = new URL(url);
-	return /** @type {ServerRequest} */ ({ url, method, headers, path, query, search, body });
+export function request(event) {
+	const { request, waitUntil } = event;
+	const { url, method, headers } = request;
+	const ctype = headers.get('content-type');
+	const { pathname, search, searchParams } = new URL(url);
+	return /** @type {ServerRequest} */ ({
+		url, method, headers,
+		path: pathname,
+		search, query: searchParams,
+		body: body.bind(0, request, ctype),
+		defer: waitUntil
+	});
 }
 
 /**
  * @TODO Cast `formData` to object again?
  * @param {Request} req
+ * @param {string|null} ctype
  * @returns {Promise<any>}
  */
-export async function toBody(req) {
-	const ctype = req.headers.get('content-type');
+export async function body(req, ctype) {
 	if (!req.body || !ctype) return;
 	if (ctype.includes('application/json')) return req.json();
 	if (ctype.includes('application/text')) return req.text();
