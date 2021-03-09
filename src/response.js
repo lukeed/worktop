@@ -58,8 +58,9 @@ export function ServerResponse(method) {
 
 	/** @type {SR['end']} */
 	this.end = (data) => {
-		this.body = data;
+		if (this.finished) return;
 		this.finished = true;
+		this.body = data;
 	}
 
 	/** @type {SR['writeHead']} */

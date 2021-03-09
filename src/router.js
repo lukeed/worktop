@@ -12,8 +12,8 @@ import * as utils from './utils';
  * @returns {Promise<Response>}
  */
 async function call(fn, req, res, ...args) {
-	const out = await fn.call(fn, req, res, ...args);
-	if (out instanceof Response) return out;
+	const output = await fn(req, res, ...args);
+	if (output instanceof Response) return output;
 	return new Response(res.body, res);
 }
 
@@ -104,6 +104,9 @@ export function Router() {
 		async run(event) {
 			const req = utils.request(event);
 			const res = new ServerResponse(req.method);
+
+			if ($.prepare) await $.prepare(req, res);
+			if (res.finished) return new Response(res.body, res);
 
 			const { params, handler } = $.find(req.method, req.path);
 			if (!handler) return call($.onerror, req, res, 404);

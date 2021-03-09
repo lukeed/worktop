@@ -12,6 +12,7 @@ export declare class Router {
 	run(event: FetchEvent): Promise<Response>;
 	listen(event: FetchEvent): void;
 	onerror(req: Omit<ServerRequest, 'params'>, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;
+	prepare?(req: Omit<ServerRequest, 'params'>, res: ServerResponse): Promisable<void>;
 }
 
 // TODO?: worktop/status | worktop/errors
