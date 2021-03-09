@@ -1,7 +1,21 @@
 import regexparam from 'regexparam';
 import * as Cache from 'worktop/cache';
 import { ServerResponse } from './response';
+import { STATUS_CODES } from './status';
 import * as utils from './utils';
+
+/**
+ * @param {Function} fn
+ * @param {import('..').ServerRequest} req
+ * @param {import('..').ServerResponse} res
+ * @param  {...any} args
+ * @returns {Promise<Response>}
+ */
+async function call(fn, req, res, ...args) {
+	const out = await fn.call(fn, req, res, ...args);
+	if (out instanceof Response) return out;
+	return new Response(res.body, res);
+}
 
 /**
  * @typedef {import('..').Router} Router
@@ -81,21 +95,24 @@ export function Router() {
 			return { params, handler: false };
 		},
 
+		onerror(req, res, status, error) {
+			const statusText = STATUS_CODES[status = status || 500];
+			const body = error && error.message || statusText || String(status);
+			return new Response(body, { status, statusText });
+		},
+
 		async run(event) {
 			const req = utils.request(event);
+			const res = new ServerResponse(req.method);
+
 			const { params, handler } = $.find(req.method, req.path);
-			if (!handler) return new Response('404', { status: 404 });
+			if (!handler) return call($.onerror, req, res, 404);
 
 			try {
 				req.params = params;
-				const res = new ServerResponse(req.method);
-
-				const out = await handler(req, res);
-				if (out instanceof Response) return out;
-				return new Response(res.body, res);
+				return call(handler, req, res);
 			} catch (err) {
-				// TODO: onError
-				return new Response(err.message, { status: 500 });
+				return call($.onerror, req, res, 500, err);
 			}
 		},
 

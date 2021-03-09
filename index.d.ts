@@ -1,15 +1,21 @@
 /// <reference lib="webworker" />
 
+type Promisable<T> = Promise<T> | T;
+
 // worktop/router
 export type Route = { params: Params; handler: Handler | false };
-export type Handler = (req: ServerRequest, res: ServerResponse) => void | Response | Promise<void | Response>;
+export type Handler = (req: ServerRequest, res: ServerResponse) => Promisable<Response|void>;
 export type Params = Record<string, string>;
 export declare class Router {
 	add(method: string, route: RegExp | string, handler: Handler): void;
 	find(method: string, pathname: string): Route;
 	run(event: FetchEvent): Promise<Response>;
 	listen(event: FetchEvent): void;
+	onerror(req: Omit<ServerRequest, 'params'>, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;
 }
+
+// TODO?: worktop/status | worktop/errors
+export declare var STATUS_CODES : Record<string|number, string>;
 
 // worktop/request
 export interface ServerRequest {
