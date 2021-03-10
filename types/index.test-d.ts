@@ -1,6 +1,6 @@
 import * as tsd from 'tsd';
 import * as Cache from '../cache';
-import { reply, Router, ServerResponse } from '..';
+import { reply, Router, ServerResponse, STATUS_CODES } from '..';
 import type { Route, FetchHandler, ServerRequest } from '..';
 
 declare function addEventListener(type: 'fetch', handler: FetchHandler): void;
@@ -60,6 +60,13 @@ tsd.expectType<void>(response.send(200, new FormData));
 tsd.expectType<void>(response.send(200));
 
 /**
+ * WORKTOP/STATUS
+ */
+tsd.expectType<string>(STATUS_CODES[200]);
+tsd.expectType<string>(STATUS_CODES['200']);
+STATUS_CODES['404'] = 'Custom Error Message';
+
+/**
  * WORKTOP/ROUTER
  */
 
@@ -81,6 +88,36 @@ tsd.expectType<void>(
 	API.add('GET', '/asd', console.log)
 );
 
+API.add('POST', '/items', async (req, res) => {
+	// Assert `req` & `res` types
+	tsd.expectType<ServerRequest>(req);
+	tsd.expectType<ServerResponse>(res);
+
+	// Assert `req` properties
+	tsd.expectType<string>(req.method);
+	tsd.expectType<string>(req.url);
+	tsd.expectType<string>(req.path);
+	tsd.expectType<object>(req.params);
+	tsd.expectType<URLSearchParams>(req.query);
+	tsd.expectType<()=>Promise<unknown>>(req.body);
+	tsd.expectType<(f:any)=>void>(req.extend);
+	tsd.expectType<Headers>(req.headers);
+	tsd.expectType<string>(req.search);
+
+	// Assert `req.body` types
+	let output1 = await req.body();
+	tsd.expectType<unknown>(output1);
+
+	type Foo = { bar: string };
+	let output2 = await req.body<Foo>();
+	tsd.expectType<Foo>(output2);
+
+	// Assert `req.extend` usage
+	req.extend(async function () {}());
+	req.extend(fetch('/analytics'));
+	req.extend(function () {}());
+});
+
 // @ts-expect-error
 API.find(123, 'asd');
 // @ts-expect-error
@@ -92,41 +129,27 @@ tsd.expectType<Route>(
 	API.find('GET', '/pathname')
 );
 
+reply(API.run);
+
 reply(event => {
-	return API.run(event.request);
+	return API.run(event);
 });
 
 async function foo1(event: FetchEvent) {
 	// @ts-expect-error
 	await API.run('hello');
 
-	const res1 = await API.run(event.request);
+	const res1 = await API.run(event);
 	tsd.expectType<Response>(res1);
 
-	const res2 = API.run(event.request);
+	const res2 = API.run(event);
 	tsd.expectType<Promise<Response>>(res2);
 }
 
-// returns void
 // @ts-expect-error
 reply(API.listen);
 
 addEventListener('fetch', API.listen);
-
-/**
- * WORKTOP/REQUEST
- */
-
-const request: ServerRequest = {
-	method: 'GET',
-	url: '/foo?bar=123',
-	path: '/foo',
-	params: {},
-	query: new URLSearchParams('?bar=123'),
-	search: '?bar=123',
-	headers: new Headers,
-	body: null
-};
 
 
 /**
