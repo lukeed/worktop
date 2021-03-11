@@ -23,6 +23,7 @@ export interface ServerRequest {
 	url: string;
 	method: string;
 	path: string;
+	hostname: string;
 	params: Params;
 	query: URLSearchParams;
 	search: string;

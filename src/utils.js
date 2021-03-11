@@ -33,12 +33,12 @@
  */
 export function request(event) {
 	const { request, waitUntil } = event;
-	const { url, method, headers } = request;
+	const { url, method, headers } = request; // todo: cf
+	const { hostname, pathname, search, searchParams } = new URL(url);
 	const ctype = headers.get('content-type');
-	const { pathname, search, searchParams } = new URL(url);
 	return /** @type {ServerRequest} */ ({
 		url, method, headers,
-		path: pathname,
+		hostname, path: pathname,
 		search, query: searchParams,
 		body: body.bind(0, request, ctype),
 		extend: waitUntil

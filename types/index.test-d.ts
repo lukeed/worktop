@@ -94,10 +94,11 @@ API.add('POST', '/items', async (req, res) => {
 	tsd.expectType<ServerResponse>(res);
 
 	// Assert `req` properties
-	tsd.expectType<string>(req.method);
 	tsd.expectType<string>(req.url);
 	tsd.expectType<string>(req.path);
 	tsd.expectType<object>(req.params);
+	tsd.expectType<string>(req.hostname);
+	tsd.expectType<string>(req.method);
 	tsd.expectType<URLSearchParams>(req.query);
 	tsd.expectType<()=>Promise<unknown>>(req.body);
 	tsd.expectType<(f:any)=>void>(req.extend);
