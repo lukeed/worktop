@@ -77,7 +77,7 @@ export function ServerResponse(method) {
 	 * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
 	 */
 	this.send = (code, data, headers) => {
-		/** @type {Record<string,string|number>} */let obj={};
+		/** @type {Record<string,string>} */let obj={};
 		for (let key in headers) obj[key.toLowerCase()] = headers[key];
 		let type = obj['content-type'] || this.getHeader('content-type');
 
@@ -89,7 +89,7 @@ export function ServerResponse(method) {
 		}
 
 		obj['content-type'] = type || 'text/plain';
-		obj['content-length'] = String(data).length;
+		obj['content-length'] = ''+String(data).length;
 		delete obj['content-length'];
 		delete obj['content-type'];
 
@@ -103,7 +103,7 @@ export function ServerResponse(method) {
 			data = '';
 		}
 
-		this.writeHead(code, headers);
+		this.writeHead(code, obj);
 		this.end(data);
 	}
 
