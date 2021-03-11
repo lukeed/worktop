@@ -1,7 +1,7 @@
 /**
  * Common Error Codes
- * @see `http.STATUS_CODES`
  * @type {import('..').STATUS_CODES}
+ * @note `require('http').STATUS_CODES`
  */
 export const STATUS_CODES = {
 	'400': 'Bad Request',
