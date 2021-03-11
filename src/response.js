@@ -93,9 +93,9 @@ export function ServerResponse(method) {
 		delete obj['content-length'];
 		delete obj['content-type'];
 
-		if (code === 204 || code === 304) {
-			this.removeHeader('content-type');
+		if (code === 204 || code === 205 || code === 304) {
 			this.removeHeader('content-length');
+			this.removeHeader('content-type');
 			delete obj['content-length'];
 			delete obj['content-type'];
 			data = null;
