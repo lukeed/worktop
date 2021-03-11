@@ -82,7 +82,9 @@ export function ServerResponse(method) {
 		}
 
 		obj['content-type'] = type || 'text/plain';
-		obj['content-length'] = len || ''+String(data).length;
+		obj['content-length'] = len || String(
+			data.byteLength || new TextEncoder().encode(data).byteLength
+		);
 
 		if (code === 204 || code === 205 || code === 304) {
 			this.removeHeader('content-length');
