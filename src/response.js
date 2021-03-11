@@ -98,9 +98,9 @@ export function ServerResponse(method) {
 			this.removeHeader('content-length');
 			delete obj['content-length'];
 			delete obj['content-type'];
-			data = '';
+			data = null;
 		} else if (method === 'HEAD') {
-			data = '';
+			data = null;
 		}
 
 		this.writeHead(code, obj);
