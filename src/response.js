@@ -10,14 +10,6 @@ export function reply(handler) {
 	};
 }
 
-// /**
-//  * @param {Response} res
-//  * @returns {Promise<number>}
-//  */
-// export function length(res) {
-// 	return res.clone().arrayBuffer().then(x => x.byteLength);
-// }
-
 /**
  * @template T
  * @typedef Writable<T>
@@ -79,6 +71,7 @@ export function ServerResponse(method) {
 	this.send = (code, data, headers) => {
 		/** @type {Record<string,string>} */let obj={};
 		for (let key in headers) obj[key.toLowerCase()] = headers[key];
+		let len = obj['content-length'] || this.getHeader('content-length');
 		let type = obj['content-type'] || this.getHeader('content-type');
 
 		if (data == null) {
@@ -89,9 +82,7 @@ export function ServerResponse(method) {
 		}
 
 		obj['content-type'] = type || 'text/plain';
-		obj['content-length'] = ''+String(data).length;
-		delete obj['content-length'];
-		delete obj['content-type'];
+		obj['content-length'] = len || ''+String(data).length;
 
 		if (code === 204 || code === 205 || code === 304) {
 			this.removeHeader('content-length');
