@@ -82,7 +82,7 @@ export function ServerResponse(method) {
 		let type = obj['content-type'] || this.getHeader('content-type');
 
 		if (data == null) {
-			data = String(code);
+			data = '';
 		} else if (typeof data === 'object') {
 			data = JSON.stringify(data);
 			type = type || 'application/json;charset=utf-8';
