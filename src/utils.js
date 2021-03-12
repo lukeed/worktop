@@ -53,10 +53,10 @@ export function request(event) {
  */
 export async function body(req, ctype) {
 	if (!req.body || !ctype) return;
-	if (ctype.includes('application/json')) return req.json();
-	if (ctype.includes('application/text')) return req.text();
-	if (ctype.includes('form')) return req.formData();
-	return /text\/*/i.test(ctype) ? req.text() : req.blob();
+	if (!!~ctype.indexOf('application/json')) return req.json();
+	if (!!~ctype.indexOf('multipart/form-data')) return req.formData();
+	if (!!~ctype.indexOf('application/x-www-form-urlencoded')) return req.formData();
+	return !!~ctype.indexOf('text/') ? req.text() : req.blob();
 }
 
 /**
