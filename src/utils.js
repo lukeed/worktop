@@ -67,7 +67,7 @@ export function isCachable(res) {
 	if (res.status === 206) return false;
 
 	const vary = res.headers.get('Vary') || '';
-	if (vary.includes('*')) return false;
+	if (!!~vary.indexOf('*')) return false;
 
 	const ccontrol = res.headers.get('Cache-Control') || '';
 	if (/(private|no-cache|no-store)/i.test(ccontrol)) return false;
