@@ -56,7 +56,7 @@ export async function body(req, ctype) {
 	if (!!~ctype.indexOf('application/json')) return req.json();
 	if (!!~ctype.indexOf('multipart/form-data')) return req.formData();
 	if (!!~ctype.indexOf('application/x-www-form-urlencoded')) return req.formData();
-	return !!~ctype.indexOf('text/') ? req.text() : req.blob();
+	return !!~ctype.indexOf('text/') ? req.text() : req.arrayBuffer();
 }
 
 /**
