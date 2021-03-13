@@ -36,10 +36,8 @@ export function request(event) {
 	const { url, method, headers } = request; // todo: cf
 	const { hostname, pathname, search, searchParams } = new URL(url);
 	const $body = body.bind(0, request, headers.get('content-type'));
-	$body.blob=request.blob; $body.text=request.text;
-	$body.arrayBuffer = request.arrayBuffer;
-	$body.formData = request.formData;
-	$body.json = request.json;
+	// @ts-ignore - lol
+	$body.blob=request.blob; $body.text=request.text; $body.arrayBuffer = request.arrayBuffer; $body.formData = request.formData; $body.json = request.json;
 
 	return /** @type {ServerRequest} */ ({
 		url, method, headers,
