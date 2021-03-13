@@ -35,12 +35,17 @@ export function request(event) {
 	const { request, waitUntil } = event;
 	const { url, method, headers } = request; // todo: cf
 	const { hostname, pathname, search, searchParams } = new URL(url);
-	const ctype = headers.get('content-type');
+	const $body = body.bind(0, request, headers.get('content-type'));
+	$body.blob=request.blob; $body.text=request.text;
+	$body.arrayBuffer = request.arrayBuffer;
+	$body.formData = request.formData;
+	$body.json = request.json;
+
 	return /** @type {ServerRequest} */ ({
 		url, method, headers,
 		hostname, path: pathname,
 		search, query: searchParams,
-		body: body.bind(0, request, ctype),
+		body: $body,
 		extend: waitUntil
 	});
 }

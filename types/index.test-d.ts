@@ -111,7 +111,15 @@ API.add('POST', '/items', async (req, res) => {
 
 	type Foo = { bar: string };
 	let output2 = await req.body<Foo>();
-	tsd.expectType<Foo>(output2);
+	tsd.expectType<Foo|void>(output2);
+
+	// Assert raw body parsers
+	tsd.expectType<any>(await req.body.json());
+	tsd.expectType<Foo>(await req.body.json<Foo>());
+	tsd.expectType<ArrayBuffer>(await req.body.arrayBuffer());
+	tsd.expectType<FormData>(await req.body.formData());
+	tsd.expectType<string>(await req.body.text());
+	tsd.expectType<Blob>(await req.body.blob());
 
 	// Assert `req.extend` usage
 	req.extend(async function () {}());

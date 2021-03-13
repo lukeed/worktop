@@ -21,15 +21,22 @@ export declare var STATUS_CODES : Record<string|number, string>;
 // worktop/request
 export interface ServerRequest {
 	url: string;
-	method: string;
 	path: string;
+	method: string;
 	hostname: string;
 	params: Params;
-	query: URLSearchParams;
 	search: string;
-	headers: Headers;
-	body<T>(): Promise<T>;
+	query: URLSearchParams;
 	extend: FetchEvent['waitUntil'];
+	headers: Headers;
+	body: {
+		<T>(): Promise<T|void>;
+		json<T=any>(): Promise<T>;
+		arrayBuffer(): Promise<ArrayBuffer>;
+		formData(): Promise<FormData>;
+		text(): Promise<string>;
+		blob(): Promise<Blob>;
+	};
 }
 
 // worktop/response
