@@ -33,7 +33,7 @@
  */
 export function request(event) {
 	const { request, waitUntil } = event;
-	const { url, method, headers } = request; // todo: cf
+	const { url, method, headers, cf } = request;
 	const { hostname, pathname, search, searchParams } = new URL(url);
 	const $body = body.bind(0, request, headers.get('content-type'));
 	// @ts-ignore - lol
@@ -43,8 +43,9 @@ export function request(event) {
 		url, method, headers,
 		hostname, path: pathname,
 		search, query: searchParams,
+		extend: waitUntil,
 		body: $body,
-		extend: waitUntil
+		cf: cf,
 	});
 }
 

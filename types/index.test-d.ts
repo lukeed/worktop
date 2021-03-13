@@ -1,7 +1,7 @@
 import * as tsd from 'tsd';
 import * as Cache from '../cache';
 import { reply, Router, ServerResponse, STATUS_CODES } from '..';
-import type { Route, FetchHandler, ServerRequest } from '..';
+import type { Route, FetchHandler, ServerRequest, IncomingCloudflareProperties } from '..';
 
 declare function addEventListener(type: 'fetch', handler: FetchHandler): void;
 
@@ -125,6 +125,18 @@ API.add('POST', '/items', async (req, res) => {
 	req.extend(async function () {}());
 	req.extend(fetch('/analytics'));
 	req.extend(function () {}());
+
+	// Assert `req.cf` properties
+	tsd.expectType<IncomingCloudflareProperties>(req.cf);
+	tsd.expectType<string>(req.cf.httpProtocol);
+	tsd.expectNotType<string>(req.cf.city);
+	tsd.expectType<string>(req.cf.asn);
+	// @ts-expect-error
+	tsd.expectType<string>(req.cf.country);
+	tsd.expectType<string|null>(req.cf.country);
+	// @ts-expect-error
+	tsd.expectError(req.cf.tlsClientAuth.certFingerprintSHA1);
+	tsd.expectType<string>(req.cf.tlsClientAuth!.certFingerprintSHA1);
 });
 
 // @ts-expect-error
