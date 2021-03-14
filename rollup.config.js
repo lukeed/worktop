@@ -1,6 +1,7 @@
-const Magic = require('magic-string').default;
-const pkg = require('./package.json');
+import { minify } from 'terser';
+import * as pkg from './package.json';
 
+/** @type {import('rollup').RollupOptions} */
 const commons = {
 	external: [
 		'worktop', 'worktop/cache',
@@ -10,7 +11,34 @@ const commons = {
 		moduleSideEffects: false,
 	},
 	plugins: [
-		comments()
+		{
+			name: 'terser',
+			async renderChunk(code) {
+				const output = await minify(code, {
+					module: true,
+					toplevel: true,
+					sourceMap: false,
+					mangle: true,
+					compress: {
+						ecma: 2020,
+						inline: 0,
+						drop_console: true,
+						conditionals: false,
+					},
+					output: {
+						beautify: true,
+						comments: false,
+						indent_level: 2,
+						ecma: 2020,
+					},
+				});
+
+				return {
+					code: output.code,
+					map: output.map
+				};
+			}
+		}
 	]
 };
 
@@ -26,34 +54,7 @@ function bundle(input, output) {
 	return { input, output, ...commons };
 }
 
-/** @returns {import('rollup').Plugin} */
-function comments(options={}) {
-	return {
-		name: 'comments',
-		transform(code, id) {
-			const comments = [];
-
-			// @ts-ignore https://github.com/Rich-Harris/magic-string/pull/183
-			const file = new Magic(code, { filename: id });
-
-			this.parse(code, {
-				ecmaVersion: 10,
-				sourceType: 'module',
-				onComment: comments,
-			});
-
-			// TODO: preserve "PURE" annotations
-			for (let i=0, tmp; i < comments.length; i++) {
-				tmp = comments[i];
-				file.remove(tmp.start, tmp.end).trim();
-			}
-
-			return file.trimLines().toString().replace(/(\r?\n){2,}/g, '\n');
-		}
-	}
-}
-
-module.exports = [
+export default [
 	bundle('src/index.js', pkg.exports['.']),
 	bundle('src/cache.js', pkg.exports['./cache']),
 ]
