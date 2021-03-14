@@ -10,7 +10,6 @@
     "email": "luke.edwards05@gmail.com",
     "url": "https://lukeed.com"
   },
-  "type": "module",
   "exports": {
     ".": "./router/index.mjs",
     "./cache": "./cache/index.mjs",

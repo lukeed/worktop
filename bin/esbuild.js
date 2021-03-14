@@ -2,9 +2,9 @@ const esbuild = require('esbuild');
 
 /** @type {esbuild.CommonOptions} */
 const options = {
-	treeShaking: true,
 	target: 'esnext',
 	sourcemap: false,
+	treeShaking: true,
 	minifySyntax: true,
 	minifyIdentifiers: true,
 	logLevel: 'info', // summary
@@ -22,6 +22,6 @@ exports.build = function (input, output, externals=[]) {
 		format: 'esm',
 		outfile: output,
 		entryPoints: [input],
-		external: externals
+		external: externals,
 	});
 }
