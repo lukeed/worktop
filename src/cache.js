@@ -1,23 +1,14 @@
 import * as utils from './utils';
 
-/** @type {Cache} */
+/** @type import('./cache').Cache */
 export const Cache = /** @type {*} */(caches).default;
 
-/**
- * @param {FetchEvent} event
- * @param {Request|string} [request]
- * @returns {Promise<Response|void>}
- */
+/** @type import('./cache').lookup */
 export function lookup(event, request) {
 	return Cache.match(request || event.request);
 }
 
-/**
- * @param {FetchEvent} event
- * @param {Response} res
- * @param {Request|string} [request]
- * @returns {Response}
- */
+/** @type import('./cache').save */
 export function save(event, res, request) {
 	const req = request || event.request;
 	const isGET = typeof req === 'string' || /^(GET|HEAD)$/.test(req.method);
