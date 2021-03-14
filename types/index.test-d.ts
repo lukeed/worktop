@@ -3,8 +3,6 @@ import * as Cache from '../cache';
 import { reply, Router, ServerResponse, STATUS_CODES } from '..';
 import type { Route, FetchHandler, ServerRequest, IncomingCloudflareProperties } from '..';
 
-declare function addEventListener(type: 'fetch', handler: FetchHandler): void;
-
 /**
  * WORKTOP/RESPONSE
  */

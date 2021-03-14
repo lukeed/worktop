@@ -131,6 +131,8 @@ export interface IncomingCloudflareProperties {
 }
 
 declare global {
+	function addEventListener(type: 'fetch', handler: FetchHandler): void;
+
 	interface Request {
 		cf: IncomingCloudflareProperties;
 	}
