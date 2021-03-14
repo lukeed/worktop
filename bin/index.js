@@ -10,6 +10,7 @@ const externals = [
 ];
 
 /**
+ * @TODO print sizes
  * @param {string} input
  * @param {string} output
  */
@@ -30,4 +31,4 @@ async function bundle(input, output) {
  * init
  */
 bundle('src/index.js', pkg.exports['.']);
-bundle('src/cache.js', pkg.exports['./cache']);
+bundle('src/cache.ts', pkg.exports['./cache']);
