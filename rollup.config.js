@@ -14,24 +14,15 @@ const commons = {
 	]
 };
 
-/**
- * @param {string} file
- * @param {'esm' | 'cjs'} format
- * @returns {import('rollup').OutputOptions}
- */
-const make = (file, format) => ({
-	file, format,
-	sourcemap: false,
-	esModule: false,
-	interop: false,
-	strict: false
-});
-
-function bundle(input, conds) {
-	let output = [
-		conds.import && make(conds.import, 'esm'),
-		conds.require && make(conds.require, 'cjs'),
-	];
+function bundle(input, output) {
+	output = {
+		file: output,
+		format: 'esm',
+		sourcemap: false,
+		esModule: false,
+		interop: false,
+		strict: false
+	};
 	return { input, output, ...commons };
 }
 

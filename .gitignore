@@ -3,5 +3,5 @@
 *-lock.*
 *.lock
 
-/build
 /cache
+/router
