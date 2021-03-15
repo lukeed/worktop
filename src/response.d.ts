@@ -1,3 +1,5 @@
+/// <reference lib="webworker" />
+
 export type FetchHandler = (event: FetchEvent) => void;
 export type ResponseHandler = (event: FetchEvent) => Promise<Response> | Response;
 export function reply(handler: ResponseHandler): FetchHandler;
