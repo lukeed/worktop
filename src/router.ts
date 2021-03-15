@@ -4,8 +4,8 @@ import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './status';
 import * as utils from './utils';
 
-import type { Handler, Params, ServerRequest } from '..';
-import type { Router as RR } from '..';
+import type { Handler, Params, ServerRequest } from 'worktop';
+import type { Router as RR } from 'worktop';
 
 interface Entry {
 	keys: string[];

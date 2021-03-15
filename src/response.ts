@@ -11,9 +11,6 @@ export function reply(handler: ResponseHandler): FetchHandler {
 	);
 }
 
-/**
- * @class
- */
 export function ServerResponse(this: Writable<SR>, method: string): SR {
 	var hh = this.headers = new Headers({
 		'Cache-Control': 'private, no-cache'

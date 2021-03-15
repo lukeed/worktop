@@ -31,6 +31,6 @@ async function bundle(input, output) {
 /**
  * init
  */
-bundle('src/index.js', pkg.exports['.']);
-bundle('src/cache.ts', pkg.exports['./cache']);
+bundle('src/router.ts', pkg.exports['.']);
 bundle('src/response.ts', pkg.exports['./response']);
+bundle('src/cache.ts', pkg.exports['./cache']);

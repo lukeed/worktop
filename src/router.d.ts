@@ -1,11 +1,17 @@
 /// <reference lib="webworker" />
 
+import type { ServerResponse, FetchHandler } from 'worktop/response';
+
 type Promisable<T> = Promise<T> | T;
 
-// worktop/router
+declare global {
+	function addEventListener(type: 'fetch', handler: FetchHandler): void;
+}
+
+export type Params = Record<string, string>;
 export type Route = { params: Params; handler: Handler | false };
 export type Handler = (req: ServerRequest, res: ServerResponse) => Promisable<Response|void>;
-export type Params = Record<string, string>;
+
 export declare class Router {
 	add(method: string, route: RegExp | string, handler: Handler): void;
 	find(method: string, pathname: string): Route;
@@ -16,7 +22,14 @@ export declare class Router {
 }
 
 // TODO?: worktop/status | worktop/errors
-export declare var STATUS_CODES : Record<string|number, string>;
+export declare var STATUS_CODES: Record<string|number, string>;
+
+// worktop/request
+declare global {
+	interface Request {
+		cf: IncomingCloudflareProperties;
+	}
+}
 
 /** @see https://developers.cloudflare.com/workers/runtime-apis/request#incomingrequestcfproperties */
 export interface IncomingCloudflareProperties {
@@ -130,15 +143,6 @@ export interface IncomingCloudflareProperties {
 	timezone?: string;
 }
 
-declare global {
-	function addEventListener(type: 'fetch', handler: FetchHandler): void;
-
-	interface Request {
-		cf: IncomingCloudflareProperties;
-	}
-}
-
-// worktop/request
 export interface ServerRequest {
 	url: string;
 	path: string;
