@@ -1,5 +1,3 @@
-import type { ServerRequest } from 'worktop';
-
 // /**
 //  * @template T
 //  * @typedef Dict<T>
@@ -23,31 +21,6 @@ import type { ServerRequest } from 'worktop';
 // 	}
 // 	return out;
 // }
-
-/**
- * @TODO Cast `query` as object again?
- **/
-export function request(event: FetchEvent): ServerRequest {
-	const { request, waitUntil } = event;
-	const { url, method, headers, cf } = request;
-	const { hostname, pathname, search, searchParams } = new URL(url);
-
-	// @ts-ignore - expects all properties upfront; this is
-	const $body: ServerRequest['body'] = body.bind(0, request, headers.get('content-type'));
-	$body.blob=request.blob; $body.text=request.text;
-	$body.arrayBuffer = request.arrayBuffer;
-	$body.formData = request.formData;
-	$body.json = request.json;
-
-	return {
-		url, method, headers,
-		hostname, path: pathname,
-		search, query: searchParams,
-		extend: waitUntil,
-		body: $body,
-		cf: cf,
-	} as ServerRequest;
-}
 
 /**
  * @TODO Cast `formData` to object again?

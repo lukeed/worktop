@@ -1,7 +1,10 @@
 import * as Cache from 'worktop/cache';
 import { Router, STATUS_CODES } from 'worktop';
-import { reply, ServerResponse, FetchHandler } from 'worktop/response';
-import type { Route, ServerRequest, IncomingCloudflareProperties } from 'worktop';
+import { reply, ServerResponse } from 'worktop/response';
+
+import type { ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
+import type { FetchHandler } from 'worktop/response';
+import type { Route } from 'worktop';
 
 declare function assert<T>(value: T): void;
 

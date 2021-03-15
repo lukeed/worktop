@@ -1,11 +1,11 @@
 import regexparam from 'regexparam';
 import * as Cache from 'worktop/cache';
+import { ServerRequest } from 'worktop/request';
 import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './internal/constants';
-import * as utils from './internal/utils';
 
-import type { Handler, Params, ServerRequest } from 'worktop';
-import type { Router as RR } from 'worktop';
+import type { Handler, Router as RR } from 'worktop';
+import type { Params } from 'worktop/request';
 
 export { STATUS_CODES };
 
@@ -87,7 +87,7 @@ export function Router(): RR {
 		},
 
 		async run(event) {
-			const req = utils.request(event);
+			const req = new ServerRequest(event);
 			const res = new ServerResponse(req.method);
 
 			// TODO: options.cors?
