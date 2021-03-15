@@ -1,9 +1,7 @@
 /**
  * Common Error Codes
- * @type {import('..').STATUS_CODES}
- * @note `require('http').STATUS_CODES`
  */
-export const STATUS_CODES = {
+export const STATUS_CODES: Record<string|number, string> = {
 	'400': 'Bad Request',
 	'401': 'Unauthorized',
 	'403': 'Forbidden',

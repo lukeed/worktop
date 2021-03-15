@@ -1,50 +1,33 @@
 import regexparam from 'regexparam';
 import * as Cache from 'worktop/cache';
-import { ServerResponse } from './response';
+import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './status';
 import * as utils from './utils';
 
-/**
- * @param {Function} fn
- * @param {import('..').ServerRequest} req
- * @param {import('..').ServerResponse} res
- * @param  {...any} args
- * @returns {Promise<Response>}
- */
-async function call(fn, req, res, ...args) {
+import type { Handler, Params, ServerRequest } from '..';
+import type { Router as RR } from '..';
+
+interface Entry {
+	keys: string[];
+	handler: Handler;
+}
+
+interface Branch {
+	__d: Map<RegExp, Entry>;
+	__s: Record<string, Entry>;
+}
+
+type Method = string;
+type Tree = Record<Method, Branch>;
+
+async function call(fn: Function, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response> {
 	const output = await fn(req, res, ...args);
 	if (output instanceof Response) return output;
 	return new Response(res.body, res);
 }
 
-/**
- * @typedef {import('..').Router} Router
- * @typedef {import('..').Handler} Handler
- * @typedef {import('..').Params} Params
- * @typedef {import('..').Route} Route
- */
-
-/**
- * @typedef Entry
- * @property {string[]} keys
- * @property {Handler} handler
- */
-
-/**
- * @typedef Branch
- * @property {Map<RegExp, Entry>} __d
- * @property {Record<string, Entry>} __s
- */
-
-/**
- * @typedef Tree
- * @type {Record<string, Branch>}
- */
-
-/** @returns {Router} */
-export function Router() {
-	/** @type {Router} */let $;
-	/** @type {Tree} */let tree={};
+export function Router(): RR {
+	let $: RR, tree: Tree = {};
 
 	return $ = {
 		add(method, route, handler) {
@@ -68,7 +51,7 @@ export function Router() {
 		},
 
 		find(method, pathname) {
-			/** @type {Params} */let params={};
+			let params: Params = {};
 			let tmp, dict, rgx, val, match;
 
 			if (dict = tree[method]) {
@@ -105,6 +88,7 @@ export function Router() {
 			const req = utils.request(event);
 			const res = new ServerResponse(req.method);
 
+			// TODO: options.cors?
 			if ($.prepare) await $.prepare(req, res);
 			if (res.finished) return new Response(res.body, res);
 
