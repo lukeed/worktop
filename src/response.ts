@@ -14,35 +14,35 @@ export function reply(handler: ResponseHandler): FetchHandler {
 }
 
 export function ServerResponse(this: Writable<SR>, method: string): SR {
-	var hh = this.headers = new Headers({
+	var $ = this, hh = $.headers = new Headers({
 		'Cache-Control': 'private, no-cache'
 	});
 
-	this.body = '';
-	this.finished = false;
-	this.status = this.statusCode = 200;
+	$.body = '';
+	$.finished = false;
+	$.status = $.statusCode = 200;
 
-	this.getHeaders = () => Object.fromEntries(hh);
-	this.getHeaderNames = () => [...hh.keys()];
+	$.getHeaders = () => Object.fromEntries(hh);
+	$.getHeaderNames = () => [...hh.keys()];
 
-	this.hasHeader = hh.has.bind(hh);
-	this.getHeader = hh.get.bind(hh);
-	this.removeHeader = hh.delete.bind(hh);
-	this.setHeader = hh.set.bind(hh);
+	$.hasHeader = hh.has.bind(hh);
+	$.getHeader = hh.get.bind(hh);
+	$.removeHeader = hh.delete.bind(hh);
+	$.setHeader = hh.set.bind(hh);
 
-	Object.defineProperty(this, 'status', {
-		set: (x: number) => { this.statusCode = x },
-		get: () => this.statusCode,
+	Object.defineProperty($, 'status', {
+		set: (x: number) => { $.statusCode = x },
+		get: () => $.statusCode,
 	});
 
-	this.end = (data) => {
-		if (this.finished) return;
-		this.finished = true;
-		this.body = data;
+	$.end = (data) => {
+		if ($.finished) return;
+		$.finished = true;
+		$.body = data;
 	}
 
-	this.writeHead = (code, heads) => {
-		this.statusCode = code;
+	$.writeHead = (code, heads) => {
+		$.statusCode = code;
 		for (let k in heads) {
 			hh.set(k, heads[k]);
 		}
@@ -52,11 +52,11 @@ export function ServerResponse(this: Writable<SR>, method: string): SR {
 	 * @TODO Remove / extract?
 	 * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
 	 */
-	this.send = (code, data, headers) => {
+	$.send = (code, data, headers) => {
 		let obj: HeadersObject = {};
 		for (let key in headers) obj[key.toLowerCase()] = headers[key];
-		let len = obj[CLENGTH] || this.getHeader(CLENGTH);
-		let type = obj[CTYPE] || this.getHeader(CTYPE);
+		let len = obj[CLENGTH] || $.getHeader(CLENGTH);
+		let type = obj[CTYPE] || $.getHeader(CTYPE);
 
 		if (data == null) {
 			data = '';
@@ -71,8 +71,8 @@ export function ServerResponse(this: Writable<SR>, method: string): SR {
 		);
 
 		if (code === 204 || code === 205 || code === 304) {
-			this.removeHeader(CLENGTH);
-			this.removeHeader(CTYPE);
+			$.removeHeader(CLENGTH);
+			$.removeHeader(CTYPE);
 			delete obj[CLENGTH];
 			delete obj[CTYPE];
 			data = null;
@@ -80,9 +80,9 @@ export function ServerResponse(this: Writable<SR>, method: string): SR {
 			data = null;
 		}
 
-		this.writeHead(code, obj);
-		this.end(data);
+		$.writeHead(code, obj);
+		$.end(data);
 	}
 
-	return this;
+	return $;
 }
