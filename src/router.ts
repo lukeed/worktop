@@ -7,6 +7,8 @@ import * as utils from './utils';
 import type { Handler, Params, ServerRequest } from 'worktop';
 import type { Router as RR } from 'worktop';
 
+export { STATUS_CODES };
+
 interface Entry {
 	keys: string[];
 	handler: Handler;
