@@ -19,7 +19,7 @@ async function bundle(input, output) {
 	await esbuild.build(input, output, externals);
 
 	let dts = input.replace(/\.[mc]?[tj]s$/, '.d.ts');
-	if (!existsSync(dts)) return console.warn('Missing "%s" file!', dts);
+	if (!existsSync(dts)) return console.warn('Missing "%s" file!', dts),process.exitCode=1;
 
 	let info = parse(input);
 	info.base = 'index.d.ts';
@@ -32,5 +32,5 @@ async function bundle(input, output) {
  * init
  */
 bundle('src/router.ts', pkg.exports['.']);
-bundle('src/response.ts', pkg.exports['./response']);
 bundle('src/cache.ts', pkg.exports['./cache']);
+bundle('src/response.ts', pkg.exports['./response']);
