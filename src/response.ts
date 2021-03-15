@@ -1,3 +1,5 @@
+import { CLENGTH, CTYPE } from './internal/constants';
+
 import type { FetchHandler, ResponseHandler } from 'worktop/response';
 import type { HeadersObject, ServerResponse as SR } from 'worktop/response';
 
@@ -53,8 +55,8 @@ export function ServerResponse(this: Writable<SR>, method: string): SR {
 	this.send = (code, data, headers) => {
 		let obj: HeadersObject = {};
 		for (let key in headers) obj[key.toLowerCase()] = headers[key];
-		let len = obj['content-length'] || this.getHeader('content-length');
-		let type = obj['content-type'] || this.getHeader('content-type');
+		let len = obj[CLENGTH] || this.getHeader(CLENGTH);
+		let type = obj[CTYPE] || this.getHeader(CTYPE);
 
 		if (data == null) {
 			data = '';
@@ -63,16 +65,16 @@ export function ServerResponse(this: Writable<SR>, method: string): SR {
 			type = type || 'application/json;charset=utf-8';
 		}
 
-		obj['content-type'] = type || 'text/plain';
-		obj['content-length'] = len || String(
+		obj[CTYPE] = type || 'text/plain';
+		obj[CLENGTH] = len || String(
 			data.byteLength || new TextEncoder().encode(data).byteLength
 		);
 
 		if (code === 204 || code === 205 || code === 304) {
-			this.removeHeader('content-length');
-			this.removeHeader('content-type');
-			delete obj['content-length'];
-			delete obj['content-type'];
+			this.removeHeader(CLENGTH);
+			this.removeHeader(CTYPE);
+			delete obj[CLENGTH];
+			delete obj[CTYPE];
 			data = null;
 		} else if (method === 'HEAD') {
 			data = null;

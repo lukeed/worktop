@@ -21,3 +21,9 @@ export const STATUS_CODES: Record<string|number, string> = {
 	'503': 'Service Unavailable',
 	'504': 'Gateway Timeout',
 };
+
+/**
+ * response header names
+ */
+export const CTYPE = 'content-type';
+export const CLENGTH = 'content-length';
