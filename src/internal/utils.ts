@@ -1,4 +1,4 @@
-import type { ServerRequest } from '..';
+import type { ServerRequest } from 'worktop';
 
 // /**
 //  * @template T

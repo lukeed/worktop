@@ -20,4 +20,4 @@ export const STATUS_CODES: Record<string|number, string> = {
 	'502': 'Bad Gateway',
 	'503': 'Service Unavailable',
 	'504': 'Gateway Timeout',
-}
+};

@@ -1,8 +1,8 @@
 import regexparam from 'regexparam';
 import * as Cache from 'worktop/cache';
 import { ServerResponse } from 'worktop/response';
-import { STATUS_CODES } from './status';
-import * as utils from './utils';
+import { STATUS_CODES } from './internal/constants';
+import * as utils from './internal/utils';
 
 import type { Handler, Params, ServerRequest } from 'worktop';
 import type { Router as RR } from 'worktop';

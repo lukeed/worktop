@@ -1,4 +1,4 @@
-import * as utils from './utils';
+import { isCachable } from './internal/utils';
 
 export const Cache: Cache = (caches as any).default;
 
@@ -10,7 +10,7 @@ export function save(event: FetchEvent, res: Response, request?: Request | strin
 	const req = request || event.request;
 	const isGET = typeof req === 'string' || /^(GET|HEAD)$/.test(req.method);
 
-	if (isGET && utils.isCachable(res)) {
+	if (isGET && isCachable(res)) {
 		event.waitUntil(Cache.put(req, res.clone()));
 	}
 
