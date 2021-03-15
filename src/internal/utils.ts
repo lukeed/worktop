@@ -59,19 +59,3 @@ export async function body<T=unknown>(req: Request, ctype: string | null): Promi
 	if (!!~ctype.indexOf('application/x-www-form-urlencoded')) return req.formData();
 	return !!~ctype.indexOf('text/') ? req.text() : req.arrayBuffer();
 }
-
-export function isCachable(res: Response): boolean {
-	if (res.status === 206) return false;
-
-	const vary = res.headers.get('Vary') || '';
-	if (!!~vary.indexOf('*')) return false;
-
-	const ccontrol = res.headers.get('Cache-Control') || '';
-	if (/(private|no-cache|no-store)/i.test(ccontrol)) return false;
-
-	if (res.headers.has('Set-Cookie')) {
-		res.headers.append('Cache-Control', 'private=Set-Cookie');
-	}
-
-	return true;
-}

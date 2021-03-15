@@ -17,7 +17,7 @@
     "paths": {
       "worktop": ["./router.d.ts", "./router.ts"],
       "worktop/cache": ["./cache.d.ts", "./cache.ts"],
-      "worktop/response": ["./response.d.ts", "./response.ts"]
+      "worktop/response": ["./response.d.ts", "./response.ts"],
     }
   },
   "include": [
