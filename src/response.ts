@@ -1,31 +1,20 @@
-/**
- * @param {import('..').ResponseHandler} handler
- * @returns {import('..').FetchHandler}
- */
-export function reply(handler) {
-	return function (event) {
-		event.respondWith(
-			handler(event)
-		);
-	};
+import type { FetchHandler, ResponseHandler } from 'worktop/response';
+import type { HeadersObject, ServerResponse as SR } from 'worktop/response';
+
+type Writable<T> = {
+	-readonly [P in keyof T]: T[P]
+};
+
+export function reply(handler: ResponseHandler): FetchHandler {
+	return event => event.respondWith(
+		handler(event)
+	);
 }
 
 /**
- * @template T
- * @typedef Writable<T>
- * @type {{ -readonly [P in keyof T]: T[P] }}
+ * @class
  */
-
-/**
- * @typedef {import('..').ServerResponse} SR
- */
-
-/**
- * @this {Writable<SR>}
- * @param {string} method
- * @returns {SR}
- */
-export function ServerResponse(method) {
+export function ServerResponse(this: Writable<SR>, method: string): SR {
 	var hh = this.headers = new Headers({
 		'Cache-Control': 'private, no-cache'
 	});
@@ -43,19 +32,16 @@ export function ServerResponse(method) {
 	this.setHeader = hh.set.bind(hh);
 
 	Object.defineProperty(this, 'status', {
-		/** @param {number} x */
-		set: x => { this.statusCode = x },
+		set: (x: number) => { this.statusCode = x },
 		get: () => this.statusCode,
 	});
 
-	/** @type {SR['end']} */
 	this.end = (data) => {
 		if (this.finished) return;
 		this.finished = true;
 		this.body = data;
 	}
 
-	/** @type {SR['writeHead']} */
 	this.writeHead = (code, heads) => {
 		this.statusCode = code;
 		for (let k in heads) {
@@ -64,12 +50,11 @@ export function ServerResponse(method) {
 	}
 
 	/**
-	 * @type {SR['send']}
 	 * @TODO Remove / extract?
 	 * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
 	 */
 	this.send = (code, data, headers) => {
-		/** @type {Record<string,string>} */let obj={};
+		let obj: HeadersObject = {};
 		for (let key in headers) obj[key.toLowerCase()] = headers[key];
 		let len = obj['content-length'] || this.getHeader('content-length');
 		let type = obj['content-type'] || this.getHeader('content-type');

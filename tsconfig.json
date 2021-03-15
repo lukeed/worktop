@@ -16,7 +16,8 @@
     "baseUrl": "./src",
     "paths": {
       "worktop": ["./index.js"],
-      "worktop/cache": ["./cache.js"]
+      "worktop/cache": ["./cache.d.ts", "./cache.ts"],
+      "worktop/response": ["./response.d.ts", "./response.ts"]
     }
   },
   "include": [

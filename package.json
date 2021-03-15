@@ -13,10 +13,12 @@
   "exports": {
     ".": "./router/index.mjs",
     "./cache": "./cache/index.mjs",
+    "./response": "./response/index.mjs",
     "./package.json": "./package.json"
   },
   "files": [
     "*.d.ts",
+    "response",
     "router",
     "cache"
   ],

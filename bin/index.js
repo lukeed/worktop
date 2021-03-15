@@ -6,6 +6,7 @@ const esbuild = require('./esbuild');
 const externals = [
 	'worktop',
 	'worktop/cache',
+	'worktop/response',
 	...Object.keys(pkg.dependencies)
 ];
 
@@ -32,3 +33,4 @@ async function bundle(input, output) {
  */
 bundle('src/index.js', pkg.exports['.']);
 bundle('src/cache.ts', pkg.exports['./cache']);
+bundle('src/response.ts', pkg.exports['./response']);
