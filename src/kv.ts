@@ -21,7 +21,7 @@ export function read<T>(binding: KV.Namespace, key: string, format: KV.GetOption
 }
 
 export function write<T=any>(binding: KV.Namespace, key: string, value: T, toJSON?: boolean): Promise<boolean> {
-	return binding.put(key, (!toJSON && (typeof value === 'string' || value instanceof ArrayBuffer || value instanceof ReadableStream)) ? value : JSON.stringify(value)).then(() => true, () => false);
+	return binding.put(key, (!toJSON && typeof value === 'string') || value instanceof ArrayBuffer || value instanceof ReadableStream ? value : JSON.stringify(value)).then(() => true, () => false);
 }
 
 export function remove(binding: KV.Namespace, key: string): Promise<boolean> {
