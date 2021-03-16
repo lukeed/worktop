@@ -3,17 +3,17 @@
 </div>
 
 <div align="center">
-  <a href="https://npmjs.org/package/kleur">
-    <img src="https://badgen.now.sh/npm/v/kleur" alt="version" />
+  <a href="https://npmjs.org/package/worktop">
+    <img src="https://badgen.now.sh/npm/v/worktop" alt="version" />
   </a>
-  <a href="https://github.com/lukeed/kleur/actions?query=workflow%3ACI">
-    <img src="https://github.com/lukeed/kleur/workflows/CI/badge.svg?event=push" alt="CI" />
+  <a href="https://github.com/lukeed/worktop/actions?query=workflow%3ACI">
+    <img src="https://github.com/lukeed/worktop/workflows/CI/badge.svg?event=push" alt="CI" />
   </a>
-  <a href="https://npmjs.org/package/kleur">
-    <img src="https://badgen.now.sh/npm/dm/kleur" alt="downloads" />
+  <a href="https://npmjs.org/package/worktop">
+    <img src="https://badgen.now.sh/npm/dm/worktop" alt="downloads" />
   </a>
-  <a href="https://packagephobia.now.sh/result?p=kleur">
-    <img src="https://packagephobia.now.sh/badge?p=kleur" alt="install size" />
+  <a href="https://packagephobia.now.sh/result?p=worktop">
+    <img src="https://packagephobia.now.sh/badge?p=worktop" alt="install size" />
   </a>
 </div>
 
