@@ -25,3 +25,15 @@ exports.build = function (input, output, externals=[]) {
 		external: externals,
 	});
 }
+
+/**
+ * @param {string} source
+ * @param {esbuild.TransformOptions} [overrides]
+ */
+exports.transform = function (source, overrides={}) {
+	return esbuild.transformSync(source, {
+		...options,
+		format: 'cjs',
+		...overrides
+	});
+}
