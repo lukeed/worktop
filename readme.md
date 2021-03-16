@@ -61,64 +61,64 @@ const API = new Router();
 
 
 API.add('GET', '/messages/:id', async (req, res) => {
-	// Pre-parsed `req.params` object
-	const key = `messages::${req.params.id}`;
+  // Pre-parsed `req.params` object
+  const key = `messages::${req.params.id}`;
 
-	// Assumes JSON (can override)
-	const message = await read<Message>(DATA, key);
+  // Assumes JSON (can override)
+  const message = await read<Message>(DATA, key);
 
-	// Alter response headers directly
-	res.setHeader('Cache-Control', 'public, max-age=60');
+  // Alter response headers directly
+  res.setHeader('Cache-Control', 'public, max-age=60');
 
-	// Smart `res.send()` helper
-	// ~> automatically stringifies JSON objects
-	// ~> auto-sets `Content-Type` & `Content-Length` headers
-	res.send(200, message);
+  // Smart `res.send()` helper
+  // ~> automatically stringifies JSON objects
+  // ~> auto-sets `Content-Type` & `Content-Length` headers
+  res.send(200, message);
 });
 
 
 API.add('POST', '/messages', async (req, res) => {
-	try {
-		// Smart `req.body` helper
-		// ~> parses JSON header as JSON
-		// ~> parses form-like header as FormData, ...etc
-		var input = await req.body<Message>();
-	} catch (err) {
-		return res.send(400, 'Error parsing request body');
-	}
+  try {
+    // Smart `req.body` helper
+    // ~> parses JSON header as JSON
+    // ~> parses form-like header as FormData, ...etc
+    var input = await req.body<Message>();
+  } catch (err) {
+    return res.send(400, 'Error parsing request body');
+  }
 
-	if (!input || !input.text.trim()) {
-		return res.send(422, { text: 'required' });
-	}
+  if (!input || !input.text.trim()) {
+    return res.send(422, { text: 'required' });
+  }
 
-	const value: Message = {
-		id: toUID(16),
-		text: input.text.trim(),
-		// ...
-	};
+  const value: Message = {
+    id: toUID(16),
+    text: input.text.trim(),
+    // ...
+  };
 
-	// Assumes JSON (can override)
-	const key = `messages::${value.id}`;
-	const success = await write<Message>(DATA, key, value);
-	//    ^ boolean
+  // Assumes JSON (can override)
+  const key = `messages::${value.id}`;
+  const success = await write<Message>(DATA, key, value);
+  //    ^ boolean
 
-	// Alias for `event.waitUntil`
-	// ~> setup background task (does NOT delay response)
-	req.extend(
-		fetch('https://.../logs', {
-			method: 'POST',
-			headers: { 'content-type': 'application/json '},
-			body: JSON.stringify({ success, value })
-		})
-	);
+  // Alias for `event.waitUntil`
+  // ~> setup background task (does NOT delay response)
+  req.extend(
+    fetch('https://.../logs', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json '},
+      body: JSON.stringify({ success, value })
+    })
+  );
 
-	if (success) res.send(201, value);
-	else res.send(500, 'Error creating record');
+  if (success) res.send(201, value);
+  else res.send(500, 'Error creating record');
 });
 
 
 API.add('GET', '/alive', (req, res) => {
-	res.end('OK'); // Node.js-like `res.end`
+  res.end('OK'); // Node.js-like `res.end`
 });
 
 
