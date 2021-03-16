@@ -1,6 +1,6 @@
 import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
-import * as KV from '../src/kv';
+import * as KV from './kv';
 
 const Namespace = () => ({}) as any;
 const Mock = (x?: any) => {
