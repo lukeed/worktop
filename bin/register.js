@@ -7,6 +7,7 @@ require.extensions['.ts'] = function (Module, filename) {
 
 	Module._compile = source => {
 		const { code, warnings } = transform(source, {
+			banner: 'globalThis.caches = { default: {} };',
 			sourcefile: filename,
 			loader: 'ts',
 		});
