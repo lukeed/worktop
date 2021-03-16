@@ -12,7 +12,7 @@ const Mock = (x?: any) => {
 // @ts-ignore - just for instanceof check
 globalThis.ReadableStream = class ReadableStream {}
 
-const read = suite('$.read');
+const read = suite('read');
 
 read('should be a function', () => {
 	assert.type(KV.read, 'function');
@@ -33,7 +33,7 @@ read.run();
 
 // ---
 
-const write = suite('$.write');
+const write = suite('write');
 
 write('should be a function', () => {
 	assert.type(KV.write, 'function');
@@ -132,7 +132,7 @@ write.run();
 
 // ---
 
-const remove = suite('$.remove');
+const remove = suite('remove');
 
 remove('should be a function', () => {
 	assert.type(KV.remove, 'function');
@@ -163,7 +163,7 @@ remove.run();
 
 // ---
 
-const Database = suite('$.Database');
+const Database = suite('Database');
 
 Database('should be a function', () => {
 	assert.type(KV.Database, 'function');
@@ -277,7 +277,7 @@ Database.run();
 
 // ---
 
-const until = suite('$.until');
+const until = suite('until');
 
 until('should be a function', () => {
 	assert.type(KV.until, 'function');
