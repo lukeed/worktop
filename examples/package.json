@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "cfw build",
+    "deploy": "cfw deploy"
+  },
+  "devDependencies": {
+    "cfw": "0.0.10",
+    "rollup-plugin-typescript2": "0.30.0",
+    "worktop": "0.0.5"
+  }
+}

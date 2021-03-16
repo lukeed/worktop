@@ -24,7 +24,8 @@
   },
   "include": [
     "src/**/*",
-    "types/**/*"
+    "types/**/*",
+    "examples/workers/**/*"
   ],
   "exclude": [
     "node_modules"
