@@ -25,7 +25,7 @@
 * First-class TypeScript support
 * Custom Middleware Support<sup>*</sup>
 * Well-organized submodules for à la carte functionality<sup>*</sup>
-* Includes Router with all pattern definitions
+* Includes Router with support for pattern definitions
 * Familiar Request-Response handler API
 * Supports `async`/`await` handlers
 * Fully treeshakable
@@ -103,7 +103,7 @@ API.add('POST', '/messages', async (req, res) => {
   //    ^ boolean
 
   // Alias for `event.waitUntil`
-  // ~> setup background task (does NOT delay response)
+  // ~> queues background task (does NOT delay response)
   req.extend(
     fetch('https://.../logs', {
       method: 'POST',
@@ -134,7 +134,7 @@ addEventListener('fetch', API.listen);
 > [View `worktop` API documentation](/src/router.d.ts)
 <!-- > [View `worktop` API documentation](/docs/module.router.md) -->
 
-The main module – focused on routing. <br>This is core of most applications. Exports the `Router` class.
+The main module – concerned with routing. <br>This is core of most applications. Exports the [`Router`](/src/router.d.ts#L15) class.
 
 ### Module: `worktop/kv`
 
@@ -155,7 +155,7 @@ The `worktop/cache` submodule contains all utilities related to [Cloudflare's Ca
 > [View `worktop/request` API documentation](/src/request.d.ts)
 <!-- > [View `worktop/request` API documentation](/docs/module.request.md) -->
 
-The `worktop/request` submodule contains the `ServerRequest` class, which provides an interface similar to the request instance(s) found in most other Node.js frameworks.
+The `worktop/request` submodule contains the [`ServerRequest`](/src/request.d.ts#L123) class, which provides an interface similar to the request instance(s) found in most other Node.js frameworks.
 
 > **Note:** This module is used internally and will (very likely) never be imported by your application.
 
@@ -164,7 +164,7 @@ The `worktop/request` submodule contains the `ServerRequest` class, which provid
 > [View `worktop/response` API documentation](/src/response.d.ts)
 <!-- > [View `worktop/response` API documentation](/docs/module.response.md) -->
 
-The `worktop/response` submodule contains the `ServerResponse` class, which provides an interface similar to the [`IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) (aka, "response") object that Node.js provides.
+The `worktop/response` submodule contains the [`ServerResponse`](/src/response.d.ts#L9) class, which provides an interface similar to the [`IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) (aka, "response") object that Node.js provides.
 
 > **Note:** This module is used internally and will (very likely) never be imported by your application.
 
