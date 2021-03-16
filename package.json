@@ -31,7 +31,7 @@
   },
   "scripts": {
     "build": "node bin",
-    "test": "uvu -r ./bin/register tests",
+    "test": "uvu src \".test.ts$\" -r ./bin/register",
     "types": "tsc"
   },
   "dependencies": {
