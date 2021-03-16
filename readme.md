@@ -17,7 +17,7 @@
   </a>
 </div>
 
-<div align="center">TODO</div>
+<div align="center">The next generation web framework for Cloudflare Workers</div>
 
 ## Features
 
