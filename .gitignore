@@ -3,6 +3,7 @@ node_modules
 *-lock.*
 *.lock
 
+/kv
 /cache
 /router
 /request

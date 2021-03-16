@@ -1,7 +1,9 @@
 import * as Cache from 'worktop/cache';
+import { Database, until } from 'worktop/kv';
 import { Router, STATUS_CODES } from 'worktop';
 import { reply, ServerResponse } from 'worktop/response';
 
+import type { KV } from 'worktop/kv';
 import type { ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
 import type { FetchHandler } from 'worktop/response';
 import type { Route } from 'worktop';
@@ -214,3 +216,66 @@ reply(event => {
 	// ignore me
 	return fetch(event.request);
 });
+
+
+/**
+ * WORKTOP/KV
+ */
+
+declare namespace Fixed {
+	type String<N extends number> = { 0: string; length: N } & string;
+}
+
+interface IUser {
+	id: string;
+	name: string;
+	age: number;
+}
+
+interface IApp {
+	uid: Fixed.String<11>;
+	name: string;
+}
+
+interface Models {
+	user: IUser;
+	app: IApp;
+}
+
+interface Identifiers {
+	user: IUser['id'];
+	app: IApp['uid'];
+}
+
+declare const APPS: KV.Namespace;
+declare const len11: Fixed.String<11>;
+declare function toUID(): Fixed.String<11>;
+
+const DB1 = new Database<Models>(APPS);
+const DB2 = new Database<Models, Identifiers>(APPS);
+
+async function storage() {
+	// @ts-expect-error - number
+	await DB1.get('user', 1235678);
+
+	// @ts-expect-error - not fixed string
+	await DB2.get('app', 'asd'); // DB2 is explicit
+	await DB2.get('app', len11);
+	await DB1.get('app', 'asd'); // DB1 is guessing
+
+	assert<IUser|false>(await DB1.get('user', 'id'));
+	assert<IApp|false>(await DB2.get('app', len11));
+
+	let user: IUser = {
+		id: 'asd',
+		name: 'foobar',
+		age: 123
+	};
+
+	assert<boolean>(await DB1.put('user', user.id, user, true));
+	assert<boolean>(await DB1.put('user', user.id, user));
+	assert<boolean>(await DB1.del('user', user.id));
+
+	const lookup = (uid: Fixed.String<11>) => DB2.get('app', uid);
+	assert<Fixed.String<11>>(await until(toUID, lookup));
+}

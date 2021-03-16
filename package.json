@@ -12,6 +12,7 @@
   },
   "exports": {
     ".": "./router/index.mjs",
+    "./kv": "./kv/index.mjs",
     "./cache": "./cache/index.mjs",
     "./request": "./request/index.mjs",
     "./response": "./response/index.mjs",
@@ -22,7 +23,8 @@
     "response",
     "request",
     "router",
-    "cache"
+    "cache",
+    "kv"
   ],
   "engines": {
     "node": ">=12"
