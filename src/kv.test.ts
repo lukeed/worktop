@@ -60,7 +60,7 @@ write('should return `false` instead of throwing', async () => {
 	assert.is(await KV.write(binding, 'foobar', 'value'), false);
 });
 
-write('should force `JSON.stringify` on value :: param', async () => {
+write('should force `JSON.stringify` on value :: param=true', async () => {
 	let binding = Namespace();
 	binding.put = Mock();
 
@@ -101,7 +101,7 @@ write('should skip `JSON.stringify` :: ReadableStream', async () => {
 	assert.equal(binding.put.args(), ['foobar', item]);
 });
 
-write.skip('should ignore `JSON.stringify` :: ReadableStream', async () => {
+write('should ignore `JSON.stringify` :: ReadableStream', async () => {
 	let binding = Namespace();
 	binding.put = Mock();
 
@@ -119,7 +119,7 @@ write('should skip `JSON.stringify` :: ArrayBuffer', async () => {
 	assert.equal(binding.put.args(), ['foobar', item]);
 });
 
-write.skip('should ignore `JSON.stringify` :: ArrayBuffer', async () => {
+write('should ignore `JSON.stringify` :: ArrayBuffer', async () => {
 	let binding = Namespace();
 	binding.put = Mock();
 
