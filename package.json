@@ -2,6 +2,7 @@
   "name": "worktop",
   "version": "0.0.5",
   "repository": "lukeed/worktop",
+  "description": "The next generation web framework for Cloudflare Workers",
   "types": "router/index.d.ts",
   "main": "router/index.mjs",
   "license": "MIT",
@@ -19,7 +20,6 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "*.d.ts",
     "response",
     "request",
     "router",
@@ -41,5 +41,14 @@
     "@types/node": "14.14.34",
     "typescript": "4.2.3",
     "uvu": "0.5.1"
-  }
+  },
+  "keywords": [
+    "serviceworker",
+    "cloudflare",
+    "framework",
+    "workers",
+    "worker",
+    "http",
+    "api"
+  ]
 }
