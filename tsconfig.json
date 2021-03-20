@@ -19,6 +19,7 @@
       "worktop/cache": ["./cache.d.ts", "./cache.ts"],
       "worktop/request": ["./request.d.ts", "./request.ts"],
       "worktop/response": ["./response.d.ts", "./response.ts"],
+      "worktop/utils": ["./utils.d.ts", "./utils.ts"],
       "worktop/kv": ["./kv.d.ts", "./kv.js"],
     }
   },
