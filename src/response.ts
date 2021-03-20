@@ -1,3 +1,4 @@
+import { byteLength } from 'worktop/utils';
 import { CLENGTH, CTYPE } from './internal/constants';
 
 import type { FetchHandler, ResponseHandler } from 'worktop/response';
@@ -67,7 +68,7 @@ export function ServerResponse(this: Writable<SR>, method: string): SR {
 
 		obj[CTYPE] = type || 'text/plain';
 		obj[CLENGTH] = len || String(
-			data.byteLength || new TextEncoder().encode(data).byteLength
+			data.byteLength || byteLength(data)
 		);
 
 		if (code === 204 || code === 205 || code === 304) {
