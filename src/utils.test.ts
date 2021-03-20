@@ -15,6 +15,56 @@ globalThis.crypto = {
 
 // ---
 
+// ---
+
+// https://github.com/lukeed/uid/blob/master/test/secure.js
+const uid = suite('uid');
+
+uid('should be a function', () => {
+	assert.type(utils.uid, 'function');
+});
+
+uid('should return 11-character string (default)', () => {
+	let output = utils.uid();
+	assert.type(output, 'string');
+	assert.is(output.length, 11);
+});
+
+uid('length :: 4', () => {
+	let i=0, tmp;
+	for (; i < 1e3; i++) {
+		tmp = utils.uid(4);
+		assert.is(tmp.length, 4, `"${tmp}" is not 4 characters!`);
+	}
+});
+
+uid('length :: 5', () => {
+	let i=0, tmp;
+	for (; i < 1e3; i++) {
+		tmp = utils.uid(5);
+		assert.is(tmp.length, 5, `"${tmp}" is not 5 characters!`);
+	}
+});
+
+uid('length :: 6', () => {
+	let i=0, tmp;
+	for (; i < 1e3; i++) {
+		tmp = utils.uid(6);
+		assert.is(tmp.length, 6, `"${tmp}" is not 6 characters!`);
+	}
+});
+
+uid('unique', () => {
+	let items = new Set();
+	for (let i=1e6; i--;) items.add(utils.uid());
+	assert.is(items.size, 1e6, '~> 1,000,000 uniques');
+});
+
+uid.run();
+
+// ---
+
+// https://github.com/lukeed/uuid/blob/master/test/secure.js
 const uuid = suite('uuid');
 
 uuid('exports', () => {
