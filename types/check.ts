@@ -2,7 +2,7 @@ import * as Cache from 'worktop/cache';
 import { Database, until } from 'worktop/kv';
 import { Router, STATUS_CODES } from 'worktop';
 import { reply, ServerResponse } from 'worktop/response';
-import { HEX, uid, uuid } from 'worktop/utils';
+import { byteLength, HEX, uid, uuid } from 'worktop/utils';
 
 import type { KV } from 'worktop/kv';
 import type { ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
@@ -296,3 +296,9 @@ assert<string>(uid());
 
 assert<Function>(uuid);
 assert<string>(uuid());
+
+assert<Function>(byteLength);
+assert<number>(byteLength(undefined));
+assert<number>(byteLength('hello'));
+assert<number>(byteLength(''));
+assert<number>(byteLength());

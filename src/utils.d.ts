@@ -16,3 +16,9 @@ export function uid(len?: number): string;
  * @NOTE Relies on `crypto` to produce cryptographically secure (CSPRNG) values.
  */
 export function uuid(): string;
+
+/**
+ * Calculate the length (in bytes) of an input string.
+ * @param {string} [input]
+ */
+export function byteLength(input?: string): number;

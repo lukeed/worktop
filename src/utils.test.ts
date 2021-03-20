@@ -113,3 +113,31 @@ uuid('validate', () => {
 });
 
 uuid.run();
+
+// ---
+
+const byteLength = suite('byteLength');
+
+byteLength('should be a function', () => {
+	assert.type(utils.byteLength, 'function');
+});
+
+byteLength('should return 0 for empty inputs', () => {
+	assert.is(utils.byteLength(), 0);
+	assert.is(utils.byteLength(undefined), 0);
+	assert.is(utils.byteLength(''), 0);
+});
+
+byteLength('should return 0 for empty inputs', () => {
+	assert.is(utils.byteLength(), 0);
+	assert.is(utils.byteLength(undefined), 0);
+	assert.is(utils.byteLength(''), 0);
+});
+
+byteLength('should return the correct value', () => {
+	assert.is(utils.byteLength('1'), 1);
+	assert.is(utils.byteLength('123'), 3);
+	assert.is(utils.byteLength('🙌🏼'), 8);
+});
+
+byteLength.run();
