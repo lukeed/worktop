@@ -15,6 +15,29 @@ globalThis.crypto = {
 
 // ---
 
+const HEX = suite('HEX');
+
+HEX('should be an Array', () => {
+	assert.instance(utils.HEX, Array);
+});
+
+HEX('should have 256 values', () => {
+	assert.is(utils.HEX.length, 256);
+});
+
+HEX('should have correct values', () => {
+	assert.is(utils.HEX[0], '00');
+	assert.is(utils.HEX[10], '0a');
+	assert.is(utils.HEX[255], 'ff');
+	assert.is(utils.HEX[256], undefined);
+
+	for (let i = 0; i < 256; i++) {
+		assert.is(utils.HEX[i], i.toString(16).padStart(2, '0'));
+	}
+});
+
+HEX.run();
+
 // ---
 
 // https://github.com/lukeed/uid/blob/master/test/secure.js
