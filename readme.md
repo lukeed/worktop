@@ -44,7 +44,7 @@ $ npm install --save worktop
 
 ```ts
 import { Router } from 'worktop';
-import { uid as toUID } from 'uid';
+import { uid as toUID } from 'worktop/utils';
 import { read, write } from 'worktop/kv';
 import type { KV } from 'worktop/kv';
 
