@@ -2,7 +2,7 @@
  * All 256 hexadecimal pairs
  * @NOTE Maximum index is `255`
  */
-export const HEX: string[];
+export const HEX: readonly string[];
 
 /**
  * Generate a unique string of `len` length.
