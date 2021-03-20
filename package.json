@@ -17,13 +17,15 @@
     "./cache": "./cache/index.mjs",
     "./request": "./request/index.mjs",
     "./response": "./response/index.mjs",
+    "./utils": "./utils/index.mjs",
     "./package.json": "./package.json"
   },
   "files": [
-    "response",
-    "request",
-    "router",
     "cache",
+    "request",
+    "response",
+    "router",
+    "utils",
     "kv"
   ],
   "engines": {

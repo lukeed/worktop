@@ -35,4 +35,5 @@ bundle('src/router.ts', pkg.exports['.']);
 bundle('src/cache.ts', pkg.exports['./cache']);
 bundle('src/request.ts', pkg.exports['./request']);
 bundle('src/response.ts', pkg.exports['./response']);
+bundle('src/utils.ts', pkg.exports['./utils']);
 bundle('src/kv.ts', pkg.exports['./kv']);
