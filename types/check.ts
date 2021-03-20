@@ -2,6 +2,7 @@ import * as Cache from 'worktop/cache';
 import { Database, until } from 'worktop/kv';
 import { Router, STATUS_CODES } from 'worktop';
 import { reply, ServerResponse } from 'worktop/response';
+import { HEX, uid, uuid } from 'worktop/utils';
 
 import type { KV } from 'worktop/kv';
 import type { ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
@@ -279,3 +280,19 @@ async function storage() {
 	const lookup = (uid: Fixed.String<11>) => DB2.get('app', uid);
 	assert<Fixed.String<11>>(await until(toUID, lookup));
 }
+
+/**
+ * WORKTOP/UTILS
+ */
+// @ts-expect-error
+HEX.push('hello', 'world');
+// @ts-expect-error
+HEX[10] = 'cannot do this';
+assert<readonly string[]>(HEX);
+
+assert<Function>(uid);
+assert<string>(uid(24));
+assert<string>(uid());
+
+assert<Function>(uuid);
+assert<string>(uuid());
