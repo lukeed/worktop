@@ -1,5 +1,5 @@
 import * as DB from 'worktop/kv';
-import { uid as toUID } from 'uid';
+import { uid as toUID } from 'worktop/utils';
 import type { KV } from 'worktop/kv';
 
 declare const TODOS: KV.Namespace;

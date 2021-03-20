@@ -7,7 +7,6 @@
   "devDependencies": {
     "cfw": "0.0.10",
     "rollup-plugin-typescript2": "0.30.0",
-    "uid": "2.0.0",
-    "worktop": "0.0.5"
+    "worktop": "latest"
   }
 }
