@@ -168,6 +168,13 @@ The `worktop/response` submodule contains the [`ServerResponse`](/src/response.d
 
 > **Note:** This module is used internally and will (very likely) never be imported by your application.
 
+### Module: `worktop/utils`
+
+> [View `worktop/utils` API documentation](/src/utils.d.ts)
+<!-- > [View `worktop/utils` API documentation](/docs/module.utils.md) -->
+
+The `worktop/utils` submodule is a collection of standalone utilities that you may find useful. These may include – but are not limited to – hashing functions and unique identifier generators.
+
 
 ## License
 
