@@ -23,3 +23,7 @@ export function uuid(): string {
 
 	return str;
 }
+
+export function byteLength(input?: string): number {
+	return input ? new TextEncoder().encode(input).byteLength : 0;
+}
