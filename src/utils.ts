@@ -24,6 +24,7 @@ export function uuid(): string {
 	return str;
 }
 
+// TODO: lift & reuse `new TextEncoder`
 export function byteLength(input?: string): number {
 	return input ? new TextEncoder().encode(input).byteLength : 0;
 }
