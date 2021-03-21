@@ -15,6 +15,7 @@
     ".": "./router/index.mjs",
     "./kv": "./kv/index.mjs",
     "./cache": "./cache/index.mjs",
+    "./crypto": "./crypto/index.mjs",
     "./request": "./request/index.mjs",
     "./response": "./response/index.mjs",
     "./utils": "./utils/index.mjs",
@@ -22,6 +23,7 @@
   },
   "files": [
     "cache",
+    "crypto",
     "request",
     "response",
     "router",

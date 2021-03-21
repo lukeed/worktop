@@ -5,6 +5,7 @@ node_modules
 
 /kv
 /cache
+/crypto
 /router
 /request
 /response
