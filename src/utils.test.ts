@@ -40,6 +40,28 @@ HEX.run();
 
 // ---
 
+const toHEX = suite('toHEX');
+
+toHEX('should be a function', () => {
+	assert.type(utils.toHEX, 'function');
+});
+
+toHEX('should return a string', () => {
+	const input = new Uint8Array;
+	assert.type(utils.toHEX(input), 'string');
+	assert.type(utils.toHEX(input.buffer), 'string');
+});
+
+toHEX('should convert input HEX string', () => {
+	const input = utils.encode('hello world');
+	assert.is(utils.toHEX(input), '68656c6c6f20776f726c64');
+	assert.is(utils.toHEX(input.buffer), '68656c6c6f20776f726c64');
+});
+
+toHEX.run();
+
+// ---
+
 // https://github.com/lukeed/uid/blob/master/test/secure.js
 const uid = suite('uid');
 

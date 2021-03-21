@@ -5,6 +5,12 @@
 export const HEX: readonly string[];
 
 /**
+ * Convert an `ArrayBuffer` to a hexadecimal string.
+ * @param {ArrayBuffer} input
+ */
+export function toHEX(input: ArrayBuffer): string;
+
+/**
  * Generate a unique string of `len` length.
  * @NOTE Relies on `crypto` to produce cryptographically secure (CSPRNG) values.
  * @param {number} [len] The desired length (defaults to `11`)
