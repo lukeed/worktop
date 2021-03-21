@@ -24,8 +24,23 @@ export const Encoder: TextEncoder;
 
 /**
  * Reusable `TextDecoder` instance.
+ * @NOTE Initialized with UTF-8 encoding.
  */
 export const Decoder: TextDecoder;
+
+/**
+ * Encode a string as an `Uint8Array` containing UTF-8 encoded text.
+ * @param {string} input
+ */
+export function encode(input: string): Uint8Array;
+
+/**
+ * Decode a string from an `ArrayBuffer` or an `ArrayBufferView` input.
+ * @param {string} input
+ * @param {boolean} [isStream] Additional data will follow in subsequent calls to decode.
+ */
+export function decode(input: ArrayBufferView | ArrayBuffer, isStream?: boolean): string;
+
 
 /**
  * Calculate the length (in bytes) of an input string.
