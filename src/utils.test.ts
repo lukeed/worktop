@@ -141,3 +141,31 @@ byteLength('should return the correct value', () => {
 });
 
 byteLength.run();
+
+// ---
+
+const Encoder = suite('Encoder');
+
+Encoder('should be a `TextEncoder` instance', () => {
+	assert.instance(utils.Encoder, TextEncoder);
+});
+
+Encoder('should have the `encode` method', () => {
+	assert.type(utils.Encoder.encode, 'function');
+});
+
+Encoder.run();
+
+// ---
+
+const Decoder = suite('Decoder');
+
+Decoder('should be a `TextDecoder` instance', () => {
+	assert.instance(utils.Decoder, TextDecoder);
+});
+
+Decoder('should have the `decode` method', () => {
+	assert.type(utils.Decoder.decode, 'function');
+});
+
+Decoder.run();
