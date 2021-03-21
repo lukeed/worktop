@@ -18,6 +18,16 @@ export function uid(len?: number): string;
 export function uuid(): string;
 
 /**
+ * Reusable `TextEncoder` instance.
+ */
+export const Encoder: TextEncoder;
+
+/**
+ * Reusable `TextDecoder` instance.
+ */
+export const Decoder: TextDecoder;
+
+/**
  * Calculate the length (in bytes) of an input string.
  * @param {string} [input]
  */

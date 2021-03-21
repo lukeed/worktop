@@ -3,12 +3,7 @@ const { copyFileSync, existsSync } = require('fs');
 const pkg = require('../package.json');
 const esbuild = require('./esbuild');
 
-const externals = [
-	'worktop',
-	'worktop/cache',
-	'worktop/response',
-	...Object.keys(pkg.dependencies)
-];
+const externals = ['worktop', ...Object.keys(pkg.dependencies)];
 
 /**
  * @TODO print sizes
