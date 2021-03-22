@@ -1,4 +1,5 @@
 import { Router } from 'worktop';
+import { listen } from 'worktop/cache';
 
 const API = new Router();
 
@@ -13,4 +14,4 @@ API.add('GET', '/', (req, res) => {
 	res.end(`Howdy~! Please greet yourself; for example:\n\n  ${command}\n`);
 });
 
-addEventListener('fetch', API.listen);
+listen(API.run);
