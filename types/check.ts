@@ -2,8 +2,8 @@ import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
-import { reply, Router, STATUS_CODES } from 'worktop';
 import { byteLength, HEX, uid, uuid } from 'worktop/utils';
+import { listen, reply, Router, STATUS_CODES } from 'worktop';
 
 import type { KV } from 'worktop/kv';
 import type { FetchHandler, Route } from 'worktop';
@@ -179,9 +179,25 @@ async function foo1(event: FetchEvent) {
 }
 
 // @ts-expect-error
-reply(API.listen);
+reply(API.onerror);
+reply(API.run);
 
-addEventListener('fetch', API.listen);
+// @ts-expect-error
+addEventListener('fetch', API.find);
+addEventListener('fetch', reply(API.run));
+addEventListener('fetch', Cache.reply(API.run));
+
+// @ts-expect-error
+listen(reply(API.run));
+listen(API.run);
+
+// @ts-expect-error
+Cache.reply(API.onerror);
+Cache.reply(API.run);
+
+// @ts-expect-error
+Cache.listen(reply(API.run));
+Cache.listen(API.run);
 
 
 /**
