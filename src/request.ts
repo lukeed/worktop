@@ -23,10 +23,10 @@ export function ServerRequest(this: SR, event: FetchEvent): SR {
 
 	// @ts-ignore - expects all properties upfront
 	$.body = body.bind(0, request, $.headers.get('content-type'));
-	$.body.blob=request.blob; $.body.text=request.text;
-	$.body.arrayBuffer = request.arrayBuffer;
-	$.body.formData = request.formData;
-	$.body.json = request.json;
+	$.body.blob=request.blob.bind(request); $.body.text=request.text.bind(request);
+	$.body.arrayBuffer = request.arrayBuffer.bind(request);
+	$.body.formData = request.formData.bind(request);
+	$.body.json = request.json.bind(request);
 
 	return $;
 }
