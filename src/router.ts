@@ -1,5 +1,4 @@
 import regexparam from 'regexparam';
-import * as Cache from 'worktop/cache';
 import { ServerRequest } from 'worktop/request';
 import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './internal/constants';
@@ -114,16 +113,6 @@ export function Router(): RR {
 			} catch (err) {
 				return call($.onerror, req, res, 500, err);
 			}
-		},
-
-		listen(event) {
-			event.respondWith(
-				Cache.lookup(event).then(prev => {
-					return prev || $.run(event).then(res => {
-						return Cache.save(event, res);
-					});
-				})
-			);
 		}
 	};
 }
