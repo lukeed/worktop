@@ -16,6 +16,10 @@ export function reply(handler: ResponseHandler): FetchHandler {
 	);
 }
 
+export function listen(handler: ResponseHandler): void {
+	addEventListener('fetch', reply(handler));
+}
+
 interface Entry {
 	keys: string[];
 	handler: Handler;
