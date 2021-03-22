@@ -4,10 +4,17 @@ import { ServerRequest } from 'worktop/request';
 import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './internal/constants';
 
+import type { FetchHandler, ResponseHandler } from 'worktop';
 import type { Handler, Router as RR } from 'worktop';
 import type { Params } from 'worktop/request';
 
 export { STATUS_CODES };
+
+export function reply(handler: ResponseHandler): FetchHandler {
+	return event => event.respondWith(
+		handler(event)
+	);
+}
 
 interface Entry {
 	keys: string[];
