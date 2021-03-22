@@ -168,12 +168,19 @@ The `worktop/response` submodule contains the [`ServerResponse`](/src/response.d
 
 > **Note:** This module is used internally and will (very likely) never be imported by your application.
 
+### Module: `worktop/base64`
+
+> [View `worktop/base64` API documentation](/src/base64.d.ts)
+<!-- > [View `worktop/base64` API documentation](/docs/module.base64.md) -->
+
+The `worktop/base64` submodule contains a few utilities related to the [Base 64 encoding](https://tools.ietf.org/html/rfc4648#section-4).
+
 ### Module: `worktop/utils`
 
 > [View `worktop/utils` API documentation](/src/utils.d.ts)
 <!-- > [View `worktop/utils` API documentation](/docs/module.utils.md) -->
 
-The `worktop/utils` submodule is a collection of standalone utilities that you may find useful. These may include – but are not limited to – hashing functions and unique identifier generators.
+The `worktop/utils` submodule is a collection of standalone, general-purpose utilities that you may find useful. These may include – but are not limited to – hashing functions and unique identifier generators.
 
 
 ## License
