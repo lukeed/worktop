@@ -44,6 +44,7 @@ $ npm install --save worktop
 
 ```ts
 import { Router } from 'worktop';
+import * as Cache from 'worktop/cache';
 import { uid as toUID } from 'worktop/utils';
 import { read, write } from 'worktop/kv';
 import type { KV } from 'worktop/kv';
@@ -123,8 +124,9 @@ API.add('GET', '/alive', (req, res) => {
 
 
 // Attach "fetch" event handler
-// ~> uses `Cache` for request-matching, when permitted
-addEventListener('fetch', API.listen);
+// ~> use `Cache` for request-matching, when permitted
+// ~> store Response in `Cache`, when permitted
+Cache.listen(API.run);
 ```
 
 ## API
