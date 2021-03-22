@@ -1,16 +1,16 @@
 /// <reference lib="webworker" />
 
+import type { ServerResponse } from 'worktop/response';
 import type { ServerRequest, Params } from 'worktop/request';
-import type { ServerResponse, FetchHandler } from 'worktop/response';
 
 type Promisable<T> = Promise<T> | T;
+
+export type FetchHandler = (event: FetchEvent) => void;
+export type ResponseHandler = (event: FetchEvent) => Promisable<Response>;
 
 declare global {
 	function addEventListener(type: 'fetch', handler: FetchHandler): void;
 }
-
-export type FetchHandler = (event: FetchEvent) => void;
-export type ResponseHandler = (event: FetchEvent) => Promisable<Response>;
 
 /**
  * Return the `handler` with an `event.respondWith` wrapper.
