@@ -9,6 +9,10 @@ declare global {
 	function addEventListener(type: 'fetch', handler: FetchHandler): void;
 }
 
+export type FetchHandler = (event: FetchEvent) => void;
+export type ResponseHandler = (event: FetchEvent) => Promisable<Response>;
+export function reply(handler: ResponseHandler): FetchHandler;
+
 export type Route = { params: Params; handler: Handler | false };
 export type Handler = (req: ServerRequest, res: ServerResponse) => Promisable<Response|void>;
 
