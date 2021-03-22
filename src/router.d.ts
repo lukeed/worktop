@@ -11,7 +11,19 @@ declare global {
 
 export type FetchHandler = (event: FetchEvent) => void;
 export type ResponseHandler = (event: FetchEvent) => Promisable<Response>;
+
+/**
+ * Return the `handler` with an `event.respondWith` wrapper.
+ * @param {ResponseHandler} handler
+ */
 export function reply(handler: ResponseHandler): FetchHandler;
+
+/**
+ * Assign the `handler` to the "fetch" event.
+ * @note Your `handler` will be wrapped by `reply` automatically.
+ * @param {ResponseHandler} handler
+ */
+export function listen(handler: ResponseHandler): void;
 
 export type Route = { params: Params; handler: Handler | false };
 export type Handler = (req: ServerRequest, res: ServerResponse) => Promisable<Response|void>;
