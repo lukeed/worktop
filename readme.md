@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.png" alt="worktop" height="220" />
+  <img src="logo.png" alt="worktop" width="620" />
 </div>
 
 <div align="center">
