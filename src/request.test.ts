@@ -52,21 +52,11 @@ request('should have instance properties', () => {
 	assert.is(req.search, url.search);
 
 	assert.type(req.body, 'function');
-
 	assert.type(req.body.blob, 'function');
-	assert.ok(req.body.blob === event.request.blob);
-
 	assert.type(req.body.text, 'function');
-	assert.ok(req.body.text === event.request.text);
-
 	assert.type(req.body.arrayBuffer, 'function');
-	assert.ok(req.body.arrayBuffer === event.request.arrayBuffer);
-
 	assert.type(req.body.formData, 'function');
-	assert.ok(req.body.formData === event.request.formData);
-
 	assert.type(req.body.json, 'function');
-	assert.ok(req.body.json === event.request.json);
 });
 
 request.run();
