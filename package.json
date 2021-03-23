@@ -18,12 +18,14 @@
     "./crypto": "./crypto/index.mjs",
     "./request": "./request/index.mjs",
     "./response": "./response/index.mjs",
+    "./base64": "./base64/index.mjs",
     "./utils": "./utils/index.mjs",
     "./package.json": "./package.json"
   },
   "files": [
     "cache",
     "crypto",
+    "base64",
     "request",
     "response",
     "router",
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@types/node": "14.14.34",
     "is-uuid": "1.0.2",
+    "kleur": "4.1.4",
     "typescript": "4.2.3",
     "uvu": "0.5.1"
   },

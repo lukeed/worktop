@@ -1,18 +1,11 @@
 import { byteLength } from 'worktop/utils';
 import { CLENGTH, CTYPE } from './internal/constants';
 
-import type { FetchHandler, ResponseHandler } from 'worktop/response';
 import type { HeadersObject, ServerResponse as SR } from 'worktop/response';
 
 type Writable<T> = {
 	-readonly [P in keyof T]: T[P]
 };
-
-export function reply(handler: ResponseHandler): FetchHandler {
-	return event => event.respondWith(
-		handler(event)
-	);
-}
 
 export function ServerResponse(this: Writable<SR>, method: string): SR {
 	var $ = this, hh = $.headers = new Headers({

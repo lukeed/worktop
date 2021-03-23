@@ -7,7 +7,6 @@ const options = {
 	treeShaking: true,
 	minifySyntax: true,
 	minifyIdentifiers: true,
-	logLevel: 'info', // summary
 }
 
 /**

@@ -6,9 +6,10 @@ node_modules
 /kv
 /cache
 /crypto
-/router
+/base64
 /request
 /response
+/router
 /utils
 
 /examples/build

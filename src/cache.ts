@@ -1,3 +1,6 @@
+import type { FetchHandler } from 'worktop';
+import type { ResponseHandler } from 'worktop/cache';
+
 export const Cache: Cache = (caches as any).default;
 
 export function lookup(event: FetchEvent, request?: Request | string) {
@@ -29,4 +32,18 @@ export function isCacheable(res: Response): boolean {
 	}
 
 	return true;
+}
+
+export function reply(handler: ResponseHandler): FetchHandler {
+	return event => event.respondWith(
+		lookup(event).then(prev => {
+			return prev || handler(event).then(res => {
+				return save(event, res);
+			});
+		})
+	);
+}
+
+export function listen(handler: ResponseHandler): void {
+	addEventListener('fetch', reply(handler));
 }

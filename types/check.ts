@@ -1,13 +1,13 @@
 import * as Cache from 'worktop/cache';
+import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
-import { Router, STATUS_CODES } from 'worktop';
-import { reply, ServerResponse } from 'worktop/response';
+import { ServerResponse } from 'worktop/response';
 import { byteLength, HEX, uid, uuid } from 'worktop/utils';
+import { listen, reply, Router, STATUS_CODES } from 'worktop';
 
 import type { KV } from 'worktop/kv';
+import type { FetchHandler, Route } from 'worktop';
 import type { ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
-import type { FetchHandler } from 'worktop/response';
-import type { Route } from 'worktop';
 
 declare function assert<T>(value: T): void;
 
@@ -179,9 +179,25 @@ async function foo1(event: FetchEvent) {
 }
 
 // @ts-expect-error
-reply(API.listen);
+reply(API.onerror);
+reply(API.run);
 
-addEventListener('fetch', API.listen);
+// @ts-expect-error
+addEventListener('fetch', API.find);
+addEventListener('fetch', reply(API.run));
+addEventListener('fetch', Cache.reply(API.run));
+
+// @ts-expect-error
+listen(reply(API.run));
+listen(API.run);
+
+// @ts-expect-error
+Cache.reply(API.onerror);
+Cache.reply(API.run);
+
+// @ts-expect-error
+Cache.listen(reply(API.run));
+Cache.listen(API.run);
 
 
 /**
@@ -302,3 +318,17 @@ assert<number>(byteLength(undefined));
 assert<number>(byteLength('hello'));
 assert<number>(byteLength(''));
 assert<number>(byteLength());
+
+/**
+ * WORKTOP/BASE64
+ */
+
+assert<string>(Base64.encode('asd'));
+assert<string>(Base64.base64url('asd'));
+assert<string>(Base64.decode('asd'));
+
+// @ts-expect-error
+Base64.encode(12345);
+
+// @ts-expect-error
+Base64.encode(new Uint8Array);

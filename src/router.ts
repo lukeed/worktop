@@ -1,13 +1,23 @@
 import regexparam from 'regexparam';
-import * as Cache from 'worktop/cache';
 import { ServerRequest } from 'worktop/request';
 import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './internal/constants';
 
+import type { FetchHandler, ResponseHandler } from 'worktop';
 import type { Handler, Router as RR } from 'worktop';
 import type { Params } from 'worktop/request';
 
 export { STATUS_CODES };
+
+export function reply(handler: ResponseHandler): FetchHandler {
+	return event => event.respondWith(
+		handler(event)
+	);
+}
+
+export function listen(handler: ResponseHandler): void {
+	addEventListener('fetch', reply(handler));
+}
 
 interface Entry {
 	keys: string[];
@@ -103,16 +113,6 @@ export function Router(): RR {
 			} catch (err) {
 				return call($.onerror, req, res, 500, err);
 			}
-		},
-
-		listen(event) {
-			event.respondWith(
-				Cache.lookup(event).then(prev => {
-					return prev || $.run(event).then(res => {
-						return Cache.save(event, res);
-					});
-				})
-			);
 		}
 	};
 }
