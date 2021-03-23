@@ -5,6 +5,7 @@ node_modules
 
 /kv
 /cache
+/crypto
 /base64
 /request
 /response

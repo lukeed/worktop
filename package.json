@@ -15,14 +15,16 @@
     ".": "./router/index.mjs",
     "./kv": "./kv/index.mjs",
     "./cache": "./cache/index.mjs",
-    "./base64": "./base64/index.mjs",
+    "./crypto": "./crypto/index.mjs",
     "./request": "./request/index.mjs",
     "./response": "./response/index.mjs",
+    "./base64": "./base64/index.mjs",
     "./utils": "./utils/index.mjs",
     "./package.json": "./package.json"
   },
   "files": [
     "cache",
+    "crypto",
     "base64",
     "request",
     "response",
