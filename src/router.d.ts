@@ -26,10 +26,24 @@ export function reply(handler: ResponseHandler): FetchHandler;
 export function listen(handler: ResponseHandler): void;
 
 export type Route = { params: Params; handler: Handler | false };
-export type Handler = (req: ServerRequest, res: ServerResponse) => Promisable<Response|void>;
+export type Handler<P extends Params = Params> = (req: ServerRequest<P>, res: ServerResponse) => Promisable<Response|void>;
+
+// TODO: wildcard
+export type RouteParams<T extends string> =
+  T extends `${infer S}:${infer P}?/${infer Rest}`
+		? { [K in P]?: string } & RouteParams<Rest>
+  : T extends `${infer S}:${infer P}/${infer Rest}`
+		? { [K in P | keyof RouteParams<Rest>]: string }
+  : T extends `${infer S}:${infer P}?`
+		? { [K in P]?: string }
+  : T extends `${infer S}:${infer P}`
+		? { [K in P]: string }
+  : {};
 
 export declare class Router {
-	add(method: string, route: RegExp | string, handler: Handler): void;
+	add<T extends RegExp>(method: string, route: T, handler: Handler<Params>): void;
+	add<T extends string>(method: string, route: T, handler: Handler<RouteParams<T>>): void;
+
 	find(method: string, pathname: string): Route;
 	run(event: FetchEvent): Promise<Response>;
 	onerror(req: ServerRequest, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;

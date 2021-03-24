@@ -42,7 +42,7 @@ export function Router(): RR {
 	let $: RR, tree: Tree = {};
 
 	return $ = {
-		add(method, route, handler) {
+		add(method: string, route: RegExp | string, handler: Handler) {
 			let dict = tree[method];
 
 			if (dict === void 0) {
