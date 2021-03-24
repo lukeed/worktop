@@ -120,7 +120,7 @@ export interface IncomingCloudflareProperties {
 	timezone?: string;
 }
 
-export declare class ServerRequest {
+export declare class ServerRequest<P extends Params = Params> {
 	constructor(event: FetchEvent);
 	url: string;
 	path: string;
@@ -131,7 +131,7 @@ export declare class ServerRequest {
 	extend: FetchEvent['waitUntil'];
 	cf: IncomingCloudflareProperties;
 	headers: Headers;
-	params: Params;
+	params: P;
 	body: {
 		<T>(): Promise<T|void>;
 		json<T=any>(): Promise<T>;

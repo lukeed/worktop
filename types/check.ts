@@ -6,8 +6,8 @@ import { byteLength, HEX, uid, uuid } from 'worktop/utils';
 import { listen, reply, Router, STATUS_CODES } from 'worktop';
 
 import type { KV } from 'worktop/kv';
-import type { FetchHandler, Route } from 'worktop';
-import type { ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
+import type { FetchHandler, Route, RouteParams } from 'worktop';
+import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
 
 declare function assert<T>(value: T): void;
 
@@ -198,6 +198,89 @@ Cache.reply(API.run);
 // @ts-expect-error
 Cache.listen(reply(API.run));
 Cache.listen(API.run);
+
+/**
+ * WORKTOP/ROUTER
+ * > PATTERNS & PARAMS
+ */
+
+let foo='', bar='';
+
+// @ts-expect-error
+assert<RouteParams<'/:foo'>>({ /*empty*/ });
+assert<RouteParams<'/:foo'>>({ foo });
+assert<RouteParams<'/:foo?'>>({ foo });
+assert<RouteParams<'/:foo?'>>({ /*empty*/ });
+assert<RouteParams<'/foo'>>({ /*empty*/ });
+
+// @ts-expect-error
+assert<RouteParams<'/foo/:bar'>>({ /*empty*/ });
+assert<RouteParams<'/foo/:bar'>>({ bar });
+// @ts-expect-error
+assert<RouteParams<'/:foo/:bar'>>({ bar });
+assert<RouteParams<'/:foo/:bar'>>({ foo, bar });
+// @ts-expect-error
+assert<RouteParams<'/:foo?/:bar'>>({ /*empty*/ });
+assert<RouteParams<'/:foo?/:bar'>>({ foo, bar });
+assert<RouteParams<'/:foo?/:bar'>>({ bar });
+assert<RouteParams<'/:foo?/:bar?'>>({ /*empty*/ });
+
+// @ts-expect-error
+assert<RouteParams<'/foo/:bar/baz'>>({ /*empty*/ });
+assert<RouteParams<'/foo/:bar/baz'>>({ bar });
+assert<RouteParams<'/:foo/:bar/baz'>>({ foo, bar});
+assert<RouteParams<'/:foo?/:bar/baz'>>({ foo, bar });
+assert<RouteParams<'/:foo?/:bar/baz'>>({ bar });
+assert<RouteParams<'/:foo?/:bar?/baz'>>({ /*empty*/ });
+assert<RouteParams<'/:foo?/:bar?/baz'>>({ foo, bar });
+assert<RouteParams<'/:foo?/:bar?/baz'>>({ bar });
+
+// @ts-expect-error
+assert<RouteParams<'/foo/baz/:bar'>>({ /*empty*/ });
+assert<RouteParams<'/foo/baz/:bar'>>({ bar });
+// @ts-expect-error
+assert<RouteParams<'/:foo/baz/:bar'>>({ /*empty*/ });
+// @ts-expect-error
+assert<RouteParams<'/:foo/baz/:bar'>>({ foo });
+assert<RouteParams<'/:foo/baz/:bar'>>({ foo, bar });
+// @ts-expect-error
+assert<RouteParams<'/:foo?/baz/:bar'>>({ /*empty*/ });
+assert<RouteParams<'/:foo?/baz/:bar'>>({ foo, bar });
+assert<RouteParams<'/:foo?/baz/:bar'>>({ bar });
+// @ts-expect-error
+assert<RouteParams<'/:foo?/baz/:bar?'>>({ hello: 'x' });
+assert<RouteParams<'/:foo?/baz/:bar?'>>({ /*empty*/ });
+assert<RouteParams<'/:foo?/baz/:bar?'>>({ foo, bar });
+assert<RouteParams<'/:foo?/baz/:bar?'>>({ bar });
+
+API.add('GET', '/foo', (req) => {
+	assert<{}>(req.params);
+	// @ts-expect-error
+	req.params.anything;
+});
+
+API.add('GET', '/foo/:bar', (req) => {
+	assert<{ bar: string }>(req.params);
+	assert<string>(req.params.bar);
+	// @ts-expect-error
+	req.params.hello;
+});
+
+API.add('GET', '/foo/:bar?/:baz', (req) => {
+	assert<{ bar?: string, baz: string }>(req.params);
+	assert<string|undefined>(req.params.bar);
+	assert<string>(req.params.baz);
+	// @ts-expect-error
+	assert<string>(req.params.bar);
+	// @ts-expect-error
+	req.params.hello;
+});
+
+API.add('GET', /^[/]foobar[/]?/, (req) => {
+	assert<{}>(req.params);
+	assert<Params>(req.params);
+	assert<string>(req.params.anything);
+});
 
 
 /**
