@@ -30,7 +30,7 @@ export type Handler<P extends Params = Params> = (req: ServerRequest<P>, res: Se
 
 export type RouteParams<T extends string> =
 	T extends `${infer Prev}/*/${infer Rest}`
-		? { wild: string } & RouteParams<Prev> & RouteParams<Rest>
+		? RouteParams<Prev> & { wild: string } & RouteParams<Rest>
 	: T extends `${string}:${infer P}?/${infer Rest}`
 		? { [K in P]?: string } & RouteParams<Rest>
 	: T extends `${string}:${infer P}/${infer Rest}`
