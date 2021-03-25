@@ -5,8 +5,7 @@
     "deploy": "cfw deploy"
   },
   "devDependencies": {
-    "cfw": "0.0.10",
-    "rollup-plugin-typescript2": "0.30.0",
+    "cfw": "0.1.0",
     "worktop": "latest"
   }
 }

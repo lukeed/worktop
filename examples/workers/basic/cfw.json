@@ -1,0 +1,9 @@
+{
+  "name": "worktop-demo-basic",
+  "zoneid": "<YOUR ZONE ID>",
+  "profile": "personal",
+  "entry": "index.ts",
+  "routes": [
+    "<YOUR DOMAIN>/*"
+  ]
+}
