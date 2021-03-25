@@ -204,7 +204,7 @@ Cache.listen(API.run);
  * > PATTERNS & PARAMS
  */
 
-let foo='', bar='';
+let foo='', bar='', baz='', wild='';
 
 // @ts-expect-error
 assert<RouteParams<'/:foo'>>({ /*empty*/ });
@@ -253,6 +253,34 @@ assert<RouteParams<'/:foo?/baz/:bar?'>>({ /*empty*/ });
 assert<RouteParams<'/:foo?/baz/:bar?'>>({ foo, bar });
 assert<RouteParams<'/:foo?/baz/:bar?'>>({ bar });
 
+// @ts-expect-error
+assert<RouteParams<'/*'>>({ bar });
+assert<RouteParams<'/*'>>({ wild });
+// @ts-expect-error
+assert<RouteParams<'/foo/*'>>({ /*empty*/ });
+assert<RouteParams<'/foo/*'>>({ wild });
+// @ts-expect-error
+assert<RouteParams<'/:foo/*'>>({ foo });
+assert<RouteParams<'/:foo/*'>>({ foo, wild });
+// @ts-expect-error
+assert<RouteParams<'/:foo?/*'>>({ /*empty*/ });
+assert<RouteParams<'/:foo?/*'>>({ foo, wild });
+assert<RouteParams<'/:foo?/*'>>({ wild });
+// @ts-expect-error
+assert<RouteParams<'/:foo/*/:bar?'>>({ bar, wild});
+assert<RouteParams<'/:foo/*/:bar?'>>({ foo, bar, wild});
+// @ts-expect-error
+assert<RouteParams<'/:foo/*/:bar/:baz?'>>({ foo, bar, baz });
+assert<RouteParams<'/:foo/*/:bar/:baz?'>>({ foo, bar, baz, wild });
+// @ts-expect-error
+assert<RouteParams<'/:foo/*/:bar?/:baz'>>({ foo, baz });
+assert<RouteParams<'/:foo/*/:bar?/:baz'>>({ foo, baz, wild });
+assert<RouteParams<'/:foo/*/:bar?/:baz'>>({ foo, bar, baz, wild });
+// @ts-expect-error
+assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ bar, baz });
+assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ bar, baz, wild });
+assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ foo, bar, baz, wild });
+
 API.add('GET', '/foo', (req) => {
 	assert<{}>(req.params);
 	// @ts-expect-error
@@ -269,6 +297,17 @@ API.add('GET', '/foo/:bar', (req) => {
 API.add('GET', '/foo/:bar?/:baz', (req) => {
 	assert<{ bar?: string, baz: string }>(req.params);
 	assert<string|undefined>(req.params.bar);
+	assert<string>(req.params.baz);
+	// @ts-expect-error
+	assert<string>(req.params.bar);
+	// @ts-expect-error
+	req.params.hello;
+});
+
+API.add('GET', '/foo/:bar?/*/:baz', (req) => {
+	assert<{ bar?: string, baz: string, wild: string }>(req.params);
+	assert<string|undefined>(req.params.bar);
+	assert<string>(req.params.wild);
 	assert<string>(req.params.baz);
 	// @ts-expect-error
 	assert<string>(req.params.bar);
