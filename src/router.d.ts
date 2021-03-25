@@ -28,17 +28,20 @@ export function listen(handler: ResponseHandler): void;
 export type Route = { params: Params; handler: Handler | false };
 export type Handler<P extends Params = Params> = (req: ServerRequest<P>, res: ServerResponse) => Promisable<Response|void>;
 
-// TODO: wildcard
 export type RouteParams<T extends string> =
-  T extends `${infer S}:${infer P}?/${infer Rest}`
+	T extends `${infer Prev}/*/${infer Rest}`
+		? RouteParams<Prev> & { wild: string } & RouteParams<Rest>
+	: T extends `${string}:${infer P}?/${infer Rest}`
 		? { [K in P]?: string } & RouteParams<Rest>
-  : T extends `${infer S}:${infer P}/${infer Rest}`
-		? { [K in P | keyof RouteParams<Rest>]: string }
-  : T extends `${infer S}:${infer P}?`
+	: T extends `${string}:${infer P}/${infer Rest}`
+		? { [K in P]: string } & RouteParams<Rest>
+	: T extends `${string}:${infer P}?`
 		? { [K in P]?: string }
-  : T extends `${infer S}:${infer P}`
+	: T extends `${string}:${infer P}`
 		? { [K in P]: string }
-  : {};
+	: T extends `${string}*`
+		? { wild: string }
+	: {};
 
 export declare class Router {
 	add<T extends RegExp>(method: string, route: T, handler: Handler<Params>): void;
