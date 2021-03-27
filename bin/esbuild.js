@@ -2,7 +2,7 @@ const esbuild = require('esbuild');
 
 /** @type {esbuild.CommonOptions} */
 const options = {
-	target: 'esnext',
+	target: 'es2019',
 	sourcemap: false,
 	treeShaking: true,
 	minifySyntax: true,
@@ -22,7 +22,6 @@ exports.build = function (input, output, externals=[]) {
 		outfile: output,
 		entryPoints: [input],
 		external: externals,
-		target: 'es2019',
 	});
 }
 
