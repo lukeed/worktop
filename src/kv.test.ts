@@ -29,6 +29,20 @@ read('should call `get()` binding method', async () => {
 	assert.equal(binding.get.args(), ['foobar', 'text']);
 });
 
+read('should return false if `get()` returns null', async () => {
+	let binding = Namespace();
+	binding.get = Mock(null);
+
+	assert.is(await KV.read(binding, 'foobar'), false);
+});
+
+read('should return false if `get()` returns undefined', async () => {
+	let binding = Namespace();
+	binding.get = Mock(undefined);
+
+	assert.is(await KV.read(binding, 'foobar'), false);
+});
+
 read.run();
 
 // ---
