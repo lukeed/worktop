@@ -17,7 +17,7 @@ export function Database<M, I extends Record<keyof M, string> = { [P in keyof M]
 }
 
 export function read<T>(binding: KV.Namespace, key: string, format: KV.GetOptions = 'json'): Promise<T | false> {
-	return binding.get<T>(key, format).then(x => x !== void 0 ? x : false);
+	return binding.get<T>(key, format).then(x => x != null ? x : false);
 }
 
 export function write<T=any>(binding: KV.Namespace, key: string, value: T, toJSON?: boolean): Promise<boolean> {

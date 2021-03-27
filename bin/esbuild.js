@@ -2,7 +2,7 @@ const esbuild = require('esbuild');
 
 /** @type {esbuild.CommonOptions} */
 const options = {
-	target: 'esnext',
+	target: 'es2019',
 	sourcemap: false,
 	treeShaking: true,
 	minifySyntax: true,
