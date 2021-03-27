@@ -4,7 +4,6 @@
     "noEmit": true,
     "allowJs": true,
     "checkJs": true,
-    "target": "esnext",
     "skipLibCheck": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
