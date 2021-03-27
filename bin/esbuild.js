@@ -22,6 +22,7 @@ exports.build = function (input, output, externals=[]) {
 		outfile: output,
 		entryPoints: [input],
 		external: externals,
+		target: 'es2019',
 	});
 }
 
