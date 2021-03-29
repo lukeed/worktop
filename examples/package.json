@@ -5,7 +5,7 @@
     "deploy": "cfw deploy"
   },
   "devDependencies": {
-    "cfw": "0.1.0",
+    "cfw": "0.1.2",
     "worktop": "latest"
   }
 }
