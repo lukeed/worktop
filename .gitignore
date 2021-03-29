@@ -5,6 +5,7 @@ node_modules
 
 /kv
 /cache
+/cookie
 /crypto
 /base64
 /request

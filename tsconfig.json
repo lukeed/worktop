@@ -20,6 +20,7 @@
       "worktop/base64": ["./base64.d.ts", "./base64.ts"],
       "worktop/request": ["./request.d.ts", "./request.ts"],
       "worktop/response": ["./response.d.ts", "./response.ts"],
+      "worktop/cookie": ["./cookie.d.ts", "./cookie.ts"],
       "worktop/utils": ["./utils.d.ts", "./utils.ts"],
       "worktop/kv": ["./kv.d.ts", "./kv.js"],
     }

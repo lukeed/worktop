@@ -177,6 +177,13 @@ The `worktop/response` submodule contains the [`ServerResponse`](/src/response.d
 
 The `worktop/base64` submodule contains a few utilities related to the [Base 64 encoding](https://tools.ietf.org/html/rfc4648#section-4).
 
+### Module: `worktop/cookie`
+
+> [View `worktop/cookie` API documentation](/src/cookie.d.ts)
+<!-- > [View `worktop/cookie` API documentation](/docs/module.cookie.md) -->
+
+The `worktop/cookie` submodule contains `parse` and `stringify` utilities for dealing with cookie header(s).
+
 ### Module: `worktop/utils`
 
 > [View `worktop/utils` API documentation](/src/utils.d.ts)

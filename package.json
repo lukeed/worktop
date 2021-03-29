@@ -15,6 +15,7 @@
     ".": "./router/index.mjs",
     "./kv": "./kv/index.mjs",
     "./cache": "./cache/index.mjs",
+    "./cookie": "./cookie/index.mjs",
     "./crypto": "./crypto/index.mjs",
     "./request": "./request/index.mjs",
     "./response": "./response/index.mjs",
@@ -23,9 +24,10 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "base64",
     "cache",
     "crypto",
-    "base64",
+    "cookie",
     "request",
     "response",
     "router",
