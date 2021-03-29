@@ -30,8 +30,8 @@ export function uuid(): string {
 	return str;
 }
 
-export const Encoder = new TextEncoder;
-export const Decoder = new TextDecoder;
+export const Encoder = /*#__PURE__*/ new TextEncoder;
+export const Decoder = /*#__PURE__*/ new TextDecoder;
 
 export const encode = (input: string) => Encoder.encode(input);
 export const decode = (input: ArrayBufferView | ArrayBuffer, stream = false) => Decoder.decode(input, { stream });
