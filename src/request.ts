@@ -1,9 +1,6 @@
 import { body } from './internal/request';
 import type { ServerRequest as SR } from 'worktop/request';
 
-/**
- * @TODO Cast `query` as object again?
- */
 export function ServerRequest(this: SR, event: FetchEvent): SR {
 	const { request, waitUntil } = event;
 	const url = new URL(request.url);

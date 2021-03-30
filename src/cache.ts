@@ -1,7 +1,7 @@
 import type { FetchHandler } from 'worktop';
 import type { ResponseHandler } from 'worktop/cache';
 
-export const Cache: Cache = (caches as any).default;
+export const Cache: Cache = /*#__PURE__*/ (caches as any).default;
 
 export function lookup(event: FetchEvent, request?: Request | string) {
 	return Cache.match(request || event.request);
