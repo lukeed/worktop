@@ -35,7 +35,7 @@ $ npm run build
 
 ***Deploy***
 
-> **Important:** You must set up your `cfw` credentials and update all `workers/*/cfw.js` files.
+> **Important:** You must set up your `cfw` credentials and update all `workers/*/cfw.json` files.
 
 ```sh
 $ pnpm run deploy
