@@ -1,11 +1,12 @@
 import * as DB from 'worktop/kv';
 import { uid as toUID } from 'worktop/utils';
+import type { UID } from 'worktop/utils';
 import type { KV } from 'worktop/kv';
 
 declare const TODOS: KV.Namespace;
 
 export interface Todo {
-	uid: string;
+	uid: UID<8>;
 	title: string;
 	done: boolean;
 	created_at: number;
