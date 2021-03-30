@@ -15,13 +15,15 @@ export function toHEX(input: ArrayBuffer): string;
  * @NOTE Relies on `crypto` to produce cryptographically secure (CSPRNG) values.
  * @param {number} [len] The desired length (defaults to `11`)
  */
-export function uid(len?: number): string;
+export function uid<N extends number = 11>(len?: N): UID<N>;
+export type UID<N extends number> = { 0: string; length: N } & string;
 
 /**
  * Generate a new UUID.V4 value.
  * @NOTE Relies on `crypto` to produce cryptographically secure (CSPRNG) values.
  */
-export function uuid(): string;
+export function uuid(): UUID;
+export type UUID = { 0: string; length: 36 } & string;
 
 /**
  * Reusable `TextEncoder` instance.
