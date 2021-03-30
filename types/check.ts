@@ -6,6 +6,7 @@ import { byteLength, HEX, uid, uuid } from 'worktop/utils';
 import { listen, reply, Router, STATUS_CODES } from 'worktop';
 
 import type { KV } from 'worktop/kv';
+import type { UID, UUID } from 'worktop/utils';
 import type { FetchHandler, Route, RouteParams } from 'worktop';
 import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
 
@@ -430,10 +431,22 @@ assert<readonly string[]>(HEX);
 
 assert<Function>(uid);
 assert<string>(uid(24));
+assert<Fixed.String<24>>(uid(24));
+assert<UID<24>>(uid(24));
 assert<string>(uid());
+assert<Fixed.String<11>>(uid());
+assert<UID<11>>(uid());
+
+// @ts-expect-error
+assert<UID<24>>(uid(32));
 
 assert<Function>(uuid);
 assert<string>(uuid());
+assert<UUID>(uuid());
+
+// @ts-expect-error
+assert<Fixed.String<11>>(uuid());
+assert<UID<36>>(uuid());
 
 assert<Function>(byteLength);
 assert<number>(byteLength(undefined));
