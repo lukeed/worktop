@@ -32,7 +32,8 @@ Promise.all([
 	bundle('src/base64.ts', pkg.exports['./base64']),
 	bundle('src/request.ts', pkg.exports['./request']),
 	bundle('src/response.ts', pkg.exports['./response']),
-  bundle('src/crypto.ts', pkg.exports['./crypto']),
+	bundle('src/crypto.ts', pkg.exports['./crypto']),
 	bundle('src/utils.ts', pkg.exports['./utils']),
+	bundle('src/cors.ts', pkg.exports['./cors']),
 	bundle('src/kv.ts', pkg.exports['./kv']),
 ]).then(table);

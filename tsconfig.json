@@ -22,6 +22,7 @@
       "worktop/response": ["./response.d.ts", "./response.ts"],
       "worktop/cookie": ["./cookie.d.ts", "./cookie.ts"],
       "worktop/utils": ["./utils.d.ts", "./utils.ts"],
+      "worktop/cors": ["./cors.d.ts", "./cors.js"],
       "worktop/kv": ["./kv.d.ts", "./kv.js"],
     }
   },
