@@ -105,6 +105,7 @@ API.add('POST', '/items', async (req, res) => {
 	assert<string>(req.path);
 	assert<object>(req.params);
 	assert<string>(req.hostname);
+	assert<string>(req.origin);
 	assert<string>(req.method);
 	assert<URLSearchParams>(req.query);
 	assert<()=>Promise<unknown>>(req.body);

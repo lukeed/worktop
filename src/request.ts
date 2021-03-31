@@ -15,6 +15,7 @@ export function ServerRequest(this: SR, event: FetchEvent): SR {
 
 	$.path = url.pathname;
 	$.hostname = url.hostname;
+	$.origin = url.origin;
 	$.query = url.searchParams;
 	$.search = url.search;
 

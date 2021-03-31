@@ -125,6 +125,7 @@ export declare class ServerRequest<P extends Params = Params> {
 	url: string;
 	path: string;
 	method: string;
+	origin: string;
 	hostname: string;
 	search: string;
 	query: URLSearchParams;
