@@ -48,6 +48,18 @@ assert<string | null>(response.getHeader('foo'));
 assert<void>(response.setHeader('foo', 'bar'));
 assert<void>(response.removeHeader('foo'));
 
+// NOTE: native cast to string
+response.setHeader('foo', 123);
+response.setHeader('foo', [123]);
+response.setHeader('foo', ['bar']);
+response.setHeader('foo', 123.45678);
+response.setHeader('foo', ['a', 1, 'b']);
+
+// @ts-expect-error
+response.setHeader('foo', { foo: 123 });
+// @ts-expect-error - altho technically ok
+response.setHeader('foo', new Date);
+
 // @ts-expect-error
 assert<void>(response.writeHead('foo'));
 assert<void>(response.writeHead(200, { foo: 'bar'}));

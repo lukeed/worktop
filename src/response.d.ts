@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 
+type Arrayable<T> = T[] | T;
 export type HeadersObject = Record<string, string>;
 
 export declare class ServerResponse {
@@ -18,7 +19,7 @@ export declare class ServerResponse {
 
 	hasHeader(key: string): boolean;
 	getHeader(key: string): string | null;
-	setHeader(key: string, value: string): void;
+	setHeader(key: string, value: Arrayable<string|number>): void;
 	removeHeader(key: string): void;
 
 	writeHead(code: number, headers?: HeadersObject): void;
