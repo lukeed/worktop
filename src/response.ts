@@ -47,16 +47,18 @@ export function ServerResponse(this: Writable<SR>, method: string): SR {
 	 * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
 	 */
 	$.send = (code, data, headers) => {
-		let obj: HeadersObject = {};
+		let dtype = typeof data, obj: HeadersObject = {};
 		for (let key in headers) obj[key.toLowerCase()] = headers[key];
 		let len = obj[CLENGTH] || $.getHeader(CLENGTH);
 		let type = obj[CTYPE] || $.getHeader(CTYPE);
 
 		if (data == null) {
 			data = '';
-		} else if (typeof data === 'object') {
+		} else if (dtype === 'object') {
 			data = JSON.stringify(data);
 			type = type || 'application/json;charset=utf-8';
+		} else if (dtype !== 'string') {
+			data = String(data);
 		}
 
 		obj[CTYPE] = type || 'text/plain';
