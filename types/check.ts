@@ -1,3 +1,4 @@
+import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
@@ -480,3 +481,32 @@ Base64.encode(12345);
 
 // @ts-expect-error
 Base64.encode(new Uint8Array);
+
+/**
+ * WORKTOP/CORS
+ */
+assert<CORS.Config>(CORS.config);
+assert<string>(CORS.config.origin);
+assert<string[]>(CORS.config.headers!);
+assert<boolean>(CORS.config.credentials!);
+assert<string[]>(CORS.config.methods!);
+assert<string[]>(CORS.config.expose!);
+
+assert<Function>(CORS.headers);
+assert<Function>(CORS.preflight);
+
+declare const request: ServerRequest;
+
+// @ts-expect-error
+CORS.headers(request);
+CORS.headers(response);
+
+CORS.headers(response, {
+	// @ts-expect-error
+	origin: true
+});
+
+// @ts-expect-error
+CORS.preflight(request, response);
+CORS.preflight()(request, response);
+CORS.preflight({ origin: true });
