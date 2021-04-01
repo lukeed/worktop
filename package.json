@@ -14,6 +14,7 @@
   "exports": {
     ".": "./router/index.mjs",
     "./kv": "./kv/index.mjs",
+    "./cors": "./cors/index.mjs",
     "./cache": "./cache/index.mjs",
     "./cookie": "./cookie/index.mjs",
     "./crypto": "./crypto/index.mjs",
@@ -32,6 +33,7 @@
     "response",
     "router",
     "utils",
+    "cors",
     "kv"
   ],
   "engines": {

@@ -47,6 +47,7 @@ request('should have instance properties', () => {
 	const url = new URL(req.url);
 	assert.is(req.path, url.pathname);
 	assert.is(req.hostname, url.hostname);
+	assert.is(req.origin, url.origin);
 	assert.instance(req.query, URLSearchParams);
 	assert.equal(req.query, url.searchParams);
 	assert.is(req.search, url.search);

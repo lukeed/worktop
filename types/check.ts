@@ -1,3 +1,4 @@
+import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
@@ -47,6 +48,18 @@ assert<boolean>(response.hasHeader('foo'));
 assert<string | null>(response.getHeader('foo'));
 assert<void>(response.setHeader('foo', 'bar'));
 assert<void>(response.removeHeader('foo'));
+
+// NOTE: native cast to string
+response.setHeader('foo', 123);
+response.setHeader('foo', [123]);
+response.setHeader('foo', ['bar']);
+response.setHeader('foo', 123.45678);
+response.setHeader('foo', ['a', 1, 'b']);
+
+// @ts-expect-error
+response.setHeader('foo', { foo: 123 });
+// @ts-expect-error - altho technically ok
+response.setHeader('foo', new Date);
 
 // @ts-expect-error
 assert<void>(response.writeHead('foo'));
@@ -105,6 +118,7 @@ API.add('POST', '/items', async (req, res) => {
 	assert<string>(req.path);
 	assert<object>(req.params);
 	assert<string>(req.hostname);
+	assert<string>(req.origin);
 	assert<string>(req.method);
 	assert<URLSearchParams>(req.query);
 	assert<()=>Promise<unknown>>(req.body);
@@ -467,3 +481,32 @@ Base64.encode(12345);
 
 // @ts-expect-error
 Base64.encode(new Uint8Array);
+
+/**
+ * WORKTOP/CORS
+ */
+assert<CORS.Config>(CORS.config);
+assert<string>(CORS.config.origin);
+assert<string[]>(CORS.config.headers!);
+assert<boolean>(CORS.config.credentials!);
+assert<string[]>(CORS.config.methods!);
+assert<string[]>(CORS.config.expose!);
+
+assert<Function>(CORS.headers);
+assert<Function>(CORS.preflight);
+
+declare const request: ServerRequest;
+
+// @ts-expect-error
+CORS.headers(request);
+CORS.headers(response);
+
+CORS.headers(response, {
+	// @ts-expect-error
+	origin: true
+});
+
+// @ts-expect-error
+CORS.preflight(request, response);
+CORS.preflight()(request, response);
+CORS.preflight({ origin: true });

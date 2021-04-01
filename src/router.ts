@@ -100,7 +100,6 @@ export function Router(): RR {
 			const req = new ServerRequest(event);
 			const res = new ServerResponse(req.method);
 
-			// TODO: options.cors?
 			if ($.prepare) await $.prepare(req, res);
 			if (res.finished) return new Response(res.body, res);
 
