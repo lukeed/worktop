@@ -55,3 +55,8 @@ export declare class Router {
 
 // TODO?: worktop/status | worktop/errors
 export declare var STATUS_CODES: Record<string|number, string>;
+
+/**
+ * Compose multiple `Handler` functions together, creating a final handler.
+ */
+export function compose<P extends Params = Params>(...handlers: Handler<P>[]): Handler<P>;

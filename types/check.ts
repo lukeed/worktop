@@ -4,7 +4,7 @@ import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
 import { byteLength, HEX, uid, uuid } from 'worktop/utils';
-import { listen, reply, Router, STATUS_CODES } from 'worktop';
+import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 
 import type { KV } from 'worktop/kv';
 import type { UID, UUID } from 'worktop/utils';
@@ -336,6 +336,25 @@ API.add('GET', /^[/]foobar[/]?/, (req) => {
 	assert<string>(req.params.anything);
 });
 
+/**
+ * WORKTOP/ROUTER
+ * > COMPOSE
+ */
+
+API.add('GET', '/foo/:bar?', compose(
+	(req, res) => {
+		assert<string|void>(req.params.bar);
+	},
+	async (req, res) => {
+		assert<string|void>(req.params.bar);
+		res.end('hello');
+	},
+	// @ts-expect-error
+	(req, res) => {
+		assert<string|void>(req.params.bar);
+		return 123;
+	}
+));
 
 /**
  * WORKTOP/CACHE
