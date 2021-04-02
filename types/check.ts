@@ -374,6 +374,17 @@ API.prepare = function (req, res) {
 // @ts-expect-error - numerical
 API.prepare = (req, res) => 123;
 
+API.add('GET', '/static/:group/*', compose(
+  CORS.preflight({ maxage: 86400 }),
+  async (req, res) => {
+		// @ts-expect-error
+		req.params.foobar // is not defined
+		assert<{ group: string; wild: string }>(req.params);
+		assert<string>(req.params.group);
+		assert<string>(req.params.wild);
+  }
+));
+
 /**
  * WORKTOP/CACHE
  */
