@@ -19,6 +19,15 @@ export function listen(handler: ResponseHandler): void {
 	addEventListener('fetch', reply(handler));
 }
 
+export function compose(...handlers: Handler[]): Handler {
+	return async function (req, res) {
+		for (let handler of handlers) {
+			let tmp = await handler(req, res);
+			if (tmp instanceof Response) return tmp;
+			if (res.finished) return new Response(res.body, res);
+		}
+	};
+}
 interface Entry {
 	keys: string[];
 	handler: Handler;
