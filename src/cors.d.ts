@@ -1,4 +1,4 @@
-import type { ServerRequest } from 'worktop/request';
+import type { ServerRequest, Params } from 'worktop/request';
 import type { ServerResponse } from 'worktop/response';
 
 export interface Config {
@@ -68,4 +68,4 @@ type PreflightConfig = Omit<Config, 'origin'> & {
  * Apply all CORS headers (see `headers` export)
  * Will also handle preflight (aka, OPTIONS) requests.
  */
-export function preflight(options?: PreflightConfig): (req: ServerRequest, res: ServerResponse) => void;
+export function preflight(options?: PreflightConfig): <P extends Params = Params>(req: ServerRequest<P>, res: ServerResponse) => void;
