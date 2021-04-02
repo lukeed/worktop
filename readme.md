@@ -23,14 +23,14 @@
 
 * Super [lightweight](https://npm.anvaka.com/#/view/2d/worktop)
 * First-class TypeScript support
-* Custom Middleware Support<sup>*</sup>
+* Custom Middleware Support
 * Well-organized submodules for à la carte functionality<sup>*</sup>
 * Includes Router with support for pattern definitions
 * Familiar Request-Response handler API
 * Supports `async`/`await` handlers
 * Fully treeshakable
 
-> <sup>*</sup>_Work In Progress! (ASAP)_
+> <sup>*</sup>_More to come!_
 
 ## Install
 
