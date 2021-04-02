@@ -95,8 +95,6 @@ export function Router(): RR {
 					return { params, handler: val.handler };
 				}
 			}
-
-			return { params, handler: false };
 		},
 
 		onerror(req, res, status, error) {
@@ -106,18 +104,18 @@ export function Router(): RR {
 		},
 
 		async run(event) {
-			const req = new ServerRequest(event);
+			let tmp, req = new ServerRequest(event);
 			const res = new ServerResponse(req.method);
 
 			if ($.prepare) await $.prepare(req, res);
 			if (res.finished) return new Response(res.body, res);
 
-			const { params, handler } = $.find(req.method, req.path);
-			if (!handler) return call($.onerror, req, res, 404);
+			tmp = $.find(req.method, req.path);
+			if (!tmp) return call($.onerror, req, res, 404);
 
 			try {
-				req.params = params;
-				return call(handler, req, res);
+				req.params = tmp.params;
+				return call(tmp.handler, req, res);
 			} catch (err) {
 				return call($.onerror, req, res, 500, err);
 			}

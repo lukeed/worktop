@@ -25,7 +25,7 @@ export function reply(handler: ResponseHandler): FetchHandler;
  */
 export function listen(handler: ResponseHandler): void;
 
-export type Route = { params: Params; handler: Handler | false };
+export type Route = { params: Params; handler: Handler };
 export type Handler<P extends Params = Params> = (req: ServerRequest<P>, res: ServerResponse) => Promisable<Response|void>;
 
 export type RouteParams<T extends string> =
@@ -46,8 +46,7 @@ export type RouteParams<T extends string> =
 export declare class Router {
 	add<T extends RegExp>(method: string, route: T, handler: Handler<Params>): void;
 	add<T extends string>(method: string, route: T, handler: Handler<RouteParams<T>>): void;
-
-	find(method: string, pathname: string): Route;
+	find(method: string, pathname: string): Route|void;
 	run(event: FetchEvent): Promise<Response>;
 	onerror(req: ServerRequest, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;
 	prepare?(req: Omit<ServerRequest, 'params'>, res: ServerResponse): Promisable<void>;
