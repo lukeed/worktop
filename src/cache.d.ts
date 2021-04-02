@@ -1,5 +1,7 @@
 /// <reference lib="webworker" />
 
+import type { FetchHandler } from 'worktop';
+
 export const Cache: Cache;
 export function save(event: FetchEvent, res: Response, request?: Request | string): Response;
 export function lookup(event: FetchEvent, request?: Request | string): Promise<Response | void>;
