@@ -21,13 +21,11 @@ export function listen(handler: ResponseHandler): void {
 
 export function compose(...handlers: Handler[]): Handler {
 	return async function (req, res) {
-		for (let handler of handlers) {
-			let tmp = await handler(req, res);
-			if (tmp instanceof Response) return tmp;
-			if (res.finished) return new Response(res.body, res);
-		}
+		let fn: Handler, tmp: Response|void, len=handlers.length;
+		for (fn of handlers) if (tmp = await call(fn, --len<=0, req, res)) return tmp;
 	};
 }
+
 interface Entry {
 	keys: string[];
 	handler: Handler;
@@ -41,10 +39,13 @@ interface Branch {
 type Method = string;
 type Tree = Record<Method, Branch>;
 
-async function call(fn: Function, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response> {
+async function call(fn: Function, isEnd: true, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response>;
+async function call(fn: Function, isEnd: false, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response|void>;
+async function call(fn: Function, isEnd: boolean, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response|void>;
+async function call(fn: Function, isEnd: boolean, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response|void> {
 	const output = await fn(req, res, ...args);
 	if (output instanceof Response) return output;
-	return new Response(res.body, res);
+	if (isEnd || res.finished) return new Response(res.body, res);
 }
 
 export function Router(): RR {
@@ -111,13 +112,13 @@ export function Router(): RR {
 			if (res.finished) return new Response(res.body, res);
 
 			tmp = $.find(req.method, req.path);
-			if (!tmp) return call($.onerror, req, res, 404);
+			if (!tmp) return call($.onerror, true, req, res, 404);
 
 			try {
 				req.params = tmp.params;
-				return call(tmp.handler, req, res);
+				return call(tmp.handler, true, req, res);
 			} catch (err) {
-				return call($.onerror, req, res, 500, err);
+				return call($.onerror, true, req, res, 500, err);
 			}
 		}
 	};
