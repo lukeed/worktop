@@ -172,7 +172,7 @@ API.find('GET', 123);
 // @ts-expect-error
 API.find('GET', /^foo[/]?/);
 
-assert<Route>(
+assert<Route|void>(
 	API.find('GET', '/pathname')
 );
 
