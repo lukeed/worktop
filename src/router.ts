@@ -108,8 +108,7 @@ export function Router(): RR {
 			let tmp, req = new ServerRequest(event);
 			const res = new ServerResponse(req.method);
 
-			if ($.prepare) await $.prepare(req, res);
-			if (res.finished) return new Response(res.body, res);
+			if ($.prepare && (tmp = await call($.prepare, false, req, res))) return tmp;
 
 			tmp = $.find(req.method, req.path);
 			if (!tmp) return call($.onerror, true, req, res, 404);
