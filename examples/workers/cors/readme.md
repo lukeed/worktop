@@ -1,6 +1,6 @@
 # Example: CORS
 
-> [View in Playground](https://cloudflareworkers.com/#955c634d65e1ebcb97be610f087be973:https://tutorial.cloudflareworkers.com/)
+> [View in Playground](https://cloudflareworkers.com/#a0edd637de1b4c7c7f5db0d073bb1fa8:https://tutorial.cloudflareworkers.com/)
 
 Configures [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) headers for multiple endpoints in this example:
 
