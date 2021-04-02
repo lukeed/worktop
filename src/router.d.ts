@@ -49,7 +49,7 @@ export declare class Router {
 	find(method: string, pathname: string): Route|void;
 	run(event: FetchEvent): Promise<Response>;
 	onerror(req: ServerRequest, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;
-	prepare?(req: Omit<ServerRequest, 'params'>, res: ServerResponse): Promisable<void>;
+	prepare?(req: Omit<ServerRequest, 'params'>, res: ServerResponse): Promisable<Response|void>;
 }
 
 // TODO?: worktop/status | worktop/errors

@@ -356,6 +356,24 @@ API.add('GET', '/foo/:bar?', compose(
 	}
 ));
 
+// Can be a Handler
+API.prepare = compose(
+	(req, res) => {},
+	(req, res) => {},
+	(req, res) => {},
+);
+
+// Can be a Handler
+API.prepare = function (req, res) {
+	// @ts-expect-error
+	req.params; // does not exist
+	// can now return Response instance~!
+	return new Response(null, { status: 204 });
+}
+
+// @ts-expect-error - numerical
+API.prepare = (req, res) => 123;
+
 /**
  * WORKTOP/CACHE
  */
