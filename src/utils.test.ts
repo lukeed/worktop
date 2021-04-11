@@ -62,6 +62,41 @@ toHEX.run();
 
 // ---
 
+const viaHEX = suite('viaHEX');
+
+viaHEX('should be a function', () => {
+	assert.type(utils.viaHEX, 'function');
+});
+
+viaHEX('should return a `Uint8Array` instance', () => {
+	assert.instance(utils.viaHEX(''), Uint8Array);
+	assert.instance(utils.viaHEX('input'), Uint8Array);
+});
+
+viaHEX('should decode HEX string', () => {
+	const expects = utils.encode('hello world');
+	const output = utils.viaHEX('68656c6c6f20776f726c64');
+	assert.equal(output, expects);
+
+	assert.is(
+		utils.decode(output),
+		'hello world'
+	);
+});
+
+viaHEX('should handle emoji content', () => {
+	const output = utils.viaHEX('54686520717569636b2062726f776e20f09fa68a206a756d7073206f766572203133206c617a7920f09f90b62e');
+
+	assert.is(
+		utils.decode(output),
+		'The quick brown 🦊 jumps over 13 lazy 🐶.'
+	);
+});
+
+viaHEX.run();
+
+// ---
+
 // https://github.com/lukeed/uid/blob/master/test/secure.js
 const uid = suite('uid');
 

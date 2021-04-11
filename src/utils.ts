@@ -8,6 +8,21 @@ export function toHEX(input: ArrayBuffer): string {
 	return output;
 }
 
+export function viaHEX(input: string): Uint8Array {
+	let i=0, len=input.length, out: number[] = [];
+
+	if (len & 1) {
+		input += '0';
+		len++;
+	}
+
+	for (; i < len; i+=2) {
+		out.push(parseInt(input[i] + input[i+1], 16));
+	}
+
+	return new Uint8Array(out);
+}
+
 // @see https://github.com/lukeed/uid
 export function uid(len = 11): string {
 	var str='', num=(1+len)/2|0, arr=crypto.getRandomValues(new Uint8Array(num));

@@ -11,6 +11,13 @@ export const HEX: readonly string[];
 export function toHEX(input: ArrayBuffer): string;
 
 /**
+ * Decode a hexadecimal string into an `Uint8Array` instance.
+ * @NOTE Pass output through `decode()` for string conversion.
+ * @param {string} input
+ */
+export function viaHEX(input: string): Uint8Array;
+
+/**
  * Generate a unique string of `len` length.
  * @NOTE Relies on `crypto` to produce cryptographically secure (CSPRNG) values.
  * @param {number} [len] The desired length (defaults to `11`)
