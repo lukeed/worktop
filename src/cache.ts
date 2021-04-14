@@ -12,6 +12,10 @@ export function save(event: FetchEvent, res: Response, request?: Request | strin
 	const isGET = typeof req === 'string' || /^(GET|HEAD)$/.test(req.method);
 
 	if (isGET && isCacheable(res)) {
+		if (res.headers.has('Set-Cookie')) {
+			res = new Response(res.body, res);
+			res.headers.append('Cache-Control', 'private=Set-Cookie');
+		}
 		event.waitUntil(Cache.put(req, res.clone()));
 	}
 
@@ -26,10 +30,6 @@ export function isCacheable(res: Response): boolean {
 
 	const ccontrol = res.headers.get('Cache-Control') || '';
 	if (/(private|no-cache|no-store)/i.test(ccontrol)) return false;
-
-	if (res.headers.has('Set-Cookie')) {
-		res.headers.append('Cache-Control', 'private=Set-Cookie');
-	}
 
 	return true;
 }

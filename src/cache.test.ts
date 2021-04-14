@@ -75,85 +75,69 @@ globalThis.Headers = class Headers extends Map {
 	}
 }
 
-const Response = (status = 200): any => ({ status, headers: new Headers });
+// @ts-ignore - faking it
+globalThis.Response = function Response(body: BodyInit, init: ResponseInit = {}) {
+	var $ = this as any;
+	$.headers = init.headers || new Headers;
+	$.status = init.status || 200;
+	$.body = body || null;
+	$.clone = () => 'cloned';
+}
 
 isCacheable('should be a function', () => {
 	assert.type(Cache.isCacheable, 'function');
 });
 
 isCacheable('status code :: 200', () => {
-	const res = Response(200);
+	const res = new Response();
 	assert.is(Cache.isCacheable(res), true);
 });
 
 isCacheable('status code :: 206', () => {
-	const res = Response(206);
+	const res = new Response(null, { status: 206 });
 	assert.is(Cache.isCacheable(res), false);
 });
 
 isCacheable('cache-control :: public', () => {
-	const res = Response();
+	const res = new Response();
 	res.headers.set('cache-control', 'public,max-age=0');
 	assert.is(Cache.isCacheable(res), true);
 });
 
 isCacheable('cache-control :: private', () => {
-	const res = Response();
+	const res = new Response();
 	res.headers.set('cache-control', 'private,max-age=0');
 	assert.is(Cache.isCacheable(res), false);
 });
 
 isCacheable('cache-control :: no-store', () => {
-	const res = Response();
+	const res = new Response();
 	res.headers.set('cache-control', 'public,no-store,max-age=0');
 	assert.is(Cache.isCacheable(res), false);
 });
 
 isCacheable('cache-control :: no-cache', () => {
-	const res = Response();
+	const res = new Response();
 	res.headers.set('cache-control', 'public,no-cache');
 	assert.is(Cache.isCacheable(res), false);
 });
 
 isCacheable('vary :: *', () => {
-	const res = Response();
+	const res = new Response();
 	res.headers.set('vary', '*');
 	assert.is(Cache.isCacheable(res), false);
 });
 
 isCacheable('vary :: user-agent', () => {
-	const res = Response();
+	const res = new Response();
 	res.headers.set('vary', 'user-agent');
 	assert.is(Cache.isCacheable(res), true);
 });
 
 isCacheable('vary :: multiple', () => {
-	const res = Response();
+	const res = new Response();
 	res.headers.set('vary', 'accept-encoding, accept-language');
 	assert.is(Cache.isCacheable(res), true);
-});
-
-isCacheable('set-cookie :: make cookie private', () => {
-	const res = Response();
-	res.headers.set('set-cookie', 'foo=bar');
-	assert.is(Cache.isCacheable(res), true);
-
-	assert.is(
-		res.headers.get('cache-control'),
-		'private=Set-Cookie'
-	);
-});
-
-isCacheable('set-cookie :: append cache-control', () => {
-	const res = Response();
-	res.headers.set('set-cookie', 'foo=bar');
-	res.headers.set('cache-control', 'public,max-age=0');
-	assert.is(Cache.isCacheable(res), true);
-
-	assert.is(
-		res.headers.get('cache-control'),
-		'public,max-age=0, private=Set-Cookie'
-	);
 });
 
 isCacheable.run();
@@ -167,10 +151,9 @@ save('should be a function', () => {
 });
 
 save('should call `event.waitUntil` and `Cache.put` when Response is cacheable', () => {
-	let waited=0, res = Response();
+	let waited=0, res = new Response();
 	const request = { method: 'GET' };
 	const event: any = { request, waitUntil: () => waited=1 };
-	res.clone = () => 'cloned';
 	Storage.put = Mock();
 
 	const output = Cache.save(event, res);
@@ -185,10 +168,9 @@ save('should call `event.waitUntil` and `Cache.put` when Response is cacheable',
 });
 
 save('should treat custom `request`-string as GET', () => {
-	let waited=0, res = Response();
+	let waited=0, res = new Response();
 	const request = { method: 'POST' };
 	const event: any = { request, waitUntil: () => waited=1 };
-	res.clone = () => 'cloned';
 	Storage.put = Mock();
 
 	const output = Cache.save(event, res, '/foo/bar');
@@ -204,11 +186,10 @@ save('should treat custom `request`-string as GET', () => {
 
 save('should not save Response if not GET|HEAD method', () => {
 	let waited=0, saved=0;
-	const res = Response();
+	const res = new Response();
 	const request = { method: 'POST' };
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
-	res.clone = () => 'cloned';
 
 	const output = Cache.save(event, res);
 	assert.ok(output === res);
@@ -219,17 +200,71 @@ save('should not save Response if not GET|HEAD method', () => {
 
 save('should not save Response if not cacheable', () => {
 	let waited=0, saved=0;
-	const res = Response(206); // <~ cacheable=false
+	const res = new Response(null, { status: 206 }); // <~ cacheable=false
 	const request = { method: 'HEAD' };
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
-	res.clone = () => 'cloned';
 
 	const output = Cache.save(event, res);
 	assert.ok(output === res);
 
 	assert.is(saved, 0);
 	assert.is(waited, 0);
+});
+
+save('should mark `private=set-cookie` :: write', () => {
+	let waited = 0;
+	const res = new Response();
+	const request = { method: 'GET' };
+	const event: any = { request, waitUntil: () => waited=1 };
+	Storage.put = Mock();
+
+	// set "existing" headers
+	res.headers.set('set-cookie', 'foo=bar');
+
+	assert.ok(Cache.isCacheable(res));
+	const output = Cache.save(event, res);
+	assert.is.not(output, res); // res = res.clone()
+
+	assert.equal(
+		Storage.put.args(),
+		[request, 'cloned']
+	);
+
+	assert.is(waited, 1);
+
+	assert.is(
+		res.headers.get('cache-control'),
+		'private=Set-Cookie'
+	);
+});
+
+save('should mark `private=set-cookie` :: append', () => {
+	let waited = 0;
+	const res = new Response();
+	const request = { method: 'GET' };
+	const event: any = { request, waitUntil: () => waited=1 };
+	Storage.put = Mock();
+
+	// set "existing" headers
+	res.headers.set('set-cookie', 'foo=bar');
+	res.headers.set('cache-control', 'public,max-age=0');
+
+	assert.ok(Cache.isCacheable(res));
+	const output = Cache.save(event, res);
+	assert.is.not(output, res); // res = res.clone()
+
+	assert.equal(
+		Storage.put.args(),
+		[request, 'cloned']
+	);
+
+	assert.is(waited, 1);
+
+	assert.is(
+		res.headers.get('cache-control'),
+		'public,max-age=0, private=Set-Cookie'
+	);
 });
 
 save.run();
