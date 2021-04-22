@@ -1,7 +1,5 @@
 const { transform } = require('./esbuild');
 
-const loadJS = require.extensions['.js'];
-
 // Browser polys for Node.js
 // TODO: Remove w/ Browser test runner
 const POLYFILLS = `
@@ -13,24 +11,40 @@ const POLYFILLS = `
 	globalThis.atob = (x) => Buffer.from(x, 'base64').toString();
 `;
 
-require.extensions['.ts'] = function (Module, filename) {
-	const pitch = Module._compile.bind(Module);
+const loadCJS = require.extensions['.js'];
 
-	Module._compile = source => {
-		const { code, warnings } = transform(source, {
-			sourcefile: filename,
-			banner: POLYFILLS,
-			loader: 'ts',
-		});
+/**
+ * @param {string} extn
+ * @param {import('esbuild').Loader} loader
+ * @param {Partial<import('esbuild').TransformOptions>} options
+ */
+function loader(extn, loader, options={}) {
+	require.extensions[extn] = function (Module, filename) {
+		// @ts-ignore
+		const pitch = Module._compile.bind(Module);
 
-		warnings.forEach(msg => {
-			console.warn(`\nesbuild warning in ${filename}:`);
-			console.warn(msg.location);
-			console.warn(msg.text);
-		});
+		// @ts-ignore
+		Module._compile = source => {
+			const { code, warnings } = transform(source, {
+				sourcefile: filename,
+				loader: loader,
+				...options,
+			});
 
-		return pitch(code, filename);
-	};
+			warnings.forEach(msg => {
+				console.warn(`\nesbuild warning in ${filename}:`);
+				console.warn(msg.location);
+				console.warn(msg.text);
+			});
 
-	loadJS(Module, filename);
+			return pitch(code, filename);
+		};
+
+		loadCJS(Module, filename);
+	}
 }
+
+loader('.mjs', 'js');
+loader('.ts', 'ts', {
+	banner: POLYFILLS
+});
