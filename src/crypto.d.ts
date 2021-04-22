@@ -27,3 +27,25 @@ export namespace Algorithms {
 		| { name: 'ECDSA'; hash: SHA }
 		| { name: 'HMAC' } | 'HMAC';
 }
+
+/**
+ * Generate a `CryptoKey` based on the raw `secret` value.
+ * @NOTE Method wraps `crypto.subtle.importKey` internally.
+ */
+export function keyload(algo: Algorithms.Keying, secret: string, scopes: KeyUsage[]): Promise<CryptoKey>;
+
+/**
+ * Generate a `CryptoKey` without a base value.
+ * @NOTE Method wraps `crypto.subtle.generateKey` internally.
+ */
+export function keygen(algo: Algorithms.Keying, scopes: KeyUsage[], extractable?: boolean): Promise<CryptoKey|CryptoKeyPair>;
+
+/**
+ * Generate a digital signature of a `payload` using the specified algorithm and cryptokey.
+ */
+export function sign(algo: Algorithms.Signing, key: CryptoKey, payload: string): Promise<ArrayBuffer>;
+
+/**
+ * Verify the digital signature of a `payload` using the specified algorithm and cryptokey.
+ */
+export function verify(algo: Algorithms.Signing, key: CryptoKey, payload: string, signature: ArrayBuffer): Promise<boolean>;
