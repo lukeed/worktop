@@ -10,18 +10,18 @@ export const SHA256 = /*#__PURE__*/ digest.bind(0, 'SHA-256');
 export const SHA384 = /*#__PURE__*/ digest.bind(0, 'SHA-384');
 export const SHA512 = /*#__PURE__*/ digest.bind(0, 'SHA-512');
 
-export function keygen(secret: string, algo: Algorithms, scopes: KeyUsage[]): Promise<CryptoKey> {
+export function keyload(algo: Algorithms.Keying, secret: string, scopes: KeyUsage[]): Promise<CryptoKey> {
 	return crypto.subtle.importKey('raw', encode(secret), algo, false, scopes);
 }
 
-export async function sign(secret: string, algo: Algorithms, msg: string): Promise<ArrayBuffer> {
-	const key = await keygen(secret, algo, ['sign']);
-	const hashname = typeof algo === 'string' ? algo : algo.name;
-	return crypto.subtle.sign(hashname, key, encode(msg));
+export function keygen(algo: Algorithms.Keying, scopes: KeyUsage[], extractable = false): Promise<CryptoKey|CryptoKeyPair> {
+	return crypto.subtle.generateKey(algo, extractable, scopes);
 }
 
-export async function verify(secret: string, algo: Algorithms, signature: ArrayBuffer, payload: string): Promise<boolean> {
-	const key = await keygen(secret, algo, ['verify']);
-	const hashname = typeof algo === 'string' ? algo : algo.name;
-	return crypto.subtle.verify(hashname, key, signature, encode(payload));
+export function sign(algo: Algorithms.Signing, key: CryptoKey, payload: string): Promise<ArrayBuffer> {
+	return crypto.subtle.sign(algo, key, encode(payload));
+}
+
+export function verify(algo: Algorithms.Signing, key: CryptoKey, payload: string, signature: ArrayBuffer): Promise<boolean> {
+	return crypto.subtle.verify(algo, key, signature, encode(payload));
 }
