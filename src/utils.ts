@@ -45,6 +45,30 @@ export function uuid(): string {
 	return str;
 }
 
+// (ulid) Crockford's Base32
+const BASE32 = /*#__PURE__*/ '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+// @see https://github.com/ulid/spec
+export function ulid(): string {
+	var str='', num=16, now=Date.now();
+	var tmp: number, maxlen = BASE32.length;
+	var arr=crypto.getRandomValues(new Uint8Array(num));
+
+	while (num--) {
+		tmp = arr[num] / 255 * maxlen | 0;
+		if (tmp === maxlen) tmp = 31;
+		str = BASE32.charAt(tmp) + str;
+	}
+
+	for (num=10; num--;) {
+		tmp = now % maxlen;
+		now = (now - tmp) / maxlen;
+		str = BASE32.charAt(tmp) + str;
+	}
+
+	return str;
+}
+
 export const Encoder = /*#__PURE__*/ new TextEncoder;
 export const Decoder = /*#__PURE__*/ new TextDecoder;
 

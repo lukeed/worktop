@@ -3,11 +3,11 @@ import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
-import { byteLength, HEX, uid, uuid } from 'worktop/utils';
+import { byteLength, HEX, uid, uuid, ulid } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 
 import type { KV } from 'worktop/kv';
-import type { UID, UUID } from 'worktop/utils';
+import type { UID, UUID, ULID } from 'worktop/utils';
 import type { FetchHandler, Route, RouteParams } from 'worktop';
 import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
 
@@ -509,6 +509,14 @@ assert<UUID>(uuid());
 // @ts-expect-error
 assert<Fixed.String<11>>(uuid());
 assert<UID<36>>(uuid());
+
+assert<Function>(ulid);
+assert<string>(ulid());
+assert<ULID>(ulid());
+
+// @ts-expect-error
+assert<Fixed.String<11>>(ulid());
+assert<UID<26>>(ulid());
 
 assert<Function>(byteLength);
 assert<number>(byteLength(undefined));

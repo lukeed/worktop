@@ -33,6 +33,14 @@ export function uuid(): UUID;
 export type UUID = { 0: string; length: 36 } & string;
 
 /**
+ * Generate a universally unique lexicographically sortable identifier (ulid).
+ * @NOTE Relies on `crypto` to produce cryptographically secure (CSPRNG) values.
+ * @see https://github.com/ulid/spec
+ */
+export function ulid(): ULID;
+export type ULID = { 0: string; length: 26 } & string;
+
+/**
  * Reusable `TextEncoder` instance.
  */
 export const Encoder: TextEncoder;
