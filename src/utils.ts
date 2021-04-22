@@ -25,14 +25,14 @@ export function viaHEX(input: string): Uint8Array {
 
 // @see https://github.com/lukeed/uid
 export function uid(len = 11): string {
-	var str='', num=(1+len)/2|0, arr=crypto.getRandomValues(new Uint8Array(num));
+	var str='', num=(1+len)/2|0, arr=randomize(num);
 	while (num--) str += HEX[arr[num]];
 	return str.substring(0, len);
 }
 
 // @see https://github.com/lukeed/uuid
 export function uuid(): string {
-	var str='', i=0, arr = crypto.getRandomValues(new Uint8Array(16));
+	var str='', i=0, arr=randomize(16);
 
 	for (; i < 16; i++) {
 		if (i===6) str += HEX[arr[i] & 15 | 64];
@@ -52,7 +52,7 @@ const BASE32 = /*#__PURE__*/ '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 export function ulid(): string {
 	var str='', num=16, now=Date.now();
 	var tmp: number, maxlen = BASE32.length;
-	var arr=crypto.getRandomValues(new Uint8Array(num));
+	var arr = randomize(num);
 
 	while (num--) {
 		tmp = arr[num] / 255 * maxlen | 0;
@@ -67,6 +67,10 @@ export function ulid(): string {
 	}
 
 	return str;
+}
+
+export function randomize(length: number): Uint8Array {
+	return crypto.getRandomValues(new Uint8Array(length));
 }
 
 export const Encoder = /*#__PURE__*/ new TextEncoder;

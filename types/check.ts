@@ -3,7 +3,7 @@ import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
-import { byteLength, HEX, uid, uuid, ulid } from 'worktop/utils';
+import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 
 import type { KV } from 'worktop/kv';
@@ -523,6 +523,13 @@ assert<number>(byteLength(undefined));
 assert<number>(byteLength('hello'));
 assert<number>(byteLength(''));
 assert<number>(byteLength());
+
+assert<Function>(randomize);
+assert<Uint8Array>(randomize(11));
+// @ts-expect-error
+assert<Uint8Array>(randomize());
+// @ts-expect-error
+assert<Uint32Array>(randomize(1));
 
 /**
  * WORKTOP/BASE64
