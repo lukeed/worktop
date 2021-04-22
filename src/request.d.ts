@@ -35,7 +35,7 @@ export interface IncomingCloudflareProperties {
 	 * The browser-requested prioritization information in the request object
 	 * @example "weight=192;exclusive=0;group=3;group-weight=127"
 	 */
-	requestPriority: string | null;
+	requestPriority?: string;
 	/**
 	 * The cipher for the connection to Cloudflare
 	 * @example "AEAD-AES128-GCM-SHA256"
@@ -66,58 +66,49 @@ export interface IncomingCloudflareProperties {
 	tlsVersion: string;
 	/**
 	 * City of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "Austin"
 	 **/
 	city?: string;
 	/**
 	 * Continent of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "NA"
 	 **/
 	continent?: string;
 	/**
 	 * Latitude of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "30.27130"
 	 **/
 	latitude?: string;
 	/**
 	 * Longitude of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "-97.74260"
 	 **/
 	longitude?: string;
 	/**
 	 * Postal code of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "78701"
 	 **/
-	postalCode?: string | null;
+	postalCode?: string;
 	/**
 	 * Metro code (DMA) of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "635"
 	 **/
-	metroCode?: string | null;
+	metroCode?: string;
 	/**
 	 * If known, the `ISO 3166-2` name for the first level region associated with the IP address of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "Texas"
 	 **/
-	region?: string | null;
+	region?: string;
 	/**
 	 * If known, the `ISO 3166-2` code for the first level region associated with the IP address of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "TX"
 	 **/
-	regionCode?: string | null;
+	regionCode?: string;
 	/**
 	 * Timezone of the incoming request
-	 * @note Requires Business of Enterprise plan
 	 * @example "America/Chicago".
 	 **/
-	timezone?: string;
+	timezone: string;
 }
 
 export declare class ServerRequest<P extends Params = Params> {
