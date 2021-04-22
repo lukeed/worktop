@@ -9,13 +9,19 @@ export function SHA256(message: string): Promise<string>;
 export function SHA384(message: string): Promise<string>;
 export function SHA512(message: string): Promise<string>;
 
-// NOTE: for importKey only
-export type Algorithms =
-	| { name: 'RSASSA-PKCS1-v1_5'; hash: SHA }
-	| { name: 'RSA-OAEP'; hash: SHA }
-	| { name: 'RSA-PSS'; hash: SHA }
-	| { name: 'ECDSA'; namedCurve: NIST }
-	| { name: 'ECDH'; namedCurve: NIST }
-	| { name: 'HMAC'; hash: SHA; length?: number }
-	| { name: AES }
-	| AES | 'PBKDF2' | 'HKDF';
+export namespace Algorithms {
+	type Keying =
+		| { name: 'RSASSA-PKCS1-v1_5'; hash: SHA }
+		| { name: 'RSA-OAEP'; hash: SHA }
+		| { name: 'RSA-PSS'; hash: SHA }
+		| { name: 'ECDSA'; namedCurve: NIST }
+		| { name: 'ECDH'; namedCurve: NIST }
+		| { name: 'HMAC'; hash: SHA; length?: number }
+		| { name: AES } | AES | 'PBKDF2' | 'HKDF';
+
+	type Signing =
+		| { name: 'RSASSA-PKCS1-v1_5' } | 'RSASSA-PKCS1-v1_5'
+		| { name: 'RSA-PSS'; saltLength: number }
+		| { name: 'ECDSA'; hash: SHA }
+		| { name: 'HMAC' } | 'HMAC';
+}
