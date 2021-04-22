@@ -49,3 +49,14 @@ export function sign(algo: Algorithms.Signing, key: CryptoKey, payload: string):
  * Verify the digital signature of a `payload` using the specified algorithm and cryptokey.
  */
 export function verify(algo: Algorithms.Signing, key: CryptoKey, payload: string, signature: ArrayBuffer): Promise<boolean>;
+
+/**
+ * Apply the PBKDF2 function to an input using a salt and derivation parameters.
+ * @see https://en.wikipedia.org/wiki/PBKDF2
+ * @param {SHA}    digest   The hashing function to use.
+ * @param {string} password The input value to protect.
+ * @param {string} salt     The cryptographic salt.
+ * @param {number} iters    The number of hashing iterations.
+ * @param {number} length   The desired number of bits to derive.
+ */
+export function PBKDF2(digest: Algorithms.Digest, password: string, salt: string, iters: number, length: number): Promise<ArrayBuffer>;

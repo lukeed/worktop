@@ -25,3 +25,16 @@ export function sign(algo: Algorithms.Signing, key: CryptoKey, payload: string):
 export function verify(algo: Algorithms.Signing, key: CryptoKey, payload: string, signature: ArrayBuffer): Promise<boolean> {
 	return crypto.subtle.verify(algo, key, signature, encode(payload));
 }
+
+export async function PBKDF2(digest: Algorithms.Digest, password: string, salt: string, iters: number, length: number): Promise<ArrayBuffer> {
+	const key = await keyload('PBKDF2', password, ['deriveBits']);
+
+	const algo: Pbkdf2Params = {
+		name: 'PBKDF2',
+		salt: encode(salt),
+		iterations: iters,
+		hash: digest,
+	};
+
+	return crypto.subtle.deriveBits(algo, key, length << 3);
+}
