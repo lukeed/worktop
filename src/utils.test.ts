@@ -173,6 +173,41 @@ uuid.run();
 
 // ---
 
+const ulid = suite('ulid');
+
+ulid('exports', () => {
+	assert.type(utils.ulid, 'function', 'exports function');
+});
+
+ulid('returns', () => {
+	let out = utils.ulid();
+	assert.type(out, 'string', 'returns a string');
+	assert.is(out.length, 26, '~> 26 characters long');
+});
+
+ulid('unique', () => {
+	let length = 1e6;
+	assert.is.not(utils.ulid(), utils.ulid(), '~> single');
+	let unique = new Set(Array.from({ length }, utils.ulid));
+	assert.is(unique.size, length, '~> 1,000,000 uniques');
+});
+
+ulid('validate', () => {
+	let input = new Set(
+		Array.from({ length: 1e3 }, () => {
+			return utils.ulid().substring(0, 10);
+		})
+	);
+
+	let raw = [...input];
+	let copy = [...input].sort();
+	assert.equal(raw, copy, '~> time sort order');
+});
+
+ulid.run();
+
+// ---
+
 const byteLength = suite('byteLength');
 
 byteLength('should be a function', () => {
