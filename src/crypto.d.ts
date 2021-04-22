@@ -10,6 +10,8 @@ export function SHA384(message: string): Promise<string>;
 export function SHA512(message: string): Promise<string>;
 
 export namespace Algorithms {
+	type Digest = SHA;
+
 	type Keying =
 		| { name: 'RSASSA-PKCS1-v1_5'; hash: SHA }
 		| { name: 'RSA-OAEP'; hash: SHA }
