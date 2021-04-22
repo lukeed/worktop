@@ -201,8 +201,6 @@ ulid('validate', () => {
 
 	let raw = [...input];
 	let copy = [...input].sort();
-
-	console.log({ raw, copy });
 	assert.equal(raw, copy, '~> time sort order');
 });
 
