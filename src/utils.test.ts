@@ -236,6 +236,29 @@ byteLength.run();
 
 // ---
 
+const randomize = suite('randomize');
+
+randomize('should be a function', () => {
+	assert.type(utils.randomize, 'function');
+});
+
+randomize('should return a `Uint8Array` instance of `size` length', () => {
+	let output = utils.randomize(11);
+	assert.instance(output, Uint8Array);
+	assert.is(output.byteLength, 11);
+	assert.is(output.length, 11);
+});
+
+randomize('should return unique number values', () => {
+	let foo = utils.randomize(11).join(',');
+	let bar = utils.randomize(11).join(',');
+	assert.is.not(foo, bar);
+});
+
+randomize.run();
+
+// ---
+
 const Encoder = suite('Encoder');
 
 Encoder('should be a `TextEncoder` instance', () => {

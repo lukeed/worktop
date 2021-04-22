@@ -69,6 +69,10 @@ export function ulid(): string {
 	return str;
 }
 
+export function randomize(length: number): Uint8Array {
+	return crypto.getRandomValues(new Uint8Array(length));
+}
+
 export const Encoder = /*#__PURE__*/ new TextEncoder;
 export const Decoder = /*#__PURE__*/ new TextDecoder;
 

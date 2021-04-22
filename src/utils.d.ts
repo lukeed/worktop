@@ -41,6 +41,12 @@ export function ulid(): ULID;
 export type ULID = { 0: string; length: 26 } & string;
 
 /**
+ * Generate a specified number of cryptographically strong random values.
+ * @NOTE Throws a `QuotaExceededError` error if `length` exceeds 65,536 bytes.
+ */
+export function randomize(length: number): Uint8Array;
+
+/**
  * Reusable `TextEncoder` instance.
  */
 export const Encoder: TextEncoder;
