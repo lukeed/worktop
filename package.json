@@ -12,16 +12,46 @@
     "url": "https://lukeed.com"
   },
   "exports": {
-    ".": "./router/index.mjs",
-    "./kv": "./kv/index.mjs",
-    "./cors": "./cors/index.mjs",
-    "./cache": "./cache/index.mjs",
-    "./cookie": "./cookie/index.mjs",
-    "./crypto": "./crypto/index.mjs",
-    "./request": "./request/index.mjs",
-    "./response": "./response/index.mjs",
-    "./base64": "./base64/index.mjs",
-    "./utils": "./utils/index.mjs",
+    ".": {
+      "import": "./router/index.mjs",
+      "require": "./router/index.js"
+    },
+    "./kv": {
+      "import": "./kv/index.mjs",
+      "require": "./kv/index.js"
+    },
+    "./cors": {
+      "import": "./cors/index.mjs",
+      "require": "./cors/index.js"
+    },
+    "./cache": {
+      "import": "./cache/index.mjs",
+      "require": "./cache/index.js"
+    },
+    "./cookie": {
+      "import": "./cookie/index.mjs",
+      "require": "./cookie/index.js"
+    },
+    "./crypto": {
+      "import": "./crypto/index.mjs",
+      "require": "./crypto/index.js"
+    },
+    "./request": {
+      "import": "./request/index.mjs",
+      "require": "./request/index.js"
+    },
+    "./response": {
+      "import": "./response/index.mjs",
+      "require": "./response/index.js"
+    },
+    "./base64": {
+      "import": "./base64/index.mjs",
+      "require": "./base64/index.js"
+    },
+    "./utils": {
+      "import": "./utils/index.mjs",
+      "require": "./utils/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
