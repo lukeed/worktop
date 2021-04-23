@@ -1,5 +1,6 @@
 // @see https://github.com/lukeed/bundt/blob/master/index.js
 const { white, cyan, dim } = require('kleur');
+const rimports = require('rewrite-imports');
 const { readFileSync } = require('fs');
 const { normalize } = require('path');
 const { gzipSync } = require('zlib');
@@ -62,9 +63,35 @@ exports.table = function () {
 	out += G1 + th(rpad('Filename', f)) + G2 + th(lpad('Filesize', s)) + G1 + dim().bold().italic(lpad('(gzip)', g));
 
 	arr.forEach((obj, idx) => {
-		if (idx && idx % 2 === 0) out += '\n';
+		if (idx && idx % 3 === 0) out += '\n';
 		out += ('\n' + G1 + white(rpad(obj.file, f)) + G2 + cyan(lpad(obj.size, s)) + G1 + dim().italic(lpad(obj.gzip, g)));
 	});
 
 	console.log('\n' + out + '\n');
+}
+
+/**
+ * @param {string} input The ESM input file
+ * @see https://github.com/lukeed/bundt/blob/master/index.js#L131
+ */
+exports.rewrite = function (input) {
+	let footer = '';
+	let content = readFileSync(input, 'utf8');
+
+	return rimports(content)
+		.replace(/(^|\s|;)export default/, '$1module.exports =')
+		.replace(/(^|\s|;)export (const|(?:async )?function|class|let|var) (.+?)(?=(\(|\s|\=))/gi, (_, x, type, name) => {
+			footer += `\nexports.${name} = ${name};`;
+			return `${x}${type} ${name}`;
+		})
+		.replace(/(^|\s|\n|;?)export \{([\s\S]*?)\};?([\n\s]*?|$)/g, (_, x, names) => {
+			names.split(',').forEach(name => {
+				let [src, dest] = name.trim().split(/\s+as\s+/);
+				footer += `\nexports.${dest || src} = ${src};`;
+			});
+			return x;
+		})
+		.concat(
+			footer
+		);
 }
