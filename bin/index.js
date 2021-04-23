@@ -1,6 +1,6 @@
 const { parse, format } = require('path');
-const { copyFileSync, existsSync } = require('fs');
-const { save, table } = require('./format');
+const { copyFileSync, existsSync, writeFileSync } = require('fs');
+const { rewrite, save, table } = require('./format');
 const pkg = require('../package.json');
 const esbuild = require('./esbuild');
 
@@ -8,10 +8,15 @@ const externals = ['worktop', ...Object.keys(pkg.dependencies)];
 
 /**
  * @param {string} input
- * @param {string} output
+ * @param {Record<'import'|'require', string>} files
  */
-async function bundle(input, output) {
-	await esbuild.build(input, save(output), externals);
+async function bundle(input, files) {
+	await esbuild.build(input, save(files.import), externals);
+
+	writeFileSync(
+		save(files.require),
+		rewrite(files.import)
+	);
 
 	let dts = input.replace(/\.[mc]?[tj]s$/, '.d.ts');
 	if (!existsSync(dts)) return console.warn('Missing "%s" file!', dts),process.exitCode=1;
