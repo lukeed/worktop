@@ -58,7 +58,10 @@ write('should call `put()` binding method', async () => {
 	binding.put = Mock();
 
 	await KV.write(binding, 'foobar', 'value');
-	assert.equal(binding.put.args(), ['foobar', 'value']);
+	assert.equal(
+		binding.put.args(),
+		['foobar', 'value', undefined]
+	);
 });
 
 write('should return `true` when sucessful', async () => {
@@ -78,32 +81,44 @@ write('should force `JSON.stringify` on value :: param=true', async () => {
 	let binding = Namespace();
 	binding.put = Mock();
 
-	await KV.write(binding, 'foobar', 'value', true);
-	assert.equal(binding.put.args(), ['foobar', JSON.stringify('value')]);
+	let input = 'value';
+	let real = JSON.stringify('value');
+
+	await KV.write(binding, 'foobar', input, true);
+	assert.equal(binding.put.args(), ['foobar', real, undefined]);
 });
 
 write('should force `JSON.stringify` on value :: object', async () => {
 	let binding = Namespace();
 	binding.put = Mock();
 
-	await KV.write(binding, 'foobar', { foo: 123 });
-	assert.equal(binding.put.args(), ['foobar', '{"foo":123}']);
+	let input = { foo: 123 };
+	let real = JSON.stringify(input);
+
+	await KV.write(binding, 'foobar', input);
+	assert.equal(binding.put.args(), ['foobar', real, undefined]);
 });
 
 write('should force `JSON.stringify` on value :: array', async () => {
 	let binding = Namespace();
 	binding.put = Mock();
 
-	await KV.write(binding, 'foobar', [1, 2, 3]);
-	assert.equal(binding.put.args(), ['foobar', '[1,2,3]']);
+	let input = [1, 2, 3];
+	let real = JSON.stringify(input);
+
+	await KV.write(binding, 'foobar', input);
+	assert.equal(binding.put.args(), ['foobar', real, undefined]);
 });
 
 write('should force `JSON.stringify` on value :: boolean', async () => {
 	let binding = Namespace();
 	binding.put = Mock();
 
-	await KV.write(binding, 'foobar', true);
-	assert.equal(binding.put.args(), ['foobar', 'true']);
+	let input = true;
+	let real = JSON.stringify(input);
+
+	await KV.write(binding, 'foobar', input);
+	assert.equal(binding.put.args(), ['foobar', real, undefined]);
 });
 
 write('should skip `JSON.stringify` :: ReadableStream', async () => {
@@ -112,7 +127,7 @@ write('should skip `JSON.stringify` :: ReadableStream', async () => {
 
 	let item = new ReadableStream();
 	await KV.write(binding, 'foobar', item);
-	assert.equal(binding.put.args(), ['foobar', item]);
+	assert.equal(binding.put.args(), ['foobar', item, undefined]);
 });
 
 write('should ignore `JSON.stringify` :: ReadableStream', async () => {
@@ -121,7 +136,7 @@ write('should ignore `JSON.stringify` :: ReadableStream', async () => {
 
 	let item = new ReadableStream();
 	await KV.write(binding, 'foobar', item, true);
-	assert.equal(binding.put.args(), ['foobar', item]);
+	assert.equal(binding.put.args(), ['foobar', item, undefined]);
 });
 
 write('should skip `JSON.stringify` :: ArrayBuffer', async () => {
@@ -130,7 +145,7 @@ write('should skip `JSON.stringify` :: ArrayBuffer', async () => {
 
 	let item = new ArrayBuffer(1);
 	await KV.write(binding, 'foobar', item);
-	assert.equal(binding.put.args(), ['foobar', item]);
+	assert.equal(binding.put.args(), ['foobar', item, undefined]);
 });
 
 write('should ignore `JSON.stringify` :: ArrayBuffer', async () => {
@@ -139,7 +154,18 @@ write('should ignore `JSON.stringify` :: ArrayBuffer', async () => {
 
 	let item = new ArrayBuffer(1);
 	await KV.write(binding, 'foobar', item, true);
-	assert.equal(binding.put.args(), ['foobar', item]);
+	assert.equal(binding.put.args(), ['foobar', item, undefined]);
+});
+
+write('shoud allow `expiration` options', async () => {
+	let binding = Namespace();
+	binding.put = Mock();
+
+	let input = { foo: 123 };
+	let real = JSON.stringify(input);
+	let options = { expiration: 123 };
+	await KV.write(binding, 'foobar', input, true, options);
+	assert.equal(binding.put.args(), ['foobar', real, options]);
 });
 
 write.run();
@@ -238,9 +264,16 @@ Database('should proxy `binding.put` via `DB.put` method', async () => {
 		age: 100,
 	};
 
+	let real = JSON.stringify(user);
+
 	binding.put = Mock();
 	assert.is(await DB.put('user', 'foobar', user), true); // success
-	assert.equal(binding.put.args(), ['user__foobar', JSON.stringify(user)]);
+	assert.equal(binding.put.args(), ['user__foobar', real, undefined]);
+
+	binding.put = Mock();
+	let options = { expiration: 12345 };
+	assert.is(await DB.put('user', 'foobar', user, true, options), true); // success
+	assert.equal(binding.put.args(), ['user__foobar', real, options]);
 });
 
 Database('should proxy `binding.delete` via `DB.del` method', async () => {
@@ -278,13 +311,14 @@ Database('should allow `DB.put()` to save non-JSON', async () => {
 	let DB = KV.Database<{ foo: string }>(binding);
 	binding.put = Mock();
 
-	await DB.put('foo', 'id', 'value');
-	assert.equal(binding.put.args(), [
-		'foo__id', JSON.stringify('value')
-	]);
+	let input = 'value';
+	let real = JSON.stringify(input);
 
-	await DB.put('foo', 'id', 'value', false); // NO CAST
-	assert.equal(binding.put.args(), ['foo__id', 'value']);
+	await DB.put('foo', 'id', input);
+	assert.equal(binding.put.args(), ['foo__id', real, undefined]);
+
+	await DB.put('foo', 'id', input, false); // NO CAST
+	assert.equal(binding.put.args(), ['foo__id', input, undefined]);
 });
 
 Database.run();

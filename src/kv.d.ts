@@ -27,12 +27,12 @@ export namespace KV {
 export declare class Database<Models, Identifiers extends Record<keyof Models, string> = { [P in keyof Models]: string}> {
 	constructor(binding: KV.Namespace);
 	get<K extends keyof Models>(type: K, uid: Identifiers[K], format?: KV.GetOptions): Promise<Models[K] | false>;
-	put<K extends keyof Models>(type: K, uid: Identifiers[K], value: Models[K], toJSON?: boolean): Promise<boolean>;
+	put<K extends keyof Models>(type: K, uid: Identifiers[K], value: Models[K], toJSON?: boolean, options?: KV.WriteOptions): Promise<boolean>;
 	del<K extends keyof Models>(type: K, uid: Identifiers[K]): Promise<boolean>;
 }
 
 export function read<T>(binding: KV.Namespace, key: string, format?: KV.GetOptions): Promise<T | false>;
-export function write<T>(binding: KV.Namespace, key: string, value: T, toJSON?: boolean): Promise<boolean>;
+export function write<T>(binding: KV.Namespace, key: string, value: T, toJSON?: boolean, options?: KV.WriteOptions): Promise<boolean>;
 export function remove(binding: KV.Namespace, key: string): Promise<boolean>;
 
 export function until<X extends string>(
