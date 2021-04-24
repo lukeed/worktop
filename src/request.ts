@@ -1,5 +1,5 @@
 import { body } from './internal/request';
-import type { ServerRequest as SR } from 'worktop/request';
+import type { ServerRequest as SR, Method } from 'worktop/request';
 
 export function ServerRequest(this: SR, event: FetchEvent): SR {
 	const { request, waitUntil } = event;
@@ -7,7 +7,7 @@ export function ServerRequest(this: SR, event: FetchEvent): SR {
 	const $ = this;
 
 	$.url = request.url;
-	$.method = request.method;
+	$.method = request.method as Method;
 	$.headers = request.headers;
 	$.extend = waitUntil;
 	$.cf = request.cf;

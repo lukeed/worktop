@@ -112,11 +112,11 @@ export interface IncomingCloudflareProperties {
 	timezone: string;
 }
 
-export declare class ServerRequest<P extends Params = Params, M extends Method = Method> {
+export declare class ServerRequest<P extends Params = Params> {
 	constructor(event: FetchEvent);
 	url: string;
 	path: string;
-	method: M;
+	method: Method;
 	origin: string;
 	hostname: string;
 	search: string;

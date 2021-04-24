@@ -26,7 +26,7 @@ export function reply(handler: ResponseHandler): FetchHandler;
 export function listen(handler: ResponseHandler): void;
 
 export type Route = { params: Params; handler: Handler };
-export type Handler<P extends Params = Params, M extends Method = Method> = (req: ServerRequest<P, M>, res: ServerResponse) => Promisable<Response|void>;
+export type Handler<P extends Params = Params> = (req: ServerRequest<P>, res: ServerResponse) => Promisable<Response|void>;
 
 export type RouteParams<T extends string> =
 	T extends `${infer Prev}/*/${infer Rest}`
@@ -44,7 +44,7 @@ export type RouteParams<T extends string> =
 	: {};
 
 export declare class Router {
-	add<T extends RegExp, M extends Method>(method: M, route: T, handler: Handler<Params, M>): void;
+	add<T extends RegExp>(method: Method, route: T, handler: Handler<Params>): void;
 	add<T extends string>(method: Method, route: T, handler: Handler<RouteParams<T>>): void;
 	find(method: Method, pathname: string): Route|void;
 	run(event: FetchEvent): Promise<Response>;

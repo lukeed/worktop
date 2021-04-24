@@ -1,11 +1,11 @@
 import regexparam from 'regexparam';
-import { ServerRequest, Method } from 'worktop/request';
+import { ServerRequest } from 'worktop/request';
 import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './internal/constants';
 
 import type { FetchHandler, ResponseHandler } from 'worktop';
 import type { Handler, Router as RR } from 'worktop';
-import type { Params } from 'worktop/request';
+import type { Method, Params } from 'worktop/request';
 
 export { STATUS_CODES };
 
