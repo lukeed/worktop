@@ -4,11 +4,11 @@ import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
-import { listen, reply, Router, compose, STATUS_CODES, CronEvent } from 'worktop';
+import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 
 import type { KV } from 'worktop/kv';
 import type { UID, UUID, ULID } from 'worktop/utils';
-import type { FetchHandler, Route, RouteParams } from 'worktop';
+import type { CronEvent, FetchHandler, Route, RouteParams } from 'worktop';
 import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
 
 declare function assert<T>(value: T): void;
