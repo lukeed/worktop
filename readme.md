@@ -184,6 +184,20 @@ The `worktop/base64` submodule contains a few utilities related to the [Base 64 
 
 The `worktop/cookie` submodule contains `parse` and `stringify` utilities for dealing with cookie header(s).
 
+### Module: `worktop/cors`
+
+> [View `worktop/cors` API documentation](/src/cors.d.ts)
+<!-- > [View `worktop/cors` API documentation](/docs/module.cors.md) -->
+
+The `worktop/cors` submodule contains `preflight` and `headers` utilities for dealing with [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
+
+### Module: `worktop/crypto`
+
+> [View `worktop/crypto` API documentation](/src/crypto.d.ts)
+<!-- > [View `worktop/crypto` API documentation](/docs/module.crypto.md) -->
+
+The `worktop/crypto` submodule is a collection of cryptographic functionalities.
+
 ### Module: `worktop/utils`
 
 > [View `worktop/utils` API documentation](/src/utils.d.ts)
