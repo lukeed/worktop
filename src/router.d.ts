@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import type { ServerResponse } from 'worktop/response';
-import type { ServerRequest, Params } from 'worktop/request';
+import type { ServerRequest, Params, Method } from 'worktop/request';
 
 type Promisable<T> = Promise<T> | T;
 
@@ -44,9 +44,9 @@ export type RouteParams<T extends string> =
 	: {};
 
 export declare class Router {
-	add<T extends RegExp>(method: string, route: T, handler: Handler<Params>): void;
-	add<T extends string>(method: string, route: T, handler: Handler<RouteParams<T>>): void;
-	find(method: string, pathname: string): Route|void;
+	add<T extends RegExp>(method: Method, route: T, handler: Handler<Params>): void;
+	add<T extends string>(method: Method, route: T, handler: Handler<RouteParams<T>>): void;
+	find(method: Method, pathname: string): Route|void;
 	run(event: FetchEvent): Promise<Response>;
 	onerror(req: ServerRequest, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;
 	prepare?(req: Omit<ServerRequest, 'params'>, res: ServerResponse): Promisable<Response|void>;
