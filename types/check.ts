@@ -4,7 +4,7 @@ import * as Base64 from 'worktop/base64';
 import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
-import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
+import { listen, reply, Router, compose, STATUS_CODES, CronEvent } from 'worktop';
 
 import type { KV } from 'worktop/kv';
 import type { UID, UUID, ULID } from 'worktop/utils';
@@ -201,6 +201,21 @@ reply(API.run);
 addEventListener('fetch', API.find);
 addEventListener('fetch', reply(API.run));
 addEventListener('fetch', Cache.reply(API.run));
+
+// @ts-expect-error
+addEventListener('scheduled', API.find);
+addEventListener('scheduled', event => {
+	assert<CronEvent>(event);
+	assert<string>(event.type);
+	assert<'scheduled'>(event.type);
+
+	assert<string>(event.cron);
+	assert<number>(event.scheduledTime);
+
+	event.waitUntil(
+		fetch('/foobar')
+	);
+});
 
 // @ts-expect-error
 listen(reply(API.run));

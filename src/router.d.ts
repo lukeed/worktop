@@ -5,11 +5,31 @@ import type { ServerRequest, Params, Method } from 'worktop/request';
 
 type Promisable<T> = Promise<T> | T;
 
+type CronHandler = (event: CronEvent) => void;
 export type FetchHandler = (event: FetchEvent) => void;
 export type ResponseHandler = (event: FetchEvent) => Promisable<Response>;
 
+interface CronEvent {
+	type: 'scheduled';
+	/**
+	 * The CRON trigger
+	 * @example "23 59 LW * *"
+	 */
+	cron: string;
+	/**
+	 * Milliseconds since UNIX epoch.
+	 * @example new Date(evt.scheduledTime)
+	 */
+	scheduledTime: number;
+	/**
+	 * Method wrapper for event's action handler.
+	 */
+	waitUntil(f: Promisable<any>): void;
+}
+
 declare global {
 	function addEventListener(type: 'fetch', handler: FetchHandler): void;
+	function addEventListener(type: 'scheduled', handler: CronHandler): void;
 }
 
 /**
