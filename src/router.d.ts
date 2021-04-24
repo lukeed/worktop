@@ -3,6 +3,8 @@
 import type { ServerResponse } from 'worktop/response';
 import type { ServerRequest, Params } from 'worktop/request';
 
+export type Method = string;
+
 type Promisable<T> = Promise<T> | T;
 
 export type FetchHandler = (event: FetchEvent) => void;
@@ -44,7 +46,7 @@ export type RouteParams<T extends string> =
 	: {};
 
 export declare class Router {
-	add<T extends RegExp>(method: string, route: T, handler: Handler<Params>): void;
+	add<T extends RegExp>(method: Method | Method[], route: T, handler: Handler<Params>): void;
 	add<T extends string>(method: string, route: T, handler: Handler<RouteParams<T>>): void;
 	find(method: string, pathname: string): Route|void;
 	run(event: FetchEvent): Promise<Response>;

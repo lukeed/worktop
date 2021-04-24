@@ -52,23 +52,27 @@ export function Router(): RR {
 	let $: RR, tree: Tree = {};
 
 	return $ = {
-		add(method: string, route: RegExp | string, handler: Handler) {
-			let dict = tree[method];
+		add(method: Method | Method[], route: RegExp | string, handler: Handler) {
+			const methods = Array.isArray(method) ? method: [method];
 
-			if (dict === void 0) {
-				dict = tree[method] = {
-					__d: new Map,
-					__s: {},
-				};
-			}
+			for (const method of methods) {
+				let dict = tree[method];
 
-			if (route instanceof RegExp) {
-				dict.__d.set(route, { keys:[], handler });
-			} else if (/[:|*]/.test(route)) {
-				const { keys, pattern } = regexparam(route);
-				dict.__d.set(pattern, { keys, handler });
-			} else {
-				dict.__s[route] = { keys:[], handler };
+				if (dict === void 0) {
+					dict = tree[method] = {
+						__d: new Map,
+						__s: {},
+					};
+				}
+
+				if (route instanceof RegExp) {
+					dict.__d.set(route, { keys:[], handler });
+				} else if (/[:|*]/.test(route)) {
+					const { keys, pattern } = regexparam(route);
+					dict.__d.set(pattern, { keys, handler });
+				} else {
+					dict.__s[route] = { keys:[], handler };
+				}
 			}
 		},
 
