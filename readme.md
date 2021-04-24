@@ -189,7 +189,7 @@ The `worktop/cookie` submodule contains `parse` and `stringify` utilities for de
 > [View `worktop/cors` API documentation](/src/cors.d.ts)
 <!-- > [View `worktop/cors` API documentation](/docs/module.cors.md) -->
 
-The `worktop/cors` submodule contains `preflight` and `headers` utilities for dealing with [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).
+The `worktop/cors` submodule offers utilities for dealing with [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) headers.
 
 ### Module: `worktop/crypto`
 
