@@ -45,7 +45,7 @@ export type RouteParams<T extends string> =
 
 export declare class Router {
 	add<T extends RegExp, M extends Method>(method: M, route: T, handler: Handler<Params, M>): void;
-	add<T extends string, M extends Method>(method: M, route: T, handler: Handler<RouteParams<T>, M>): void;
+	add<T extends string>(method: Method, route: T, handler: Handler<RouteParams<T>>): void;
 	find(method: Method, pathname: string): Route|void;
 	run(event: FetchEvent): Promise<Response>;
 	onerror(req: ServerRequest, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;
