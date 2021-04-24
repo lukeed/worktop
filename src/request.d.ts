@@ -9,6 +9,7 @@ declare global {
 export type Params = Record<string, string>;
 
 export type Method = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE';
+
 /** @see https://developers.cloudflare.com/workers/runtime-apis/request#incomingrequestcfproperties */
 export interface IncomingCloudflareProperties {
 	/**
