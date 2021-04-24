@@ -1,5 +1,5 @@
 import regexparam from 'regexparam';
-import { ServerRequest } from 'worktop/request';
+import { ServerRequest, Method } from 'worktop/request';
 import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './internal/constants';
 
@@ -36,8 +36,7 @@ interface Branch {
 	__s: Record<string, Entry>;
 }
 
-type Method = string;
-type Tree = Record<Method, Branch>;
+type Tree = Partial<Record<Method, Branch>>;
 
 async function call(fn: Function, isEnd: true, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response>;
 async function call(fn: Function, isEnd: false, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response|void>;
@@ -52,7 +51,7 @@ export function Router(): RR {
 	let $: RR, tree: Tree = {};
 
 	return $ = {
-		add(method: string, route: RegExp | string, handler: Handler) {
+		add(method: Method, route: RegExp | string, handler: Handler) {
 			let dict = tree[method];
 
 			if (dict === void 0) {

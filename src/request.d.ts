@@ -8,6 +8,20 @@ declare global {
 
 export type Params = Record<string, string>;
 
+export type Method = (
+	| 'GET'
+	| 'HEAD'
+	| 'POST'
+	| 'PUT'
+	| 'DELETE'
+	| 'CONNECT'
+	| 'OPTIONS'
+	| 'TRACE'
+
+	// https://tools.ietf.org/html/rfc5789#section-2
+	| 'PATCH'
+);
+
 /** @see https://developers.cloudflare.com/workers/runtime-apis/request#incomingrequestcfproperties */
 export interface IncomingCloudflareProperties {
 	/**
@@ -111,11 +125,11 @@ export interface IncomingCloudflareProperties {
 	timezone: string;
 }
 
-export declare class ServerRequest<P extends Params = Params> {
+export declare class ServerRequest<P extends Params = Params, M extends Method = Method> {
 	constructor(event: FetchEvent);
 	url: string;
 	path: string;
-	method: string;
+	method: M;
 	origin: string;
 	hostname: string;
 	search: string;

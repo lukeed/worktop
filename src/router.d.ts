@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import type { ServerResponse } from 'worktop/response';
-import type { ServerRequest, Params } from 'worktop/request';
+import type { ServerRequest, Params, Method } from 'worktop/request';
 
 type Promisable<T> = Promise<T> | T;
 
@@ -26,7 +26,7 @@ export function reply(handler: ResponseHandler): FetchHandler;
 export function listen(handler: ResponseHandler): void;
 
 export type Route = { params: Params; handler: Handler };
-export type Handler<P extends Params = Params> = (req: ServerRequest<P>, res: ServerResponse) => Promisable<Response|void>;
+export type Handler<P extends Params = Params, M extends Method = Method> = (req: ServerRequest<P, M>, res: ServerResponse) => Promisable<Response|void>;
 
 export type RouteParams<T extends string> =
 	T extends `${infer Prev}/*/${infer Rest}`
@@ -44,9 +44,9 @@ export type RouteParams<T extends string> =
 	: {};
 
 export declare class Router {
-	add<T extends RegExp>(method: string, route: T, handler: Handler<Params>): void;
-	add<T extends string>(method: string, route: T, handler: Handler<RouteParams<T>>): void;
-	find(method: string, pathname: string): Route|void;
+	add<T extends RegExp, M extends Method>(method: M, route: T, handler: Handler<Params, M>): void;
+	add<T extends string, M extends Method>(method: M, route: T, handler: Handler<RouteParams<T>, M>): void;
+	find(method: Method, pathname: string): Route|void;
 	run(event: FetchEvent): Promise<Response>;
 	onerror(req: ServerRequest, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;
 	prepare?(req: Omit<ServerRequest, 'params'>, res: ServerResponse): Promisable<Response|void>;
