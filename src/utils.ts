@@ -93,3 +93,12 @@ export function isTypedArrayEqual(a: TypedArray, b: TypedArray): boolean {
 	}
 	return true;
 }
+
+// @see https://v8.dev/blog/dataview
+export function isArrayBufferEqual<A extends ArrayBuffer, B extends ArrayBuffer>(a: ArrayBufferPure<A>, b: ArrayBufferPure<B>): boolean {
+	if (a.byteLength !== b.byteLength) return false;
+	for (let i=0, aaa=new DataView(a), bbb=new DataView(b); i < aaa.byteLength; i++) {
+		if (aaa.getUint8(i) !== bbb.getUint8(i)) return false;
+	}
+	return true;
+}

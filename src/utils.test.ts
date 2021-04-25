@@ -426,3 +426,98 @@ isTypedArrayEqual('false :: values', () => {
 });
 
 isTypedArrayEqual.run();
+
+// ---
+
+const isArrayBufferEqual = suite('isArrayBufferEqual');
+
+isArrayBufferEqual('should be a function', () => {
+	assert.type(utils.isArrayBufferEqual, 'function');
+});
+
+isArrayBufferEqual('true :: compare to self', () => {
+	let input = new Uint8Array([1, 2, 3, 4, 5]);
+	assert.ok(
+		utils.isArrayBufferEqual(
+			input.buffer,
+			input.buffer
+		)
+	);
+});
+
+isArrayBufferEqual('true :: compare to clone', () => {
+	assert.ok(
+		utils.isArrayBufferEqual(
+			new Uint8Array([1, 2, 3, 4, 5]).buffer,
+			new Uint8Array([1, 2, 3, 4, 5]).buffer
+		)
+	);
+
+	assert.ok(
+		utils.isArrayBufferEqual(
+			new Int8Array([1, 2, 3, 4, 5]).buffer,
+			new Uint8Array([1, 2, 3, 4, 5]).buffer
+		)
+	);
+});
+
+isArrayBufferEqual('true :: empty values', () => {
+	let input = new Int16Array(2);
+	assert.is(input.byteLength, 4);
+	assert.is(input.length, 2);
+
+	assert.ok(
+		utils.isArrayBufferEqual(
+			input.buffer,
+			new ArrayBuffer(4)
+		)
+	);
+
+	assert.ok(
+		utils.isArrayBufferEqual(
+			new ArrayBuffer(1),
+			new ArrayBuffer(1)
+		)
+	);
+
+	assert.ok(
+		utils.isArrayBufferEqual(
+			new Uint8Array(2).buffer,
+			new ArrayBuffer(2)
+		)
+	);
+});
+
+isArrayBufferEqual('false :: byteLength', () => {
+	assert.not.ok(
+		utils.isArrayBufferEqual(
+			new Uint8Array(4).buffer,
+			new Uint8Array(12).buffer,
+		)
+	);
+
+	assert.not.ok(
+		utils.isArrayBufferEqual(
+			new ArrayBuffer(4),
+			new ArrayBuffer(12),
+		)
+	);
+
+	assert.not.ok(
+		utils.isArrayBufferEqual(
+			new Uint8Array([1, 2, 3]).buffer,
+			new Uint32Array([1, 2, 3]).buffer,
+		)
+	);
+});
+
+isArrayBufferEqual('false :: values', () => {
+	assert.not.ok(
+		utils.isArrayBufferEqual(
+			new Uint8Array([1, 2, 3]).buffer,
+			new Uint8Array([1, 2, 5]).buffer,
+		)
+	);
+});
+
+isArrayBufferEqual.run();

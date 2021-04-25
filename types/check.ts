@@ -5,7 +5,7 @@ import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
-import { isTypedArrayEqual } from 'worktop/utils';
+import { isTypedArrayEqual, isArrayBufferEqual } from 'worktop/utils';
 
 import type { KV } from 'worktop/kv';
 import type { UID, UUID, ULID } from 'worktop/utils';
@@ -560,6 +560,16 @@ assert<boolean>(isTypedArrayEqual(u32, i8));
 isTypedArrayEqual(u8, dv);
 // @ts-expect-error - ArrayBuffer
 isTypedArrayEqual(ab, i8);
+
+assert<boolean>(isArrayBufferEqual(ab, ab));
+isArrayBufferEqual(i8.buffer, u32.buffer);
+isArrayBufferEqual(dv.buffer, ab);
+// @ts-expect-error - DataView
+isArrayBufferEqual(ab, dv);
+// @ts-expect-error - Int8Array
+isArrayBufferEqual(ab, i8);
+// @ts-expect-error - TypedArrays
+isArrayBufferEqual(u32, i8);
 
 /**
  * WORKTOP/BASE64
