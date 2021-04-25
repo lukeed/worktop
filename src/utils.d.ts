@@ -75,3 +75,15 @@ export function decode(input: ArrayBufferView | ArrayBuffer, isStream?: boolean)
  * @param {string} [input]
  */
 export function byteLength(input?: string): number;
+
+/**
+ * Convenient alias for all TypedArray classes
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray
+ */
+export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array;
+
+/**
+ * Check if two `TypedArray` inputs are equal.
+ * @NOTE See `isArrayBufferEqual` for raw `ArrayBuffer` instances.
+ */
+export function isTypedArrayEqual(a: TypedArray, b: TypedArray): boolean;

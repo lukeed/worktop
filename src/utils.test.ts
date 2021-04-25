@@ -367,3 +367,62 @@ decode('should return decoded values', () => {
 });
 
 decode.run();
+
+// ---
+
+const isTypedArrayEqual = suite('isTypedArrayEqual');
+
+isTypedArrayEqual('should be a function', () => {
+	assert.type(utils.isTypedArrayEqual, 'function');
+});
+
+isTypedArrayEqual('true :: compare to self', () => {
+	let input = new Uint8Array([1, 2, 3, 4, 5]);
+	assert.ok(utils.isTypedArrayEqual(input, input));
+});
+
+isTypedArrayEqual('true :: compare to clone', () => {
+	let raw = [1, 2, 3, 4, 5];
+	let result = utils.isTypedArrayEqual(
+		new Uint8Array(raw), new Uint8Array(raw),
+	);
+	assert.is(result, true);
+});
+
+isTypedArrayEqual('false :: byteLength', () => {
+	assert.not.ok(
+		utils.isTypedArrayEqual(
+			new Uint8Array(1),
+			new Uint8Array(12)
+		)
+	);
+});
+
+isTypedArrayEqual('false :: constructor', () => {
+	let raw = [1, 2, 3];
+
+	assert.not.ok(
+		utils.isTypedArrayEqual(
+			new Uint8Array(raw),
+			new Uint16Array(raw)
+		)
+	);
+
+	assert.not.ok(
+		utils.isTypedArrayEqual(
+			new Int8Array(raw),
+			new Uint8Array(raw)
+		)
+	);
+});
+
+isTypedArrayEqual('false :: values', () => {
+	assert.not.ok(
+		utils.isTypedArrayEqual(
+			new Uint8Array([1, 2, 3]),
+			new Uint8Array([1, 2, 5])
+		)
+	);
+});
+
+isTypedArrayEqual.run();
