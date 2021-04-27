@@ -20,6 +20,14 @@ cache.run();
 
 // ---
 
+// @ts-ignore - faking it
+globalThis.Request = function (input: RequestInfo, init: RequestInit = {}) {
+	var $ = this as any;
+	if (typeof input === 'string') $.url = input;
+	else Object.assign($, input);
+	Object.assign($, init);
+}
+
 const lookup = suite('lookup');
 
 lookup('should be a function', () => {
@@ -49,6 +57,28 @@ lookup('should allow custom `request` value :: Request', async () => {
 
 	await Cache.lookup(event, request);
 	assert.equal(Storage.match.args(), [request]);
+});
+
+lookup('should treat HEAD as GET', async () => {
+	const request = { method: 'HEAD', url: '/foobar' } as any;
+	const event = { request } as any;
+
+	let args: any[] = [];
+	Storage.match = (...x: any[]) => {
+		args = x;
+		return new Response('hello');
+	}
+
+	let res = await Cache.lookup(event);
+	assert.instance(res, Response);
+	assert.is.not(res!.body, 'hello');
+	assert.is(res!.body, null); // because HEAD
+
+	// NOTE: stringify because of `Request` instance
+	assert.is(
+		JSON.stringify(args),
+		'[{"method":"GET","url":"/foobar"}]'
+	);
 });
 
 lookup.run();

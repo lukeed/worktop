@@ -3,8 +3,14 @@ import type { ResponseHandler } from 'worktop/cache';
 
 export const Cache: Cache = /*#__PURE__*/ (caches as any).default;
 
-export function lookup(event: FetchEvent, request?: Request | string) {
-	return Cache.match(request || event.request);
+export async function lookup(event: FetchEvent, request?: Request | string) {
+	let req = request || event.request;
+	let isHEAD = typeof req !== 'string' && req.method === 'HEAD';
+	if (isHEAD) req = new Request(req, { method: 'GET' });
+
+	let res = await Cache.match(req);
+	if (isHEAD && res) res = new Response(null, res);
+	return res;
 }
 
 export function save(event: FetchEvent, res: Response, request?: Request | string) {
