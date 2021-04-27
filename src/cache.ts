@@ -9,7 +9,7 @@ export function lookup(event: FetchEvent, request?: Request | string) {
 
 export function save(event: FetchEvent, res: Response, request?: Request | string) {
 	const req = request || event.request;
-	const isGET = typeof req === 'string' || /^(GET|HEAD)$/.test(req.method);
+	const isGET = typeof req === 'string' || req.method === 'GET';
 
 	if (isGET && isCacheable(res)) {
 		if (res.headers.has('Set-Cookie')) {

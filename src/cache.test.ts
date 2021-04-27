@@ -184,10 +184,24 @@ save('should treat custom `request`-string as GET', () => {
 	assert.is(waited, 1);
 });
 
-save('should not save Response if not GET|HEAD method', () => {
+save('should not save Response if not GET method :: POST', () => {
 	let waited=0, saved=0;
 	const res = new Response();
 	const request = { method: 'POST' };
+	const event: any = { request, waitUntil: () => waited=1 };
+	Storage.put = () => saved=1;
+
+	const output = Cache.save(event, res);
+	assert.ok(output === res);
+
+	assert.is(saved, 0);
+	assert.is(waited, 0);
+});
+
+save('should not save Response if not GET method :: HEAD', () => {
+	let waited=0, saved=0;
+	const res = new Response();
+	const request = { method: 'HEAD' };
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
 
