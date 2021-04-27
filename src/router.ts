@@ -19,10 +19,11 @@ export function listen(handler: ResponseHandler): void {
 	addEventListener('fetch', reply(handler));
 }
 
+let isPrepare = false; // @see #43 (revisit @ subrouter)
 export function compose(...handlers: Handler[]): Handler {
 	return async function (req, res) {
 		let fn: Handler, tmp: Response|void, len=handlers.length;
-		for (fn of handlers) if (tmp = await call(fn, --len<=0, req, res)) return tmp;
+		for (fn of handlers) if (tmp = await call(fn, --len<=0&&!isPrepare, req, res)) return tmp;
 	};
 }
 
@@ -107,7 +108,11 @@ export function Router(): RR {
 			let tmp, req = new ServerRequest(event);
 			const res = new ServerResponse(req.method);
 
-			if ($.prepare && (tmp = await call($.prepare, false, req, res))) return tmp;
+			if (isPrepare = !!$.prepare) {
+				tmp = await call($.prepare, false, req, res);
+				if (tmp) return tmp;
+				isPrepare = false;
+			}
 
 			tmp = $.find(req.method, req.path);
 			if (!tmp) return call($.onerror, true, req, res, 404);
