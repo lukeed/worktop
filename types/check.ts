@@ -5,6 +5,7 @@ import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
+import { timingSafeEqual } from 'worktop/crypto';
 
 import type { KV } from 'worktop/kv';
 import type { UID, UUID, ULID } from 'worktop/utils';
@@ -588,3 +589,25 @@ CORS.headers(response, {
 CORS.preflight(request, response);
 CORS.preflight()(request, response);
 CORS.preflight({ origin: true });
+
+
+/**
+ * WORKTOP/CRYPTO
+ */
+
+declare let i8: Int8Array;
+declare let u8: Uint8Array;
+declare let u32: Uint32Array;
+declare let ab: ArrayBuffer;
+declare let dv: DataView;
+
+assert<Function>(timingSafeEqual);
+assert<boolean>(timingSafeEqual(u8, u8));
+
+timingSafeEqual(u32, u32);
+// @ts-expect-error - DataView
+timingSafeEqual(u8, dv);
+// @ts-expect-error - ArrayBuffer
+timingSafeEqual(ab, i8);
+// @ts-expect-error - Mismatch
+timingSafeEqual(u8, u32);
