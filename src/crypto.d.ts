@@ -51,6 +51,19 @@ export function sign(algo: Algorithms.Signing, key: CryptoKey, payload: string):
 export function verify(algo: Algorithms.Signing, key: CryptoKey, payload: string, signature: ArrayBuffer): Promise<boolean>;
 
 /**
+ * Convenient alias for all TypedArray classes
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray
+ */
+export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array;
+
+/**
+ * A constant-time check if `a` and `b` are equal.
+ * Does not leak timing information, which would allow an attacker to guess one of the values.
+ * @see https://nodejs.org/dist/latest-v14.x/docs/api/crypto.html#crypto_crypto_timingsafeequal_a_b
+ */
+export function timingSafeEqual<T extends TypedArray>(a: T, b: T): boolean;
+
+/**
  * Apply the PBKDF2 function to an input using a salt and derivation parameters.
  * @see https://en.wikipedia.org/wiki/PBKDF2
  * @param {SHA}    digest   The hashing function to use.

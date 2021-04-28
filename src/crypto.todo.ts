@@ -210,6 +210,49 @@ verify.run();
 
 // ---
 
+const timingSafeEqual = suite('timingSafeEqual');
+
+timingSafeEqual('should be a function', () => {
+	assert.type(crypto.timingSafeEqual, 'function');
+});
+
+timingSafeEqual('true :: compare to self', () => {
+	let input = new Uint8Array([1, 2, 3, 4, 5]);
+	let output = crypto.timingSafeEqual(input, input);
+	assert.is(output, true);
+});
+
+timingSafeEqual('true :: compare to clone', () => {
+	let raw = [1, 2, 3, 4, 5];
+	let result = crypto.timingSafeEqual(
+		new Uint8Array(raw), new Uint8Array(raw),
+	);
+	assert.is(result, true);
+});
+
+timingSafeEqual('false :: byteLength', () => {
+	assert.not.ok(
+		crypto.timingSafeEqual(
+			new Uint8Array(1),
+			new Uint8Array(12)
+		)
+	);
+});
+
+timingSafeEqual('false :: values', () => {
+	assert.not.ok(
+		crypto.timingSafeEqual(
+			new Uint8Array([1, 2, 3]),
+			new Uint8Array([1, 2, 5])
+		)
+	);
+});
+
+timingSafeEqual.run();
+
+
+// ---
+
 const PBKDF2 = suite('PBKDF2', {
 	native: promisify(pbkdf2)
 });

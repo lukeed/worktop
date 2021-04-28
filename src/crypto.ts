@@ -1,5 +1,5 @@
 import { encode, toHEX } from 'worktop/utils';
-import type { Algorithms } from 'worktop/crypto';
+import type { Algorithms, TypedArray } from 'worktop/crypto';
 
 export function digest(algo: Algorithms.Digest, message: string): Promise<string> {
 	return crypto.subtle.digest(algo, encode(message)).then(toHEX);
@@ -24,6 +24,16 @@ export function sign(algo: Algorithms.Signing, key: CryptoKey, payload: string):
 
 export function verify(algo: Algorithms.Signing, key: CryptoKey, payload: string, signature: ArrayBuffer): Promise<boolean> {
 	return crypto.subtle.verify(algo, key, signature, encode(payload));
+}
+
+export function timingSafeEqual<T extends TypedArray>(a: T, b: T): boolean {
+	if (a.byteLength !== b.byteLength) return false;
+	let len = a.length, different = false;
+	while (len-- > 0) {
+		// must check all items until complete
+		if (a[len] !== b[len]) different = true;
+	}
+	return !different;
 }
 
 export async function PBKDF2(digest: Algorithms.Digest, password: string, salt: string, iters: number, length: number): Promise<ArrayBuffer> {
