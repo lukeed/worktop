@@ -44,7 +44,21 @@ export declare class Database<Models, Identifiers extends Record<keyof Models, s
 	del<K extends keyof Models>(type: K, uid: Identifiers[K]): Promise<boolean>;
 }
 
-export function read<T>(binding: KV.Namespace, key: string, format?: KV.GetOptions): Promise<T | false>;
+export function read<T>(key: string, type: 'json'): Promise<T|false>;
+export function read<T>(key: string, options: KV.GetOptions<'json'>): Promise<T|false>;
+
+export function read<T extends ReadableStream>(key: string, type: 'stream'): Promise<T|false>;
+export function read<T extends ReadableStream>(key: string, options: KV.GetOptions<'stream'>): Promise<T|false>;
+
+export function read(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer|false>;
+export function read(key: string, options: KV.GetOptions<'arrayBuffer'>): Promise<ArrayBuffer|false>;
+
+export function read<T extends string>(key: string, type: 'text'): Promise<T|false>;
+export function read<T extends string>(key: string, options: KV.GetOptions<'text'>): Promise<T|false>;
+
+export function read<T extends string>(binding: KV.Namespace, key: string, format?: KV.GetFormat): Promise<T | false>;
+export function read<T extends string>(binding: KV.Namespace, key: string, options?: KV.GetOptions<KV.GetFormat>): Promise<T | false>;
+
 export function write<T>(binding: KV.Namespace, key: string, value: T, toJSON?: boolean, options?: KV.WriteOptions): Promise<boolean>;
 export function remove(binding: KV.Namespace, key: string): Promise<boolean>;
 
