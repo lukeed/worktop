@@ -1,10 +1,16 @@
 export namespace KV {
+	type Metadata = Record<string, any>;
 	type Value = string | ReadableStream | ArrayBuffer;
 	type WriteOptions = { expiration?: number; expirationTtl?: number };
 	type ListOptions = { prefix?: string; limit?: number; cursor?: string };
 
 	type GetFormat = 'text' | 'json' | 'arrayBuffer' | 'stream';
 	type GetOptions<T> = { type: T; cacheTtl?: number };
+	type GetMetadata<T, M> = {
+		value: T | null;
+		metadata: M | null;
+	}
+
 
 	interface KeyList {
 		keys: Array<{ name: string; expiration?: number }>;
@@ -28,8 +34,20 @@ export namespace KV {
 		get<T>(key: string, type?: GetFormat): Promise<string|null>; // "text"
 		get<T>(key: string, options?: GetOptions<GetFormat> ): Promise<string|null>; // "text"
 
+		getWithMetadata<T, M extends Metadata>(key: string, type: 'json'): Promise<GetMetadata<T, M>>;
+		getWithMetadata<T, M extends Metadata>(key: string, options: GetOptions<'json'>): Promise<GetMetadata<T, M>>;
 
+		getWithMetadata<T, M extends Metadata>(key: string, type: 'stream'): Promise<GetMetadata<ReadableStream, M>>;
+		getWithMetadata<T, M extends Metadata>(key: string, options: GetOptions<'stream'>): Promise<GetMetadata<ReadableStream, M>>;
 
+		getWithMetadata<T, M extends Metadata>(key: string, type: 'arrayBuffer'): Promise<GetMetadata<ArrayBuffer, M>>;
+		getWithMetadata<T, M extends Metadata>(key: string, options: GetOptions<'arrayBuffer'>): Promise<GetMetadata<ArrayBuffer, M>>;
+
+		getWithMetadata<T, M extends Metadata>(key: string, type: 'text'): Promise<GetMetadata<string, M>>;
+		getWithMetadata<T, M extends Metadata>(key: string, options: GetOptions<'text'>): Promise<GetMetadata<string, M>>;
+
+		getWithMetadata<T, M extends Metadata>(key: string, type?: GetFormat): Promise<GetMetadata<string, M>>; // "text"
+		getWithMetadata<T, M extends Metadata>(key: string, options?: GetOptions<GetFormat>): Promise<GetMetadata<string, M>>; // "text"
 
 		put(key: string, value: Value, options?: WriteOptions): Promise<void>;
 		list(options?: ListOptions): Promise<KeyList>;
