@@ -13,20 +13,21 @@ export namespace KV {
 	}
 
 	interface Namespace {
-		get<T>(key: string, type: 'json'): Promise<T>;
-		get<T>(key: string, options: GetOptions<'json'>): Promise<T>;
+		get<T>(key: string, type: 'json'): Promise<T|null>;
+		get<T>(key: string, options: GetOptions<'json'>): Promise<T|null>;
 
-		get<T>(key: string, type: 'stream'): Promise<ReadableStream>;
-		get<T>(key: string, options: GetOptions<'stream'>): Promise<ReadableStream>;
+		get<T>(key: string, type: 'stream'): Promise<ReadableStream|null>;
+		get<T>(key: string, options: GetOptions<'stream'>): Promise<ReadableStream|null>;
 
-		get<T>(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer>;
-		get<T>(key: string, options: GetOptions<'arrayBuffer'>): Promise<ArrayBuffer>;
+		get<T>(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer|null>;
+		get<T>(key: string, options: GetOptions<'arrayBuffer'>): Promise<ArrayBuffer|null>;
 
-		get<T>(key: string, type: 'text'): Promise<string>;
-		get<T>(key: string, options: GetOptions<'text'>): Promise<string>;
+		get<T>(key: string, type: 'text'): Promise<string|null>;
+		get<T>(key: string, options: GetOptions<'text'>): Promise<string|null>;
 
-		get<T>(key: string, type?: GetFormat): Promise<string>; // "text"
-		get<T>(key: string, options?: GetOptions<GetFormat> ): Promise<string>; // "text"
+		get<T>(key: string, type?: GetFormat): Promise<string|null>; // "text"
+		get<T>(key: string, options?: GetOptions<GetFormat> ): Promise<string|null>; // "text"
+
 
 
 
