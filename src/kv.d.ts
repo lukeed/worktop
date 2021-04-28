@@ -2,7 +2,9 @@ export namespace KV {
 	type Value = string | ReadableStream | ArrayBuffer;
 	type WriteOptions = { expiration?: number; expirationTtl?: number };
 	type ListOptions = { prefix?: string; limit?: number; cursor?: string };
-	type GetOptions = 'text' | 'json' | 'arrayBuffer' | 'stream';
+
+	type GetFormat = 'text' | 'json' | 'arrayBuffer' | 'stream';
+	type GetOptions<T> = { type: T; cacheTtl?: number };
 
 	interface KeyList {
 		keys: Array<{ name: string; expiration?: number }>;
@@ -12,11 +14,21 @@ export namespace KV {
 
 	interface Namespace {
 		get<T>(key: string, type: 'json'): Promise<T>;
+		get<T>(key: string, options: GetOptions<'json'>): Promise<T>;
+
 		get<T>(key: string, type: 'stream'): Promise<ReadableStream>;
+		get<T>(key: string, options: GetOptions<'stream'>): Promise<ReadableStream>;
+
 		get<T>(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer>;
+		get<T>(key: string, options: GetOptions<'arrayBuffer'>): Promise<ArrayBuffer>;
+
 		get<T>(key: string, type: 'text'): Promise<string>;
-		get<T>(key: string, type: GetOptions): Promise<T>;
-		get<T>(key: string): Promise<string>; // "text"
+		get<T>(key: string, options: GetOptions<'text'>): Promise<string>;
+
+		get<T>(key: string, type?: GetFormat): Promise<string>; // "text"
+		get<T>(key: string, options?: GetOptions<GetFormat> ): Promise<string>; // "text"
+
+
 
 		put(key: string, value: Value, options?: WriteOptions): Promise<void>;
 		list(options?: ListOptions): Promise<KeyList>;
@@ -26,7 +38,7 @@ export namespace KV {
 
 export declare class Database<Models, Identifiers extends Record<keyof Models, string> = { [P in keyof Models]: string}> {
 	constructor(binding: KV.Namespace);
-	get<K extends keyof Models>(type: K, uid: Identifiers[K], format?: KV.GetOptions): Promise<Models[K] | false>;
+	get<K extends keyof Models>(type: K, uid: Identifiers[K], format?: KV.GetFormat): Promise<Models[K] | false>;
 	put<K extends keyof Models>(type: K, uid: Identifiers[K], value: Models[K], toJSON?: boolean, options?: KV.WriteOptions): Promise<boolean>;
 	del<K extends keyof Models>(type: K, uid: Identifiers[K]): Promise<boolean>;
 }
