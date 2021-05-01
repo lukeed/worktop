@@ -60,7 +60,7 @@ export namespace KV {
 export declare class Database<Models, Identifiers extends Record<keyof Models, string> = { [P in keyof Models]: string}> {
 	constructor(binding: KV.Namespace);
 	get<K extends keyof Models>(type: K, uid: Identifiers[K], format?: KV.GetFormat): Promise<Models[K] | false>;
-	put<K extends keyof Models, M extends KV.Metadata = KV.Metadata>(type: K, uid: Identifiers[K], value: Models[K], toJSON?: boolean, options?: KV.Options.Put<M>): Promise<boolean>;
+	put<K extends keyof Models, M extends KV.Metadata = KV.Metadata>(type: K, uid: Identifiers[K], value: Models[K], options?: Options.Write<M>): Promise<boolean>;
 	del<K extends keyof Models>(type: K, uid: Identifiers[K]): Promise<boolean>;
 }
 
@@ -68,9 +68,12 @@ export function read<T extends ArrayBuffer>(binding: KV.Namespace, key: string, 
 export function read<T extends ReadableStream>(binding: KV.Namespace, key: string, options: 'stream' | KV.Options.Get<'stream'>): Promise<T|false>;
 export function read<T extends string>(binding: KV.Namespace, key: string, options: 'text' | KV.Options.Get<'text'>): Promise<T|false>;
 export function read<T>(binding: KV.Namespace, key: string, options?: 'json' | KV.Options.Get<'json'>): Promise<T|false>;
+// Custom method options
+declare namespace Options {
+	type Write<M extends KV.Metadata = KV.Metadata> = KV.Options.Put<M> & { toJSON?: boolean };
+}
 
-// TODO: move toJSON to options?
-export function write<T, M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, key: string, value: T, options?: KV.Options.Put<M>): Promise<boolean>;
+export function write<T, M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, key: string, value: T, options?: Options.Write<M>): Promise<boolean>;
 export function remove(binding: KV.Namespace, key: string): Promise<boolean>;
 
 export function until<X extends string>(
