@@ -490,9 +490,16 @@ async function storage() {
 		age: 123
 	};
 
-	assert<boolean>(await DB1.put('user', user.id, user, true));
+	assert<boolean>(await DB1.put('user', user.id, user, { toJSON: false }));
+	assert<boolean>(await DB1.put('user', user.id, user, { toJSON: true }));
 	assert<boolean>(await DB1.put('user', user.id, user));
 	assert<boolean>(await DB1.del('user', user.id));
+
+	await DB1.put('user', user.id, user, {
+		toJSON: false,
+		expiration: 123,
+		metadata: { foo: 123 }
+	});
 
 	const lookup = (uid: Fixed.String<11>) => DB2.get('app', uid);
 	assert<Fixed.String<11>>(await until(toUID, lookup));
