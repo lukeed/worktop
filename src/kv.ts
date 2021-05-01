@@ -4,7 +4,8 @@ export function Database<Models, I extends Record<keyof Models, string> = { [P i
 	var $ = <K extends keyof I>(type: K, uid: I[K]) => `${type}__${uid}`;
 
 	return {
-		get<K extends keyof Models>(type: K, uid: I[K], format?: KV.Options.Get | KV.GetFormat) {
+		// @ts-ignore - dont want to redefine overloads in source
+		get<K extends keyof Models>(type: K, uid: I[K], format?: Options.Read | KV.GetFormat) {
 			return read<Models[K]>(binding, $(type, uid), format);
 		},
 		put<K extends keyof Models, M extends KV.Metadata = KV.Metadata>(type: K, uid: I[K], value: Models[K], options?: Options.Write<M>) {
@@ -16,9 +17,9 @@ export function Database<Models, I extends Record<keyof Models, string> = { [P i
 	};
 }
 
-export function read<T>(binding: KV.Namespace, key: string, format: KV.Options.Get | KV.GetFormat = 'json'): Promise<T|null> {
-	// @ts-ignore - thinks can be "json" only because of unknown `T` pattern match
-	return binding.get<T>(key, format);
+export function read<T, M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, key: string, format: Options.Read | KV.GetFormat = 'json'): Promise<T|null> {
+	// @ts-ignore - the compiler thinks "json" is only available `format` option because of unknown `T` pattern match
+	return (typeof format === 'string' || !format.metadata) ? binding.get<T>(key, format) : binding.getWithMetadata<T, M>(key, format);
 }
 
 export function write<T, M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, key: string, val: T, options?: Options.Write<M>): Promise<boolean> {
