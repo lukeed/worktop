@@ -480,8 +480,8 @@ async function storage() {
 	await DB2.get('app', len11);
 	await DB1.get('app', 'asd'); // DB1 is guessing
 
-	assert<IUser|false>(await DB1.get('user', 'id'));
-	assert<IApp|false>(await DB2.get('app', len11));
+	assert<IUser|null>(await DB1.get('user', 'id'));
+	assert<IApp|null>(await DB2.get('app', len11));
 
 	let user: IUser = {
 		id: 'asd',

@@ -59,19 +59,21 @@ export namespace KV {
 
 export declare class Database<Models, Identifiers extends Record<keyof Models, string> = { [P in keyof Models]: string}> {
 	constructor(binding: KV.Namespace);
-	get<K extends keyof Models>(type: K, uid: Identifiers[K], format?: KV.GetFormat): Promise<Models[K] | false>;
+	get<K extends keyof Models>(type: K, uid: Identifiers[K], format?: KV.GetFormat | KV.Options.Get): Promise<Models[K] | null>;
 	put<K extends keyof Models, M extends KV.Metadata = KV.Metadata>(type: K, uid: Identifiers[K], value: Models[K], options?: Options.Write<M>): Promise<boolean>;
 	del<K extends keyof Models>(type: K, uid: Identifiers[K]): Promise<boolean>;
 }
 
-export function read<T extends ArrayBuffer>(binding: KV.Namespace, key: string, options: 'arrayBuffer' | KV.Options.Get<'arrayBuffer'>): Promise<T|false>;
-export function read<T extends ReadableStream>(binding: KV.Namespace, key: string, options: 'stream' | KV.Options.Get<'stream'>): Promise<T|false>;
-export function read<T extends string>(binding: KV.Namespace, key: string, options: 'text' | KV.Options.Get<'text'>): Promise<T|false>;
-export function read<T>(binding: KV.Namespace, key: string, options?: 'json' | KV.Options.Get<'json'>): Promise<T|false>;
 // Custom method options
 declare namespace Options {
 	type Write<M extends KV.Metadata = KV.Metadata> = KV.Options.Put<M> & { toJSON?: boolean };
 }
+
+// Get raw item value
+export function read<T extends ArrayBuffer>(binding: KV.Namespace, key: string, options: 'arrayBuffer' | KV.Options.Get<'arrayBuffer'>): Promise<T|null>;
+export function read<T extends ReadableStream>(binding: KV.Namespace, key: string, options: 'stream' | KV.Options.Get<'stream'>): Promise<T|null>;
+export function read<T extends string>(binding: KV.Namespace, key: string, options: 'text' | KV.Options.Get<'text'>): Promise<T|null>;
+export function read<T>(binding: KV.Namespace, key: string, options?: 'json' | KV.Options.Get<'json'>): Promise<T|null>;
 
 export function write<T, M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, key: string, value: T, options?: Options.Write<M>): Promise<boolean>;
 export function remove(binding: KV.Namespace, key: string): Promise<boolean>;

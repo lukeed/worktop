@@ -16,9 +16,9 @@ export function Database<Models, I extends Record<keyof Models, string> = { [P i
 	};
 }
 
-export function read<T>(binding: KV.Namespace, key: string, format: KV.Options.Get | KV.GetFormat = 'json'): Promise<T|false> {
-	// @ts-ignore - T + generic `format` pattern match
-	return binding.get<T>(key, format).then(x => x != null ? x : false);
+export function read<T>(binding: KV.Namespace, key: string, format: KV.Options.Get | KV.GetFormat = 'json'): Promise<T|null> {
+	// @ts-ignore - thinks can be "json" only because of unknown `T` pattern match
+	return binding.get<T>(key, format);
 }
 
 export function write<T, M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, key: string, val: T, options?: Options.Write<M>): Promise<boolean> {
