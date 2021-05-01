@@ -136,8 +136,8 @@ uid('length :: 6', () => {
 
 uid('unique', () => {
 	let items = new Set();
-	for (let i=1e6; i--;) items.add(utils.uid());
-	assert.is(items.size, 1e6, '~> 1,000,000 uniques');
+	for (let i=50e3; i--;) items.add(utils.uid());
+	assert.is(items.size, 50e3, '~> 50,000 uniques');
 });
 
 uid.run();
@@ -158,10 +158,10 @@ uuid('returns', () => {
 });
 
 uuid('unique', () => {
-	let length = 1e6;
+	let length = 50e3;
 	assert.is.not(utils.uuid(), utils.uuid(), '~> single');
 	let unique = new Set(Array.from({ length }, utils.uuid));
-	assert.is(unique.size, length, '~> 1,000,000 uniques');
+	assert.is(unique.size, length, '~> 50,000 uniques');
 });
 
 uuid('validate', () => {
@@ -186,10 +186,10 @@ ulid('returns', () => {
 });
 
 ulid('unique', () => {
-	let length = 1e6;
+	let length = 50e3;
 	assert.is.not(utils.ulid(), utils.ulid(), '~> single');
 	let unique = new Set(Array.from({ length }, utils.ulid));
-	assert.is(unique.size, length, '~> 1,000,000 uniques');
+	assert.is(unique.size, length, '~> 50,000 uniques');
 });
 
 ulid('validate', () => {
