@@ -472,6 +472,22 @@ const DB1 = new Database<Models>(APPS);
 const DB2 = new Database<Models, Identifiers>(APPS);
 
 async function storage() {
+	// @ts-expect-error -> string
+	await APPS.get<number>('key');
+	// @ts-expect-error -> ArrayBuffer
+	await APPS.get<number>('key', 'arrayBuffer');
+	// @ts-expect-error -> ReadableStream
+	await APPS.get<number>('key', 'stream');
+	// @ts-expect-error -> string
+	await APPS.get<number>('key', 'text');
+
+	assert<string|null>(await APPS.get('key'));
+	assert<string|null>(await APPS.get('key', 'text'));
+	assert<ArrayBuffer|null>(await APPS.get('key', 'arrayBuffer'));
+	assert<number|null>(await APPS.get<number>('key', 'json'));
+	assert<IUser|null>(await APPS.get<IUser>('key', 'json'));
+	assert<unknown|null>(await APPS.get('key', 'json'));
+
 	// @ts-expect-error - number
 	await DB1.get('user', 1235678);
 
@@ -482,6 +498,28 @@ async function storage() {
 
 	assert<IUser|null>(await DB1.get('user', 'id'));
 	assert<IApp|null>(await DB2.get('app', len11));
+
+	assert<IUser|null>(await DB1.get('user', 'id', 'json'));
+	assert<IUser|null>(await DB1.get('user', 'id', { type: 'json' }));
+	assert<IUser|null>(await DB1.get('user', 'id', { type: 'json', metadata: false }));
+
+	// @ts-expect-error - should not be metadata
+	assert<KV.GetMetadata<IUser>>(await DB1.get('user', 'id', { type: 'json', metadata: false }));
+	assert<KV.GetMetadata<IUser>>(await DB1.get('user', 'id', { type: 'json', metadata: true }));
+
+	// @ts-expect-error - return type mismatch
+	assert<IUser|null>(await DB1.get('user', 'id', { metadata: true }));
+
+	// @ts-expect-error - missing `type` option
+	assert<KV.GetMetadata<IUser>>(await DB1.get('user', 'id', { metadata: true }));
+
+	let user123 = await DB1.get('user', 'id', { type: 'json', metadata: true });
+	assert<KV.GetMetadata<IUser>>(user123);
+	assert<KV.Metadata|null>(user123.metadata);
+	assert<IUser|null>(user123.value);
+
+	// allows `Metadata` override, since `DB.get` cannot take type arg
+	let metadata = user123.metadata as Record<'foo'|'bar', number>;
 
 	let user: IUser = {
 		id: 'asd',
