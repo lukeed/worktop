@@ -33,12 +33,12 @@ read('should return false if `get()` returns null', async () => {
 	let binding = Namespace();
 	binding.get = Mock(null);
 
-	assert.is(await KV.read(binding, 'foobar'), false);
+	assert.is(await KV.read(binding, 'foobar'), null);
 });
 
-read('should return false if `get()` returns undefined', async () => {
+read('should return false if `get()` returns false', async () => {
 	let binding = Namespace();
-	binding.get = Mock(undefined);
+	binding.get = Mock(false);
 
 	assert.is(await KV.read(binding, 'foobar'), false);
 });
@@ -242,8 +242,8 @@ Database('should proxy `binding.get` via `DB.get` method', async () => {
 	const DB = KV.Database<Models>(binding);
 	let user: Partial<IUser> = { id: 'foobar' };
 
-	binding.get = Mock(); // undefined => false
-	assert.is(await DB.get('user', 'foobar'), false);
+	binding.get = Mock(null); // null => as is
+	assert.is(await DB.get('user', 'foobar'), null);
 	assert.equal(binding.get.args(), ['user__foobar', 'json']);
 
 	binding.get = Mock(user);
