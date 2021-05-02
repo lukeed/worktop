@@ -7,8 +7,13 @@ import type { Handler } from 'worktop';
  * GET /users/:username/todos
  */
 export const list: Handler = async function (req, res) {
+	// Read `?limit=` and/or `?page=` values
+	const query = Object.fromEntries(req.query);
+	const limit = Math.min(+query.limit || 50, 50);
+	const page = Math.min(+query.page || 1, 1);
+
 	const { username } = req.params;
-	const data = await Model.list(username);
+	const data = await Model.list(username, { limit, page });
 	res.send(200, { data }, { 'cache-control': 'private,max-age=30' });
 }
 

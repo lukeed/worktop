@@ -6,6 +6,6 @@
   },
   "devDependencies": {
     "cfw": "0.1.2",
-    "worktop": "latest"
+    "worktop": "../"
   }
 }

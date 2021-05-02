@@ -1,42 +1,37 @@
 import * as DB from 'worktop/kv';
-import { uid as toUID } from 'worktop/utils';
-import type { UID } from 'worktop/utils';
+import { ulid } from 'worktop/utils';
+import type { ULID } from 'worktop/utils';
 import type { KV } from 'worktop/kv';
 
 declare const TODOS: KV.Namespace;
 
 export interface Todo {
-	uid: UID<8>;
+	uid: ULID;
 	title: string;
-	done: boolean;
+	complete: boolean;
 	created_at: number;
 	updated_at: number|null;
 }
 
-const key_owner = (username: string) => `user::${username}::todos`;
-const key_item = (username: string, uid: string) => `user::${username}::todos::${uid}`;
+const toPrefix = (username: string) => `user::${username}::todos::`;
+const toKeyname = (username: string, uid: string) => toPrefix(username) + uid;
 
 /**
- * Get the ID list for <username>
+ * Get a list of Todo IDs for <username>
  */
-export async function list(username: string): Promise<Todo['uid'][]> {
-	const key = key_owner(username);
-	return await DB.read<Todo['uid'][]>(TODOS, key, 'json') || [];
-}
-
-/**
- * Update the ID list for <username>
- */
-export function sync(username: string, IDs: string[]) {
-	const key = key_owner(username);
-	return DB.write(TODOS, key, IDs);
+export async function list(username: string, options: { limit?: number; page?: number } = {}): Promise<string[]> {
+	const prefix = toPrefix(username);
+	const keys = await DB.paginate<string[]>(TODOS, { ...options, prefix });
+	//    ^keys are the full KV key names
+	// Remove the `prefix::` from each of them
+	return keys.map(x => x.substring(prefix.length));
 }
 
 /**
  * Force-write a `Todo` record
  */
 export function save(username: string, item: Todo) {
-	const key = key_item(username, item.uid);
+	const key = toKeyname(username, item.uid);
 	return DB.write(TODOS, key, item);
 }
 
@@ -44,7 +39,7 @@ export function save(username: string, item: Todo) {
  * Find a `Todo` record by its <username>::<uid> pair
  */
 export function find(username: string, uid: string) {
-	const key = key_item(username, uid);
+	const key = toKeyname(username, uid);
 	return DB.read<Todo>(TODOS, key, 'json');
 }
 
@@ -58,24 +53,20 @@ export async function insert(username: string, item: Partial<Todo>) {
 	try {
 		// Generate new UID
 		const nextID = await DB.until(
-			() => toUID(8), // 8 character string
+			() => ulid(), // 8 character string
 			(x) => find(username, x), // check if unique for user
 		);
 
 		const values: Todo = {
 			uid: nextID,
 			title: item.title!, // validated in route
-			done: !!item.done || false,
+			complete: !!item.complete,
 			created_at: Date.now(),
 			updated_at: null
 		};
 
 		// exit early if could not save new `Todo` record
 		if (!await save(username, values)) return;
-
-		// synchronize the owner's `Todos`
-		const IDs = (await list(username)).concat(nextID);
-		if (!await sync(username, IDs)) return;
 
 		// return the new item
 		return values;
@@ -94,31 +85,20 @@ export async function update(username: string, item: Todo) {
 	const values = {
 		uid: item.uid,
 		title: item.title.trim(),
-		done: !!item.done,
+		complete: !!item.complete,
 		created_at: item.created_at,
 		updated_at: Date.now()
 	};
 
 	const success = await save(username, values);
-	return success && values;
+	if (success) return values;
 }
 
 /**
  * Remove an existing `Todo` record
  * - Synchronizes owner's ID list for `GET /todos` route
  */
-export async function destroy(username: string, uid: string) {
-	const key = key_item(username, uid);
-	const success = await DB.remove(TODOS, key);
-	if (!success) return false;
-
-	const IDs = await list(username);
-	for (let i=0; i < IDs.length; i++) {
-		if (IDs[i] === uid) {
-			IDs.splice(i, 1);
-			break;
-		}
-	}
-
-	return sync(username, IDs);
+export function destroy(username: string, uid: string) {
+	const key = toKeyname(username, uid);
+	return DB.remove(TODOS, key);
 }
