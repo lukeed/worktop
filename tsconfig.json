@@ -25,6 +25,7 @@
       "worktop/utils": ["./utils.d.ts", "./utils.ts"],
       "worktop/cors": ["./cors.d.ts", "./cors.js"],
       "worktop/kv": ["./kv.d.ts", "./kv.js"],
+      "worktop/ws": ["./ws.d.ts", "./ws.js"],
     }
   },
   "include": [

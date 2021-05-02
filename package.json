@@ -52,6 +52,10 @@
       "import": "./utils/index.mjs",
       "require": "./utils/index.js"
     },
+    "./ws": {
+      "import": "./ws/index.mjs",
+      "require": "./ws/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -64,7 +68,8 @@
     "router",
     "utils",
     "cors",
-    "kv"
+    "kv",
+    "ws"
   ],
   "engines": {
     "node": ">=12"
