@@ -32,9 +32,7 @@ export function remove(binding: KV.Namespace, key: string): Promise<boolean> {
 	return binding.delete(key).then(() => true, () => false);
 }
 
-export function list<M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, options: Options.List & { metadata: true }): AsyncGenerator<{ done: boolean; keys: KV.KeyInfo<M>[] }>;
-export function list<M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, options?: Options.List & { metadata: false }): AsyncGenerator<{ done: boolean; keys: string[] }>;
-export async function * list<M extends KV.Metadata = KV.Metadata>(
+export async function * list<M extends KV.Metadata>(
 	binding: KV.Namespace,
 	options?: Options.List
 ): AsyncGenerator<{ done: boolean; keys: KV.KeyInfo<M>[]|string[] }> {
@@ -51,6 +49,22 @@ export async function * list<M extends KV.Metadata = KV.Metadata>(
 
 		if (results.list_complete) return;
 	}
+}
+
+export async function paginate<M extends KV.Metadata>(
+	binding: KV.Namespace,
+	options?: Options.Paginate
+): Promise<KV.KeyInfo<M>[] | string[]> {
+	let { prefix, metadata=false, limit=50, page=1 } = options || {};
+	let pager = list<M>(binding, { prefix, limit, metadata });
+
+	for await (let result of pager) {
+		// page target exceeds total
+		if (--page && result.done) return [];
+		else if (page === 0) return result.keys;
+	}
+
+	return [];
 }
 
 export async function until<X extends string>(

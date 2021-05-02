@@ -2,7 +2,7 @@ import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
 import { ServerResponse } from 'worktop/response';
-import { Database, list, until } from 'worktop/kv';
+import { Database, list, paginate, until } from 'worktop/kv';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 import { timingSafeEqual } from 'worktop/crypto';
@@ -568,6 +568,13 @@ async function storage() {
 		assert<KV.Metadata|undefined>(result.keys[0].metadata);
 		assert<IUser|undefined>(result.keys[0].metadata);
 	}
+
+	assert<string[]>(await paginate(APPS, { prefix: 'apps::123' }));
+	assert<string[]>(await paginate(APPS, { prefix: 'apps::123', metadata: false }));
+	assert<KV.KeyInfo[]>(await paginate(APPS, { prefix: 'apps::123', metadata: true }));
+
+	let keys = await paginate(APPS, { page: 2, limit: 12, prefix: 'hello' });
+	assert<string>(keys[0]);
 }
 
 /**
