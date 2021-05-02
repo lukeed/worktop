@@ -32,6 +32,27 @@ export function remove(binding: KV.Namespace, key: string): Promise<boolean> {
 	return binding.delete(key).then(() => true, () => false);
 }
 
+export function list<M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, options: Options.List & { metadata: true }): AsyncGenerator<{ done: boolean; keys: KV.KeyInfo<M>[] }>;
+export function list<M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, options?: Options.List & { metadata: false }): AsyncGenerator<{ done: boolean; keys: string[] }>;
+export async function * list<M extends KV.Metadata = KV.Metadata>(
+	binding: KV.Namespace,
+	options?: Options.List
+): AsyncGenerator<{ done: boolean; keys: KV.KeyInfo<M>[]|string[] }> {
+	let { prefix, limit, cursor, metadata } = options || {};
+
+	while (true) {
+		let results = await binding.list<M>({ prefix, limit, cursor });
+		cursor = results.cursor;
+
+		yield {
+			done: results.list_complete,
+			keys: metadata ? results.keys : results.keys.map(x => x.name),
+		};
+
+		if (results.list_complete) return;
+	}
+}
+
 export async function until<X extends string>(
 	toMake: () => X,
 	toSearch: (val: X) => Promise<unknown | false>
