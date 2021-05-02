@@ -1,8 +1,8 @@
 import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
-import { Database, until } from 'worktop/kv';
 import { ServerResponse } from 'worktop/response';
+import { Database, list, until } from 'worktop/kv';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 import { timingSafeEqual } from 'worktop/crypto';
@@ -541,6 +541,33 @@ async function storage() {
 
 	const lookup = (uid: Fixed.String<11>) => DB2.get('app', uid);
 	assert<Fixed.String<11>>(await until(toUID, lookup));
+
+	let lister = list(APPS, { prefix: 'asd' });
+	assert<AsyncGenerator>(lister);
+
+	for await (let result of lister) {
+		assert<boolean>(result.done);
+		assert<string[]>(result.keys);
+	}
+
+	for await (let result of list(APPS, { metadata: true })) {
+		assert<boolean>(result.done);
+		assert<KV.KeyInfo[]>(result.keys);
+
+		assert<string>(result.keys[0].name);
+		assert<number|undefined>(result.keys[0].expiration);
+		assert<KV.Metadata|undefined>(result.keys[0].metadata);
+	}
+
+	for await (let result of list<IUser>(APPS, { metadata: true })) {
+		assert<boolean>(result.done);
+		assert<KV.KeyInfo<IUser>[]>(result.keys);
+
+		assert<string>(result.keys[0].name);
+		assert<number|undefined>(result.keys[0].expiration);
+		assert<KV.Metadata|undefined>(result.keys[0].metadata);
+		assert<IUser|undefined>(result.keys[0].metadata);
+	}
 }
 
 /**

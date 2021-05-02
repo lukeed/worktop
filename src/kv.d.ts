@@ -9,13 +9,13 @@ export namespace KV {
 		metadata: M | null;
 	}
 
-	interface KeyInfo<M extends Metadata> {
+	interface KeyInfo<M extends Metadata = Metadata> {
 		name: string;
 		expiration?: number;
 		metadata?: M;
 	}
 
-	interface KeyList<M extends Metadata> {
+	interface KeyList<M extends Metadata = Metadata> {
 		keys: KeyInfo<M>[];
 		list_complete: boolean;
 		cursor?: string;
@@ -68,6 +68,7 @@ export declare class Database<Models, Identifiers extends Record<keyof Models, s
 
 // Custom method options
 declare namespace Options {
+	type List = KV.Options.List & { metadata?: boolean };
 	type Read<T extends KV.GetFormat = KV.GetFormat> = KV.Options.Get<T> & { metadata?: boolean };
 	type Write<M extends KV.Metadata = KV.Metadata> = KV.Options.Put<M> & { toJSON?: boolean };
 }
@@ -86,6 +87,9 @@ export function read<T>(binding: KV.Namespace, key: string, options?: 'json' | O
 
 export function write<T, M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, key: string, value: T, options?: Options.Write<M>): Promise<boolean>;
 export function remove(binding: KV.Namespace, key: string): Promise<boolean>;
+
+export function list<M extends KV.Metadata = KV.Metadata>(binding: KV.Namespace, options: Options.List & { metadata: true }): AsyncGenerator<{ done: boolean; keys: KV.KeyInfo<M>[] }>;
+export function list(binding: KV.Namespace, options?: Options.List & { metadata?: false }): AsyncGenerator<{ done: boolean; keys: string[] }>;
 
 export function until<X extends string>(
 	toMake: () => X,
