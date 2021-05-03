@@ -33,17 +33,13 @@ export function listen(handler: MessageHandler): Handler {
 		let context = {};
 		server.addEventListener('message', async evt => {
 			await handler(req, {
-				send: server.send,
-				close: server.close,
+				send: server.send.bind(server),
+				close: server.close.bind(server),
 				context: context,
 				data: evt.data,
 			});
 		});
 
-		// TODO?
-		// 'Upgrade: websocket',
-		// 'Connection: Upgrade',
-		// `Sec-WebSocket-Accept: ${digest}`
 		return new Response(null, {
 			status: 101,
 			statusText: 'Switching Protocols',
