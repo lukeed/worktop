@@ -72,6 +72,10 @@ export function Router(): RR {
 			}
 		},
 
+		ws(route: string, handler: Handler) {
+			$.add('GET', route, handler);
+		},
+
 		find(method, pathname) {
 			let params: Params = {};
 			let tmp, dict, rgx, val, match;
