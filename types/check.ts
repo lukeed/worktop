@@ -716,8 +716,8 @@ const onmessage: ws.MessageHandler = async function (req, socket) {
 	}
 }
 
-API.ws('/score/:game', ws.listen(onmessage));
-API.ws(/^[/]foobar[/]/, compose(
+API.add('GET', '/score/:game', ws.listen(onmessage));
+API.add('GET', /^[/]foobar[/]/, compose(
 	(req, res) => {},
 	ws.listen(onmessage)
 ));
