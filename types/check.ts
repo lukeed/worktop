@@ -6,6 +6,7 @@ import { Database, list, paginate, until } from 'worktop/kv';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 import { timingSafeEqual } from 'worktop/crypto';
+import * as ws from 'worktop/ws';
 
 import type { KV } from 'worktop/kv';
 import type { UID, UUID, ULID } from 'worktop/utils';
@@ -690,3 +691,33 @@ timingSafeEqual(u8, dv);
 timingSafeEqual(ab, i8);
 // @ts-expect-error - Mismatch
 timingSafeEqual(u8, u32);
+
+/**
+ * WORKTOP/WS
+ */
+
+const onmessage: ws.MessageHandler = async function (req, socket) {
+	let { game } = req.params;
+	let data = JSON.parse(socket.data);
+
+	// Not thrilled w/ these types
+	let ctx = socket.context;
+	ctx.score = ctx.score || 0;
+
+	switch (data.type) {
+		case '+1':
+		case 'incr': {
+			return socket.send(`${game} score: ${++ctx.score}`);
+		}
+		case '-1':
+		case 'decr': {
+			return socket.send(`${game} score: ${--ctx.score}`);
+		}
+	}
+}
+
+API.ws('/score/:game', ws.listen(onmessage));
+API.ws(/^[/]foobar[/]/, compose(
+	(req, res) => {},
+	ws.listen(onmessage)
+));
