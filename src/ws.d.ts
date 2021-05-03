@@ -26,7 +26,14 @@ export interface WebSocket {
 	addEventListener(type: string, listener: EventListener): void;
 }
 
-export type Socket = Pick<WebSocket, 'close' | 'send'> & { data: string };
+type Context = Record<string, any>;
+export interface Socket<D extends string = string, C = Context> {
+	send: WebSocket['send'];
+	close: WebSocket['close'];
+	context: C;
+	data: D;
+}
+
 export type MessageHandler<P extends Params = Params> = (req: ServerRequest<P>, socket: Socket) => Promise<void>|void;
 
 /**

@@ -29,10 +29,13 @@ export function listen(handler: MessageHandler): Handler {
 		let { 0: client, 1: server } = new WebSocketPair;
 
 		server.accept();
+
+		let context = {};
 		server.addEventListener('message', async evt => {
 			await handler(req, {
 				send: server.send,
 				close: server.close,
+				context: context,
 				data: evt.data,
 			});
 		});
