@@ -109,6 +109,7 @@ globalThis.Headers = class Headers extends Map {
 globalThis.Response = function Response(body: BodyInit, init: ResponseInit = {}) {
 	var $ = this as any;
 	$.headers = init.headers || new Headers;
+	$.statusText = init.statusText || '';
 	$.status = init.status || 200;
 	$.body = body || null;
 	$.clone = () => 'cloned';

@@ -1,3 +1,5 @@
+import type { ServerRequest, Params } from 'worktop/request';
+
 declare global {
 	const WebSocketPair: {
 		new(): {
@@ -18,8 +20,24 @@ export interface WebSocket {
 	close(code?: number, reason?: string): void;
 
 	// TODO: Check if ArrayBuffer / ReadableStream works
-	send(data: number | string): void;
+	send(message: number | string): void;
 
-	addEventListener<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-	addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+	addEventListener<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any): void;
+	addEventListener(type: string, listener: EventListener): void;
 }
+
+export type Socket = Pick<WebSocket, 'close' | 'send'> & { data: string };
+export type MessageHandler<P extends Params = Params> = (req: ServerRequest<P>, socket: Socket) => Promise<void>|void;
+
+/**
+ * Ensure the incoming `Request` can be upgraded to a Websocket connection.
+ * @NOTE This is called automatically within the `listen()` method.
+ */
+export const connect: Handler;
+
+/**
+ * Establish a Websocket connection.
+ * Attach the `handler` as the 'message' event listener.
+ * @NOTE Invokes the `connect()` middleware automatically.
+ */
+export function listen(handler: MessageHandler): Handler;
