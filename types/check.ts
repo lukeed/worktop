@@ -713,8 +713,8 @@ const onEvent1: ws.SocketHandler = async function (req, socket) {
 	}
 }
 
-type CustomParams = { game: string };
-type CustomContext = { score: number };
+type CustomParams = { game?: string };
+type CustomContext = { score?: number };
 const onEvent2: ws.SocketHandler<CustomParams, CustomContext> = function (req, socket) {
 	let { event, context } = socket;
 
