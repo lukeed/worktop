@@ -136,7 +136,7 @@ Cache.listen(API.run);
 > [View `worktop` API documentation](/src/router.d.ts)
 <!-- > [View `worktop` API documentation](/docs/module.router.md) -->
 
-The main module – concerned with routing. <br>This is core of most applications. Exports the [`Router`](/src/router.d.ts#L15) class.
+The main module – concerned with routing. <br>This is core of most applications. Exports the [`Router`](/src/router.d.ts#L66) class.
 
 ### Module: `worktop/kv`
 
@@ -157,7 +157,7 @@ The `worktop/cache` submodule contains all utilities related to [Cloudflare's Ca
 > [View `worktop/request` API documentation](/src/request.d.ts)
 <!-- > [View `worktop/request` API documentation](/docs/module.request.md) -->
 
-The `worktop/request` submodule contains the [`ServerRequest`](/src/request.d.ts#L123) class, which provides an interface similar to the request instance(s) found in most other Node.js frameworks.
+The `worktop/request` submodule contains the [`ServerRequest`](/src/request.d.ts#L117) class, which provides an interface similar to the request instance(s) found in most other Node.js frameworks.
 
 > **Note:** This module is used internally and will (very likely) never be imported by your application.
 
@@ -166,7 +166,7 @@ The `worktop/request` submodule contains the [`ServerRequest`](/src/request.d.ts
 > [View `worktop/response` API documentation](/src/response.d.ts)
 <!-- > [View `worktop/response` API documentation](/docs/module.response.md) -->
 
-The `worktop/response` submodule contains the [`ServerResponse`](/src/response.d.ts#L9) class, which provides an interface similar to the [`IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) (aka, "response") object that Node.js provides.
+The `worktop/response` submodule contains the [`ServerResponse`](/src/response.d.ts#L6) class, which provides an interface similar to the [`IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) (aka, "response") object that Node.js provides.
 
 > **Note:** This module is used internally and will (very likely) never be imported by your application.
 
@@ -204,6 +204,13 @@ The `worktop/crypto` submodule is a collection of cryptographic functionalities.
 <!-- > [View `worktop/utils` API documentation](/docs/module.utils.md) -->
 
 The `worktop/utils` submodule is a collection of standalone, general-purpose utilities that you may find useful. These may include – but are not limited to – hashing functions and unique identifier generators.
+
+### Module: `worktop/ws`
+
+> [View `worktop/ws` API documentation](/src/ws.d.ts)
+<!-- > [View `worktop/ws` API documentation](/docs/module.ws.md) -->
+
+The `worktop/ws` submodule contains the [`WebSocket`](/src/ws.d.ts#L18) and [`WebSocketPair`](/src/ws.d.ts#L4) class definitions, as well as two middleware handlers for validating and/or setting up a [`SocketHandler`](/src/ws.d.ts#L38) for the WebSocket connection.
 
 
 ## License

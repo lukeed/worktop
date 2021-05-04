@@ -13,6 +13,7 @@ export const STATUS_CODES: Record<string|number, string> = {
 	'411': 'Length Required',
 	'413': 'Payload Too Large',
 	'422': 'Unprocessable Entity',
+	'426': 'Upgrade Required',
 	'428': 'Precondition Required',
 	'429': 'Too Many Requests',
 	'500': 'Internal Server Error',

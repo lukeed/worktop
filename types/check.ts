@@ -6,6 +6,7 @@ import { Database, list, paginate, until } from 'worktop/kv';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 import { timingSafeEqual } from 'worktop/crypto';
+import * as ws from 'worktop/ws';
 
 import type { KV } from 'worktop/kv';
 import type { UID, UUID, ULID } from 'worktop/utils';
@@ -690,3 +691,55 @@ timingSafeEqual(u8, dv);
 timingSafeEqual(ab, i8);
 // @ts-expect-error - Mismatch
 timingSafeEqual(u8, u32);
+
+/**
+ * WORKTOP/WS
+ */
+
+const onEvent1: ws.SocketHandler = async function (req, socket) {
+	assert<ws.Socket>(socket);
+	assert<ServerRequest<Params>>(req);
+
+	let { context, event } = socket;
+	assert<Event>(event);
+	assert<ws.Context>(context);
+	assert<'open'|'close'|'message'|'error'>(event.type);
+
+	if (event.type === 'message') {
+		assert<string>(event.data);
+	} else {
+		// @ts-expect-error
+		event.data;
+	}
+}
+
+type CustomParams = { game: string };
+type CustomContext = { score: number };
+const onEvent2: ws.SocketHandler<CustomParams, CustomContext> = function (req, socket) {
+	let { event, context } = socket;
+
+	if (event.type !== 'message') {
+		return;
+	}
+
+	let { game } = req.params;
+	let data = JSON.parse(event.data);
+	context.score = context.score || 0;
+
+	switch (data.type) {
+		case '+1':
+		case 'incr': {
+			return socket.send(`${game} score: ${++context.score}`);
+		}
+		case '-1':
+		case 'decr': {
+			return socket.send(`${game} score: ${--context.score}`);
+		}
+	}
+}
+
+API.add('GET', '/score/:game', ws.listen(onEvent2));
+API.add('GET', /^[/]foobar[/]/, compose(
+	(req, res) => {},
+	ws.listen(onEvent1)
+));

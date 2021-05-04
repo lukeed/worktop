@@ -13,5 +13,6 @@ node_modules
 /response
 /router
 /utils
+/ws
 
 /examples/build

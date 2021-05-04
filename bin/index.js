@@ -41,4 +41,5 @@ Promise.all([
 	bundle('src/utils.ts', pkg.exports['./utils']),
 	bundle('src/cors.ts', pkg.exports['./cors']),
 	bundle('src/kv.ts', pkg.exports['./kv']),
+	bundle('src/ws.ts', pkg.exports['./ws']),
 ]).then(table);
