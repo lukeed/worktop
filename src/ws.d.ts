@@ -51,4 +51,4 @@ export const connect: Handler;
  * Attach the `handler` as the 'message' event listener.
  * @NOTE Invokes the `connect()` middleware automatically.
  */
-export function listen(handler: MessageHandler): Handler;
+export function listen(handler: SocketHandler): Handler;
