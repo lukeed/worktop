@@ -17,11 +17,8 @@ declare global {
 
 export interface WebSocket {
 	accept(): void;
-	close(code?: number, reason?: string): void;
-
-	// TODO: Check if ArrayBuffer / ReadableStream works
 	send(message: number | string): void;
-
+	close(code?: number, reason?: string): void;
 	addEventListener<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any): void;
 	addEventListener(type: string, listener: EventListener): void;
 }
