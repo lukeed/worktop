@@ -1,7 +1,7 @@
 import { abort } from './internal/ws';
 
 import type { Handler } from 'worktop';
-import type { MessageHandler } from 'worktop/ws';
+import type { SocketHandler } from 'worktop/ws';
 
 // @todo Might need to only be 400 code?
 // @see https://datatracker.ietf.org/doc/rfc6455/?include_text=1
@@ -21,24 +21,36 @@ export const connect: Handler = function (req) {
 	if (value !== '8' && value !== '13') return abort(400);
 }
 
-export function listen(handler: MessageHandler): Handler {
+export function listen(handler: SocketHandler): Handler {
 	return function (req, res) {
 		let error = connect(req, res);
 		if (error) return error;
 
 		let { 0: client, 1: server } = new WebSocketPair;
 
-		server.accept();
-
 		let context = {};
-		server.addEventListener('message', async evt => {
-			await handler(req, {
+		function caller(evt: Event) {
+			return handler(req, {
 				send: server.send.bind(server),
 				close: server.close.bind(server),
 				context: context,
-				data: evt.data,
-			});
-		});
+				// @ts-ignore
+				event: evt
+			})
+		}
+
+		async function closer(evt: Event) {
+			try { await caller(evt) }
+			finally { server.close() }
+		}
+
+		server.accept();
+
+		// NOTE: currently "open" is never called
+		// server.addEventListener('open', caller);
+		server.addEventListener('close', closer);
+		server.addEventListener('message', caller);
+		server.addEventListener('error', closer);
 
 		return new Response(null, {
 			status: 101,

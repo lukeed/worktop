@@ -696,28 +696,50 @@ timingSafeEqual(u8, u32);
  * WORKTOP/WS
  */
 
-const onmessage: ws.MessageHandler = async function (req, socket) {
-	let { game } = req.params;
-	let data = JSON.parse(socket.data);
+const onEvent1: ws.SocketHandler = async function (req, socket) {
+	assert<ws.Socket>(socket);
+	assert<ServerRequest<Params>>(req);
 
-	// Not thrilled w/ these types
-	let ctx = socket.context;
-	ctx.score = ctx.score || 0;
+	let { context, event } = socket;
+	assert<Event>(event);
+	assert<ws.Context>(context);
+	assert<'open'|'close'|'message'|'error'>(event.type);
+
+	if (event.type === 'message') {
+		assert<string>(event.data);
+	} else {
+		// @ts-expect-error
+		event.data;
+	}
+}
+
+type CustomParams = { game: string };
+type CustomContext = { score: number };
+const onEvent2: ws.SocketHandler<CustomParams, CustomContext> = function (req, socket) {
+	let { event, context } = socket;
+
+	if (event.type !== 'message') {
+		return;
+	}
+
+	let { game } = req.params;
+	let data = JSON.parse(event.data);
+	context.score = context.score || 0;
 
 	switch (data.type) {
 		case '+1':
 		case 'incr': {
-			return socket.send(`${game} score: ${++ctx.score}`);
+			return socket.send(`${game} score: ${++context.score}`);
 		}
 		case '-1':
 		case 'decr': {
-			return socket.send(`${game} score: ${--ctx.score}`);
+			return socket.send(`${game} score: ${--context.score}`);
 		}
 	}
 }
 
-API.add('GET', '/score/:game', ws.listen(onmessage));
+API.add('GET', '/score/:game', ws.listen(onEvent2));
 API.add('GET', /^[/]foobar[/]/, compose(
 	(req, res) => {},
-	ws.listen(onmessage)
+	ws.listen(onEvent1)
 ));

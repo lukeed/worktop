@@ -27,14 +27,21 @@ export interface WebSocket {
 }
 
 type Context = Record<string, any>;
-export interface Socket<D extends string = string, C = Context> {
+export interface Socket<C extends Context = Context> {
 	send: WebSocket['send'];
 	close: WebSocket['close'];
 	context: C;
-	data: D;
+	event:
+		| { type: 'open' } & Event
+		| { type: 'close' } & CloseEvent
+		| { type: 'message' } & MessageEvent<string>
+		| { type: 'error' } & Event;
 }
 
-export type MessageHandler<P extends Params = Params> = (req: ServerRequest<P>, socket: Socket) => Promise<void>|void;
+export type SocketHandler<
+	P extends Params = Params,
+	C extends Context = Context,
+> = (req: ServerRequest<P>, socket: Socket<C>) => Promise<void>|void;
 
 /**
  * Ensure the incoming `Request` can be upgraded to a Websocket connection.
