@@ -331,11 +331,11 @@ until('should be a function', () => {
 	assert.type(KV.until, 'function');
 });
 
-until('should loop until first `false` value', async () => {
+until('should loop until first `nullish` value', async () => {
 	let values = ['1', '2', '3', '4', '5'];
 	let output = await KV.until(
 		() => values.shift() || '',
-		(x) => Promise.resolve(+x < 3),
+		(x) => Promise.resolve(+x < 3 ? +x : null)
 	);
 	assert.is(output, '3');
 	assert.equal(values, ['4', '5']);

@@ -69,11 +69,11 @@ export async function paginate<M extends KV.Metadata>(
 
 export async function until<X extends string>(
 	toMake: () => X,
-	toSearch: (val: X) => Promise<unknown | false>
+	toSearch: (val: X) => Promise<unknown|false>
 ): Promise<X> {
 	let exists, tmp = '' as X;
-	while (exists !== false) {
+	while (true) {
 		exists = await toSearch(tmp = toMake());
+		if (exists == null) return tmp;
 	}
-	return tmp;
 }
