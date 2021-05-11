@@ -117,12 +117,10 @@ export function Router(): RR {
 			tmp = $.find(req.method, req.path);
 			if (!tmp) return call($.onerror, true, req, res, 404);
 
-			try {
-				req.params = tmp.params;
-				return call(tmp.handler, true, req, res);
-			} catch (err) {
+			req.params = tmp.params;
+			return call(tmp.handler, true, req, res).catch(err => {
 				return call($.onerror, true, req, res, 500, err);
-			}
+			});
 		}
 	};
 }
