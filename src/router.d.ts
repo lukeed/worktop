@@ -6,8 +6,8 @@ import type { ServerRequest, Params, Method } from 'worktop/request';
 type Promisable<T> = Promise<T> | T;
 
 type CronHandler = (event: CronEvent) => void;
-export type FetchHandler = (event: FetchEvent) => void;
 export type ResponseHandler = (event: FetchEvent) => Promisable<Response>;
+export type FetchHandler = (event: FetchEvent, request?: Request | string) => void;
 
 interface CronEvent {
 	type: 'scheduled';

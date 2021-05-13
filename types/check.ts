@@ -204,6 +204,20 @@ addEventListener('fetch', API.find);
 addEventListener('fetch', reply(API.run));
 addEventListener('fetch', Cache.reply(API.run));
 
+const reply$1 = reply(API.run);
+const reply$2 = Cache.reply(API.run);
+addEventListener('fetch', event => {
+	const { method } = event.request;
+	if (method === 'GET') {
+		// non-cache is useless, but wont throw
+		reply$1(event, event.request);
+		reply$1(event, '/GET/123');
+	} else {
+		reply$2(event, event.request);
+		reply$2(event, `/${method}/123`);
+	}
+});
+
 // @ts-expect-error
 addEventListener('scheduled', API.find);
 addEventListener('scheduled', event => {

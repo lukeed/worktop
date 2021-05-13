@@ -41,10 +41,10 @@ export function isCacheable(res: Response): boolean {
 }
 
 export function reply(handler: ResponseHandler): FetchHandler {
-	return event => event.respondWith(
-		lookup(event).then(prev => {
+	return (event, request) => event.respondWith(
+		lookup(event, request).then(prev => {
 			return prev || handler(event).then(res => {
-				return save(event, res);
+				return save(event, res, request);
 			});
 		})
 	);

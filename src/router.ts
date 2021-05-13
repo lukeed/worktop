@@ -10,7 +10,7 @@ import type { Method, Params } from 'worktop/request';
 export { STATUS_CODES };
 
 export function reply(handler: ResponseHandler): FetchHandler {
-	return event => event.respondWith(
+	return (event) => event.respondWith(
 		handler(event)
 	);
 }
