@@ -10,7 +10,7 @@ import * as ws from 'worktop/ws';
 
 import type { KV } from 'worktop/kv';
 import type { UID, UUID, ULID } from 'worktop/utils';
-import type { CronEvent, FetchHandler, Route, RouteParams } from 'worktop';
+import type { CronEvent, FetchHandler, RouteParams } from 'worktop';
 import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
 
 declare function assert<T>(value: T): void;
@@ -167,17 +167,6 @@ API.add('POST', '/items', async (req, res) => {
 	assert<string>(req.cf.tlsClientAuth!.certFingerprintSHA1);
 });
 
-// @ts-expect-error
-API.find(123, 'asd');
-// @ts-expect-error
-API.find('GET', 123);
-// @ts-expect-error
-API.find('GET', /^foo[/]?/);
-
-assert<Route|void>(
-	API.find('GET', '/pathname')
-);
-
 reply(API.run);
 
 reply(event => {
@@ -200,7 +189,7 @@ reply(API.onerror);
 reply(API.run);
 
 // @ts-expect-error
-addEventListener('fetch', API.find);
+addEventListener('fetch', API.add);
 addEventListener('fetch', reply(API.run));
 addEventListener('fetch', Cache.reply(API.run));
 
