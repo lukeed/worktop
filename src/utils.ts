@@ -23,13 +23,6 @@ export function viaHEX(input: string): Uint8Array {
 	return new Uint8Array(out);
 }
 
-// @see https://github.com/lukeed/uid
-export function uid(len = 11): string {
-	var str='', num=(1+len)/2|0, arr=randomize(num);
-	while (num--) str += HEX[arr[num]];
-	return str.substring(0, len);
-}
-
 // @see https://github.com/lukeed/uuid
 export function uuid(): string {
 	var str='', i=0, arr=randomize(16);
@@ -42,6 +35,16 @@ export function uuid(): string {
 		if (i & 1 && i > 1 && i < 11) str += '-';
 	}
 
+	return str;
+}
+
+// Alphabet for `uid` generator
+const ALPHANUM = /*#__PURE__*/ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_';
+
+// @see https://github.com/lukeed/uid
+export function uid(len?: number): string {
+	var str='', num=len||11, arr=randomize(num);
+	while (num--) str += ALPHANUM[arr[num] & 63];
 	return str;
 }
 
