@@ -38,6 +38,7 @@ interface Branch {
 }
 
 type Tree = Partial<Record<Method, Branch>>;
+type Route = { params: Params; handler: Handler };
 
 async function call(fn: Function, isEnd: true, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response>;
 async function call(fn: Function, isEnd: false, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response|void>;
@@ -46,6 +47,32 @@ async function call(fn: Function, isEnd: boolean, req: ServerRequest, res: Serve
 	const output = await fn(req, res, ...args);
 	if (output instanceof Response) return output;
 	if (isEnd || res.finished) return new Response(res.body, res);
+}
+
+function find(tree: Tree, method: Method, pathname: string): Route|void {
+	let params: Params = {};
+	let tmp, dict, rgx, val, match;
+
+	if (dict = tree[method]) {
+		if (tmp = dict.__s[pathname]) {
+			return { params, handler: tmp.handler };
+		}
+
+		for ([rgx, val] of dict.__d) {
+			match = rgx.exec(pathname);
+			if (match === null) continue;
+			if (match.groups !== void 0) {
+				for (tmp in match.groups) {
+					params[tmp] = match.groups[tmp];
+				}
+			} else if (val.keys.length > 0) {
+				for (tmp=0; tmp < val.keys.length;) {
+					params[val.keys[tmp++]] = match[tmp];
+				}
+			}
+			return { params, handler: val.handler };
+		}
+	}
 }
 
 export function Router(): RR {
@@ -72,32 +99,6 @@ export function Router(): RR {
 			}
 		},
 
-		find(method, pathname) {
-			let params: Params = {};
-			let tmp, dict, rgx, val, match;
-
-			if (dict = tree[method]) {
-				if (tmp = dict.__s[pathname]) {
-					return { params, handler: tmp.handler };
-				}
-
-				for ([rgx, val] of dict.__d) {
-					match = rgx.exec(pathname);
-					if (match === null) continue;
-					if (match.groups !== void 0) {
-						for (tmp in match.groups) {
-							params[tmp] = match.groups[tmp];
-						}
-					} else if (val.keys.length > 0) {
-						for (tmp=0; tmp < val.keys.length;) {
-							params[val.keys[tmp++]] = match[tmp];
-						}
-					}
-					return { params, handler: val.handler };
-				}
-			}
-		},
-
 		onerror(req, res, status, error) {
 			const statusText = STATUS_CODES[status = status || 500];
 			const body = error && error.message || statusText || String(status);
@@ -114,7 +115,7 @@ export function Router(): RR {
 				isPrepare = false;
 			}
 
-			tmp = $.find(req.method, req.path);
+			tmp = find(tree, req.method, req.path);
 			if (!tmp) return call($.onerror, true, req, res, 404);
 
 			req.params = tmp.params;
