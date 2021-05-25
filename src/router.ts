@@ -1,4 +1,4 @@
-import regexparam from 'regexparam';
+import { parse } from 'regexparam';
 import { ServerRequest } from 'worktop/request';
 import { ServerResponse } from 'worktop/response';
 import { STATUS_CODES } from './internal/constants';
@@ -65,7 +65,7 @@ export function Router(): RR {
 			if (route instanceof RegExp) {
 				dict.__d.set(route, { keys:[], handler });
 			} else if (/[:|*]/.test(route)) {
-				const { keys, pattern } = regexparam(route);
+				const { keys, pattern } = parse(route);
 				dict.__d.set(pattern, { keys, handler });
 			} else {
 				dict.__s[route] = { keys:[], handler };
