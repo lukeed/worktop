@@ -9,4 +9,4 @@ export interface Attributes {
 }
 
 export function parse(cookie: string): Attributes & Record<string, string>;
-export function stringify(name: string, value: string, options: Omit<Attributes, 'expires'> & { expires?: Date | number | string }): string;
+export function stringify(name: string, value: string, options?: Omit<Attributes, 'expires'> & { expires?: Date | number | string }): string;
