@@ -2,14 +2,14 @@ import { body } from './internal/request';
 import type { ServerRequest as SR, Method } from 'worktop/request';
 
 export function ServerRequest(this: SR, event: FetchEvent): SR {
-	const { request, waitUntil } = event;
-	const url = new URL(request.url);
 	const $ = this;
+	const { request } = event;
+	const url = new URL(request.url);
 
 	$.url = request.url;
 	$.method = request.method as Method;
 	$.headers = request.headers;
-	$.extend = waitUntil;
+	$.extend = event.waitUntil.bind(event);
 	$.cf = request.cf;
 	$.params = {};
 
