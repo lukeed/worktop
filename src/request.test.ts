@@ -39,8 +39,7 @@ request('should have instance properties', () => {
 	assert.is(req.url, event.request.url);
 	assert.is(req.method, 'GET');
 	assert.ok(req.headers === event.request.headers);
-	assert.ok(req.extend === event.waitUntil);
-	assert.type(req.extend, 'function');
+	assert.type(req.extend, 'function'); // bound
 	assert.ok(req.cf === event.request.cf);
 	assert.equal(req.params, {});
 
