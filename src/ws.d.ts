@@ -44,7 +44,7 @@ export type SocketHandler<
  * Ensure the incoming `Request` can be upgraded to a Websocket connection.
  * @NOTE This is called automatically within the `listen()` method.
  */
-export const connect: Handler;
+ export function connect(req: ServerRequest<P>): Response|void;
 
 /**
  * Establish a Websocket connection.
