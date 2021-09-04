@@ -36,6 +36,10 @@
       "import": "./crypto/index.mjs",
       "require": "./crypto/index.js"
     },
+    "./durable": {
+      "import": "./durable/index.mjs",
+      "require": "./durable/index.js"
+    },
     "./request": {
       "import": "./request/index.mjs",
       "require": "./request/index.js"
@@ -67,6 +71,7 @@
     "cache",
     "crypto",
     "cookie",
+    "durable",
     "request",
     "response",
     "modules",
