@@ -35,6 +35,10 @@ export interface Bindings {
 declare global {
 	function addEventListener(type: 'fetch', handler: FetchHandler): void;
 	function addEventListener(type: 'scheduled', handler: CronHandler): void;
+
+	interface FetchEvent {
+		passThroughOnException(): void;
+	}
 }
 
 /**
