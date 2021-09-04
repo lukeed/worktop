@@ -1,17 +1,9 @@
 import { suite } from 'uvu';
-import { randomBytes } from 'crypto';
 import * as assert from 'uvu/assert';
 import * as utils from './utils';
 
-// @ts-ignore
+// @ts-ignore - missing def
 import isUUID from 'is-uuid';
-
-globalThis.crypto = {
-	// @ts-ignore
-	getRandomValues(arr: Uint8Array) {
-		return randomBytes(arr.length);
-	}
-};
 
 // ---
 

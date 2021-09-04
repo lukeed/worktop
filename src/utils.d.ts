@@ -1,3 +1,9 @@
+declare global {
+	interface Crypto {
+		randomUUID(): string;
+	}
+}
+
 /**
  * All 256 hexadecimal pairs
  * @NOTE Maximum index is `255`

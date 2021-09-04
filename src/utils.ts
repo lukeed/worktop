@@ -24,19 +24,7 @@ export function viaHEX(input: string): Uint8Array {
 }
 
 // @see https://github.com/lukeed/uuid
-export function uuid(): string {
-	var str='', i=0, arr=randomize(16);
-
-	for (; i < 16; i++) {
-		if (i===6) str += HEX[arr[i] & 15 | 64];
-		else if (i===8) str += HEX[arr[i] & 63 | 128];
-		else str += HEX[arr[i]];
-
-		if (i & 1 && i > 1 && i < 11) str += '-';
-	}
-
-	return str;
-}
+export const uuid = () => crypto.randomUUID();
 
 // Alphabet for `uid` generator
 const ALPHANUM = /*#__PURE__*/ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_';
