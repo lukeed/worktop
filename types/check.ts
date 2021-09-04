@@ -759,6 +759,9 @@ const worker1: ModuleWorker = {
 
 		assert<Bindings>(env);
 
+		// @ts-expect-error
+		let foobar = env.foobar;
+
 		assert<Function>(ctx.waitUntil);
 		assert<Function>(ctx.passThroughOnException);
 
@@ -786,11 +789,17 @@ interface CustomBindings extends Bindings {
 
 const worker2: ModuleWorker<CustomBindings> = {
 	fetch(req, env, ctx) {
+		// @ts-expect-error
+		assert<Bindings>(env);
+		// @ts-expect-error
 		assert<CustomBindings>(env);
 
 		assert<string>(env.SECRET);
 		assert<KV.Namespace>(env.DATAB);
 		assert<number>(env.COUNT);
+
+		// @ts-expect-error
+		let foo = env.missing;
 
 		// @ts-expect-error
 		assert<undefined>(env.missing);
