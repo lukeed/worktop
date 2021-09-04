@@ -6,6 +6,7 @@ import { Database, list, paginate, until } from 'worktop/kv';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 import { timingSafeEqual } from 'worktop/crypto';
+import * as modules from 'worktop/modules';
 import * as ws from 'worktop/ws';
 
 import type { KV } from 'worktop/kv';
@@ -807,3 +808,26 @@ const worker2: ModuleWorker<CustomBindings> = {
 		return new Response;
 	}
 }
+
+const worker3 = modules.define<CustomBindings>({
+	fetch(req, env, ctx) {
+		assert<Request>(req);
+
+		// @ts-expect-error
+		assert<Bindings>(env);
+		// @ts-expect-error
+		assert<CustomBindings>(env);
+
+		assert<string>(env.SECRET);
+		assert<KV.Namespace>(env.DATAB);
+		assert<number>(env.COUNT);
+
+		// @ts-expect-error
+		let foo = env.missing;
+
+		return new Response;
+	}
+});
+
+// attach Router entry
+modules.listen(API.run);

@@ -16,3 +16,13 @@ export interface ModuleWorker<B extends Bindings = Bindings> {
 	fetch?: FetchHandler<B>;
 	scheduled?: CronHandler<B>;
 }
+
+/**
+ * Tiny helper for easy TypeScript definition inferences
+ */
+export function define<B extends Bindings = Bindings>(worker: ModuleWorker<B>): ModuleWorker<B>;
+
+/**
+ * Quickly "convert" a ServiceWorker `ResponseHandler` into a `ModuleWorker` definition.
+ */
+export function listen<B extends Bindings = Bindings>(handler: ResponseHandler): ModuleWorker<B>;
