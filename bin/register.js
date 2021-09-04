@@ -1,10 +1,13 @@
+// @ts-check
 const { transform } = require('./esbuild');
 
 const loadJS = require.extensions['.js'];
 
-// @ts-ignore
-// worktop/cache
+// @ts-ignore - worktop/cache
 globalThis.caches = { default: {} };
+
+// @ts-ignore - worktop/utils, worktop/crypto
+globalThis.crypto = require('crypto').webcrypto;
 
 // worktop/base64
 globalThis.btoa = (x) => Buffer.from(x).toString('base64');

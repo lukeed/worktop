@@ -17,7 +17,7 @@ digest('should be a function', () => {
 	assert.type(crypto.digest, 'function');
 });
 
-digest.skip('should return a string', async () => {
+digest('should return a string', async () => {
 	let output = await crypto.digest('SHA-1', 'hello');
 	assert.type(output, 'string');
 });
@@ -32,7 +32,7 @@ SHA1('should be a function', () => {
 	assert.type(crypto.SHA1, 'function');
 });
 
-SHA1.skip('should return correct values as hexstrings', async () => {
+SHA1('should return correct values as hexstrings', async () => {
 	assert.is(
 		await crypto.SHA1(''),
 		createHash('sha1').update('').digest('hex'),
@@ -68,7 +68,7 @@ SHA256('should be a function', () => {
 	assert.type(crypto.SHA256, 'function');
 });
 
-SHA256.skip('should return correct values as hexstrings', async () => {
+SHA256('should return correct values as hexstrings', async () => {
 	assert.is(
 		await crypto.SHA256(''),
 		createHash('sha256').update('').digest('hex'),
@@ -104,7 +104,7 @@ SHA384('should be a function', () => {
 	assert.type(crypto.SHA384, 'function');
 });
 
-SHA384.skip('should return correct values as hexstrings', async () => {
+SHA384('should return correct values as hexstrings', async () => {
 	assert.is(
 		await crypto.SHA384(''),
 		createHash('sha384').update('').digest('hex'),
@@ -140,7 +140,7 @@ SHA512('should be a function', () => {
 	assert.type(crypto.SHA512, 'function');
 });
 
-SHA512.skip('should return correct values as hexstrings', async () => {
+SHA512('should return correct values as hexstrings', async () => {
 	assert.is(
 		await crypto.SHA512(''),
 		createHash('sha512').update('').digest('hex'),
@@ -262,7 +262,7 @@ PBKDF2('should be a function', () => {
 });
 
 // @see https://nodejs.org/api/crypto.html#crypto_crypto_pbkdf2_password_salt_iterations_keylen_digest_callback
-PBKDF2.skip('should produce expected output', async ctx => {
+PBKDF2('should produce expected output', async ctx => {
 	assert.is(
 		await crypto.PBKDF2('SHA-512', 'secret', 'salt', 100e3, 64).then(toHEX),
 		(await ctx.native('secret', 'salt', 100e3, 64, 'sha512')).toString('hex'),
