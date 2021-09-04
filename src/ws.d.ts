@@ -44,11 +44,14 @@ export type SocketHandler<
  * Ensure the incoming `Request` can be upgraded to a Websocket connection.
  * @NOTE This is called automatically within the `listen()` method.
  */
-export function connect<P extends Params = Params>(req: ServerRequest<P>): Response;
+export function connect<P extends Params = Params>(req: ServerRequest<P> | Request): Response | void;
 
 /**
  * Establish a Websocket connection.
  * Attach the `handler` as the 'message' event listener.
  * @NOTE Invokes the `connect()` middleware automatically.
  */
-export function listen(handler: SocketHandler): Handler;
+export function listen<
+	P extends Params = Params,
+	C extends Context = Context,
+>(handler: SocketHandler<P, C>): (req: ServerRequest<P>) => Response;

@@ -702,6 +702,7 @@ timingSafeEqual(u8, u32);
 const onEvent1: ws.SocketHandler = async function (req, socket) {
 	assert<ws.Socket>(socket);
 	assert<ServerRequest<Params>>(req);
+	assert<ServerRequest>(req);
 
 	let { context, event } = socket;
 	assert<Event>(event);

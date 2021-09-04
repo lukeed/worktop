@@ -1,12 +1,12 @@
 import { abort } from './internal/ws';
 
-import type { Handler } from 'worktop';
 import type { SocketHandler } from 'worktop/ws';
+import type { Params, ServerRequest } from 'worktop/request';
 
 // TODO: Might need to only be 400 code?
 // @see https://datatracker.ietf.org/doc/rfc6455/?include_text=1
 // @see https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_servers
-export const connect: Handler = function (req) {
+export function connect<P extends Params = Params>(req: ServerRequest<P> | Request) {
 	if (req.method !== 'GET') return abort(405);
 
 	let value = req.headers.get('upgrade');
@@ -19,14 +19,19 @@ export const connect: Handler = function (req) {
 	if (value !== '13') return abort(400);
 }
 
-export function listen(handler: SocketHandler): Handler {
-	return function (req, res) {
-		let error = connect(req, res);
+type Context = Record<string, any>;
+
+export function listen<
+	P extends Params = Params,
+	C extends Context = Context,
+>(handler: SocketHandler<P, C>): (req: ServerRequest<P>) => Response {
+	return function (req) {
+		let error = connect(req);
 		if (error) return error;
 
 		let { 0: client, 1: server } = new WebSocketPair;
 
-		let context = {};
+		let context = {} as C;
 		function caller(evt: Event) {
 			return handler(req, {
 				send: server.send.bind(server),
@@ -34,7 +39,7 @@ export function listen(handler: SocketHandler): Handler {
 				context: context,
 				// @ts-ignore
 				event: evt
-			})
+			});
 		}
 
 		async function closer(evt: Event) {
