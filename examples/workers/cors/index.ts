@@ -9,7 +9,7 @@ let counter = 0;
 
 /**
  * Handles `OPTIONS` requests using the same settings.
- * NOTE: Call `CORS.preflight` per-route for inidivual settings.
+ * NOTE: Call `CORS.preflight` per-route for individual settings.
  */
 API.prepare = CORS.preflight({
 	origin: '*', // allow any `Origin` to connect
