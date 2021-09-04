@@ -19,6 +19,7 @@ require.extensions['.ts'] = function (Module, filename) {
 	Module._compile = source => {
 		const { code, warnings } = transform(source, {
 			sourcefile: filename,
+			sourcemap: 'inline',
 			loader: 'ts',
 		});
 

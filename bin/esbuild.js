@@ -31,8 +31,6 @@ exports.build = function (input, output, externals=[]) {
  */
 exports.transform = function (source, overrides={}) {
 	return esbuild.transformSync(source, {
-		...options,
-		format: 'cjs',
-		...overrides
+		...options, format: 'cjs', ...overrides
 	});
 }
