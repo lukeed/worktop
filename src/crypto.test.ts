@@ -5,12 +5,6 @@ import { createHash, pbkdf2 } from 'crypto';
 import * as crypto from './crypto';
 import { toHEX } from './utils';
 
-/**
- * TODO(Node 16) SubtleCrypto
- * require(crypto).webcrypto.subtle
- * @see https://nodejs.org/api/webcrypto.html#webcrypto_class_subtlecrypto
- */
-
 const digest = suite('digest');
 
 digest('should be a function', () => {
