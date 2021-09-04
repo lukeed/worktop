@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 
+import type { KV } from 'worktop/kv';
 import type { ServerResponse } from 'worktop/response';
 import type { ServerRequest, Params, Method } from 'worktop/request';
 
@@ -25,6 +26,10 @@ interface CronEvent {
 	 * Method wrapper for event's action handler.
 	 */
 	waitUntil(f: Promisable<any>): void;
+}
+
+export interface Bindings {
+	[name: string]: string | CryptoKey | KV.Namespace;
 }
 
 declare global {
