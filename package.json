@@ -44,6 +44,10 @@
       "import": "./response/index.mjs",
       "require": "./response/index.js"
     },
+    "./modules": {
+      "import": "./modules/index.mjs",
+      "require": "./modules/index.js"
+    },
     "./base64": {
       "import": "./base64/index.mjs",
       "require": "./base64/index.js"
@@ -65,6 +69,7 @@
     "cookie",
     "request",
     "response",
+    "modules",
     "router",
     "utils",
     "cors",
