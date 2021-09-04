@@ -13,16 +13,13 @@ on:
 
 jobs:
   test:
-    name: Node.js v${{ matrix.nodejs }}
+    name: Node.js v16
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        nodejs: [12, 14]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v2
       with:
-        node-version: ${{ matrix.nodejs }}
+        node-version: 16
 
     - name: (env) pnpm
       run: curl -L https://pnpm.js.org/pnpm.js | node - add --global pnpm
