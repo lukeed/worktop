@@ -1,0 +1,13 @@
+{
+  "name": "worktop-demo-basic-module",
+  "zoneid": "<YOUR ZONE ID>",
+  "profile": "personal",
+  "entry": "index.ts",
+  "module": true,
+  "globals": {
+    "FALLBACK": "ENV:friend"
+  },
+  "routes": [
+    "<YOUR DOMAIN>/*"
+  ]
+}
