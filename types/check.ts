@@ -1,16 +1,19 @@
 import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
+import * as cookies from 'worktop/cookie';
 import { ServerResponse } from 'worktop/response';
 import { Database, list, paginate, until } from 'worktop/kv';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
 import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 import { timingSafeEqual } from 'worktop/crypto';
 import * as modules from 'worktop/modules';
+import { Actor } from 'worktop/durable';
 import * as ws from 'worktop/ws';
 
 import type { KV } from 'worktop/kv';
 import type { WebSocket } from 'worktop/ws';
+import type { Durable } from 'worktop/durable';
 import type { UID, UUID, ULID } from 'worktop/utils';
 import type { Bindings, CronEvent, FetchHandler, RouteParams } from 'worktop';
 import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
@@ -849,3 +852,77 @@ const worker3 = modules.define<CustomBindings>({
 
 // attach Router entry
 modules.listen(API.run);
+
+/**
+ * WORKTOP/DURABLE
+ */
+
+// @ts-expect-error
+let invalid = new Actor();
+
+// @ts-expect-error - incomplete
+class Counter1 extends Actor {
+	//
+}
+
+class Counter2 extends Actor {
+	DEBUG = true;
+
+	async custom() {
+		//
+	}
+
+	async setup(state: Durable.State, env: CustomBindings) {
+		// external fetch
+		await fetch('/logs', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				event: 'setup',
+				id: String(state.id),
+				timestamp: Date.now(),
+			})
+		});
+		// custom method
+		await this.custom();
+	}
+
+	async receive(req: Request): Promise<Response> {
+		return new Response('OK');
+	}
+}
+
+class Counter3 extends Actor {
+	DEBUG = true;
+	#pool = new Map<string, Set<WebSocket>>();
+
+	async onconnect(req: Request, ws: WebSocket) {
+		let value = req.headers.get('cookie')!;
+		let { userid } = cookies.parse(value);
+
+		let group = this.#pool.get(userid) || new Set;
+		this.#pool.set(userid, group);
+		group.add(ws);
+
+		// setup custom listeners
+		ws.addEventListener('close', this.onclose);
+		ws.addEventListener('message', event => {
+			assert<string>(event.data);
+		});
+	}
+
+	async onclose(event: CloseEvent) {
+		assert<string>(event.type);
+	}
+
+	async receive(req: Request): Promise<Response> {
+		if (req.url.startsWith('/ws/')) {
+			let token = req.headers.get('cookie');
+			if (token) return this.connect(req);
+			return new Response('Missing cookie', { status: 401 });
+		}
+		return new Response('OK');
+	}
+}
