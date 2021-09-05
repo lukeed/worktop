@@ -803,8 +803,9 @@ const worker1: ModuleWorker = {
 };
 
 interface CustomBindings extends Bindings {
-	DATAB: KV.Namespace;
 	SECRET: string;
+	DATAB: KV.Namespace;
+	COUNTER: Durable.Namespace;
 	// @ts-expect-error
 	COUNT: number;
 }
@@ -885,6 +886,12 @@ class Counter2 extends Actor {
 				timestamp: Date.now(),
 			})
 		});
+
+		// bindings are defined
+		assert<Durable.Namespace>(env.COUNTER);
+		assert<KV.Namespace>(env.DATAB);
+		assert<string>(env.SECRET);
+
 		// custom method
 		await this.custom();
 	}
