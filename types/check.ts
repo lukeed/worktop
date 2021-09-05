@@ -933,3 +933,31 @@ class Counter3 extends Actor {
 		return new Response('OK');
 	}
 }
+
+class Counter4 extends Actor {
+	#router: Router;
+	#wait: Durable.State['waitUntil'];
+
+	constructor(state: Durable.State, env: Bindings) {
+		super(state, env);
+		this.#router = new Router;
+		// NOTE: don't actually need this
+		this.#wait = state.waitUntil.bind(state);
+
+		this.#router.add('GET', '/', (req, res) => {
+			res.end('OK');
+		});
+
+		this.#router.add('POST', '/', async (req, res) => {
+			let input = await req.body<number[]>();
+			res.send(200, Math.max(...input!));
+		});
+	}
+
+	receive(req: Request): Promise<Response> {
+		return this.#router.run({
+			request: req,
+			waitUntil: this.#wait,
+		} as FetchEvent);
+	}
+}
