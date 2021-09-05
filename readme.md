@@ -152,6 +152,13 @@ The `worktop/kv` submodule contains all classes and utilities related to [Worker
 
 The `worktop/cache` submodule contains all utilities related to [Cloudflare's Cache](https://developers.cloudflare.com/workers/learning/how-the-cache-works).
 
+### Module: `worktop/modules`
+
+> [View `worktop/modules` API documentation](/src/modules.d.ts)
+<!-- > [View `worktop/cache` API documentation](/docs/module.cache.md) -->
+
+The `worktop/modules` submodule includes two utilities related to the Module Workers format. Most notably, it exports a `listen` method to conform existing `Router` applications from Service Worker to Module Worker format.
+
 ### Module: `worktop/request`
 
 > [View `worktop/request` API documentation](/src/request.d.ts)
