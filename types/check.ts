@@ -9,6 +9,7 @@ import { timingSafeEqual } from 'worktop/crypto';
 import * as ws from 'worktop/ws';
 
 import type { KV } from 'worktop/kv';
+import type { WebSocket } from 'worktop/ws';
 import type { UID, UUID, ULID } from 'worktop/utils';
 import type { CronEvent, FetchHandler, RouteParams } from 'worktop';
 import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
@@ -747,3 +748,19 @@ API.add('GET', /^[/]foobar[/]/, compose(
 	(req, res) => {},
 	ws.listen(onEvent1)
 ));
+
+/**
+ * WORKTOP/WS
+ */
+
+declare let websocket1: WebSocket;
+declare let listener1: EventListener;
+
+// @ts-expect-error - "open" not allowed
+websocket1.addEventListener('open', listener1);
+websocket1.addEventListener('close', listener1);
+websocket1.addEventListener('error', listener1);
+websocket1.addEventListener('message', evt => {
+	assert<MessageEvent>(evt);
+	assert<string>(evt.data);
+});

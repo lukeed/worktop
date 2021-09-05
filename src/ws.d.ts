@@ -19,8 +19,9 @@ export interface WebSocket {
 	accept(): void;
 	send(message: number | string): void;
 	close(code?: number, reason?: string): void;
-	addEventListener<K extends keyof WebSocketEventMap>(type: K, listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any): void;
-	addEventListener(type: string, listener: EventListener): void;
+	addEventListener(type: 'error', listener: (this: WebSocket, ev: Event) => any): void;
+	addEventListener(type: 'close', listener: (this: WebSocket, ev: CloseEvent) => any): void;
+	addEventListener(type: 'message', listener: (this: WebSocket, ev: MessageEvent<string>) => any): void;
 }
 
 type Context = Record<string, any>;
@@ -29,7 +30,6 @@ export interface Socket<C extends Context = Context> {
 	close: WebSocket['close'];
 	context: C;
 	event:
-		| { type: 'open' } & Event
 		| { type: 'close' } & CloseEvent
 		| { type: 'message' } & MessageEvent<string>
 		| { type: 'error' } & Event;
