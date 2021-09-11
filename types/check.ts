@@ -17,8 +17,6 @@ import type { Bindings, Context, CronEvent } from 'worktop';
 import type { Params, RouteParams, IncomingCloudflareProperties } from 'worktop';
 import type { ModuleWorker } from 'worktop/modules';
 
-declare function assert<T>(value: T): void;
-
 /**
  * WORKTOP/RESPONSE
  */
