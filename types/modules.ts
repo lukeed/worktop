@@ -7,7 +7,7 @@ import type { KV } from 'worktop/kv';
  * WORKTOP/MODULES
  */
 
- const worker1: ModuleWorker = {
+const worker1: ModuleWorker = {
 	async fetch(req, env, ctx) {
 		assert<Request>(req);
 		assert<IncomingCloudflareProperties>(req.cf);

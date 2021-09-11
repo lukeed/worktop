@@ -1,15 +1,9 @@
-
-import * as Cache from 'worktop/cache';
-import { listen, reply, Router, compose } from 'worktop';
+import { Router, compose } from 'worktop';
 
 import type { Params, ServerRequest } from 'worktop/request';
 import type { IncomingCloudflareProperties } from 'worktop/request';
 import type { ServerResponse } from 'worktop/response';
-import type { CronEvent, RouteParams } from 'worktop';
-
-/**
- * WORKTOP/ROUTER
- */
+import type { RouteParams } from 'worktop';
 
 // @ts-expect-error
 const invalid = Router();
@@ -86,16 +80,16 @@ API.add('POST', '/items', async (req, res) => {
 	assert<string>(req.cf.tlsClientAuth!.certFingerprintSHA1);
 });
 
-async function foo1(event: FetchEvent) {
-	// @ts-expect-error
-	await API.run('hello');
+declare const event: FetchEvent;
 
-	const res1 = await API.run(event);
-	assert<Response>(res1);
+// @ts-expect-error
+await API.run('hello');
 
-	const res2 = API.run(event);
-	assert<Promise<Response>>(res2);
-}
+const res1 = await API.run(event);
+assert<Response>(res1);
+
+const res2 = API.run(event);
+assert<Promise<Response>>(res2);
 
 /**
  * PARAMS / RouteParams
