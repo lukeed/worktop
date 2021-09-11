@@ -40,10 +40,6 @@
       "import": "./durable/index.mjs",
       "require": "./durable/index.js"
     },
-    "./request": {
-      "import": "./request/index.mjs",
-      "require": "./request/index.js"
-    },
     "./response": {
       "import": "./response/index.mjs",
       "require": "./response/index.js"
@@ -76,7 +72,6 @@
     "crypto",
     "cookie",
     "durable",
-    "request",
     "response",
     "modules",
     "router",

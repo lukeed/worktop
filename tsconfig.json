@@ -20,7 +20,6 @@
       "worktop/cache": ["./cache.d.ts", "./cache.ts"],
       "worktop/base64": ["./base64.d.ts", "./base64.ts"],
       "worktop/crypto": ["./crypto.d.ts", "./crypto.ts"],
-      "worktop/request": ["./request.d.ts", "./request.ts"],
       "worktop/response": ["./response.d.ts", "./response.ts"],
       "worktop/modules": ["./modules.d.ts", "./modules.ts"],
       "worktop/durable": ["./durable.d.ts", "./durable.ts"],
