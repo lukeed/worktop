@@ -73,3 +73,17 @@ export const decode = (input: ArrayBufferView | ArrayBuffer, stream = false) => 
 export function byteLength(input?: string): number {
 	return input ? Encoder.encode(input).byteLength : 0;
 }
+
+/**
+ * Parse `Request.body` according to its `Content-Type` header.
+ * @NOTE Converts `FormData` into an object.
+ */
+export async function body<T=unknown>(req: Request): Promise<T|ArrayBuffer|string|void> {
+	let ctype = req.headers.get('content-type');
+
+	if (!req.body || !ctype) return;
+	if (!!~ctype.indexOf('application/json')) return req.json() as Promise<T>;
+	if (!!~ctype.indexOf('multipart/form-data')) return req.formData().then(toObject) as Promise<T>;
+	if (!!~ctype.indexOf('application/x-www-form-urlencoded')) return req.formData().then(toObject) as Promise<T>;
+	return !!~ctype.indexOf('text/') ? req.text() : req.arrayBuffer();
+}
