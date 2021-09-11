@@ -1,5 +1,5 @@
 import type { Bindings } from 'worktop';
-import type { ModuleWorker } from 'worktop/modules';
+import type { ModuleWorker, OmitIndex } from 'worktop/modules';
 import type { IncomingCloudflareProperties } from 'worktop/request';
 import type { KV } from 'worktop/kv';
 
@@ -41,7 +41,7 @@ interface CustomBindings extends Bindings {
 
 const worker2: ModuleWorker<CustomBindings> = {
 	fetch(req, env, ctx) {
-		assert<CustomBindings>(env);
+		assert<OmitIndex<CustomBindings>>(env);
 
 		assert<string>(env.SECRET);
 		assert<KV.Namespace>(env.DATAB);

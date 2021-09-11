@@ -5,7 +5,7 @@ import type { Bindings, CronEvent } from 'worktop';
 export type ModuleContext = Pick<FetchEvent, 'waitUntil'>;
 export type FetchContext = ModuleContext & Pick<FetchEvent, 'passThroughOnException'>;
 
-type OmitIndex<T> = {
+export type OmitIndex<T> = {
 	[K in keyof T as {} extends Record<K, 1> ? never : K]: T[K];
 };
 
