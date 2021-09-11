@@ -1,6 +1,6 @@
 {
   "name": "worktop",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "repository": "lukeed/worktop",
   "description": "The next generation web framework for Cloudflare Workers",
   "types": "router/index.d.ts",
@@ -35,6 +35,10 @@
     "./crypto": {
       "import": "./crypto/index.mjs",
       "require": "./crypto/index.js"
+    },
+    "./durable": {
+      "import": "./durable/index.mjs",
+      "require": "./durable/index.js"
     },
     "./request": {
       "import": "./request/index.mjs",
@@ -71,6 +75,7 @@
     "cache",
     "crypto",
     "cookie",
+    "durable",
     "request",
     "response",
     "modules",
@@ -86,7 +91,7 @@
   "scripts": {
     "build": "node bin",
     "test": "uvu src \".test.ts$\" -r ./bin/register",
-    "types": "tsc"
+    "types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
     "regexparam": "^2.0.0"

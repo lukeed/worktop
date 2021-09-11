@@ -152,10 +152,19 @@ The `worktop/kv` submodule contains all classes and utilities related to [Worker
 
 The `worktop/cache` submodule contains all utilities related to [Cloudflare's Cache](https://developers.cloudflare.com/workers/learning/how-the-cache-works).
 
+### Module: `worktop/durable`
+
+> [View `worktop/durable` API documentation](/src/durable.d.ts)
+<!-- > [View `worktop/durable` API documentation](/docs/module.durable.md) -->
+
+The `worktop/durable` submodule includes native types for [Durable Objects](https://developers.cloudflare.com/workers/runtime-apis/durable-objects) as well as an `Actor` abstract class that provides a blueprint for authoring a Durable Object that handles WebSocket connections.
+
+> **Note:** Durable Objects can only be used with the Module Worker format. You must integrate the `Router` with the `worktop/modules` submodule.
+
 ### Module: `worktop/modules`
 
 > [View `worktop/modules` API documentation](/src/modules.d.ts)
-<!-- > [View `worktop/cache` API documentation](/docs/module.cache.md) -->
+<!-- > [View `worktop/modules` API documentation](/docs/module.modules.md) -->
 
 The `worktop/modules` submodule includes two utilities related to the Module Workers format. Most notably, it exports a `listen` method to conform existing `Router` applications from Service Worker to Module Worker format.
 

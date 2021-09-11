@@ -12,8 +12,10 @@ node_modules
 /request
 /response
 /modules
+/durable
 /router
 /utils
+/sw
 /ws
 
 /examples/build
