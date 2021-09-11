@@ -77,7 +77,7 @@
   "scripts": {
     "build": "node bin",
     "test": "uvu src \".test.ts$\" -r ./bin/register",
-    "types": "tsc"
+    "types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
     "regexparam": "^2.0.0"
