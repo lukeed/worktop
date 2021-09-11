@@ -61,7 +61,7 @@ export namespace Durable {
 	}
 
 	export interface Storage {
-		get<T>(key: string, options?: Storage.Options.Get): Promise<T>;
+		get<T>(key: string, options?: Storage.Options.Get): Promise<T | void>;
 		get<T>(keys: string[], options?: Storage.Options.Get): Promise<Map<string, T>>;
 
 		put<T>(key: string, value: T, options?: Storage.Options.Put): Promise<void>;
