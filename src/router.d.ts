@@ -1,15 +1,16 @@
 /// <reference lib="webworker" />
 
+import type { KV } from 'worktop/kv';
 import type { ServerResponse } from 'worktop/response';
 import type { ServerRequest, Params, Method } from 'worktop/request';
 
 type Promisable<T> = Promise<T> | T;
 
-type CronHandler = (event: CronEvent) => void;
+export type CronHandler = (event: CronEvent) => Promisable<void>;
 export type ResponseHandler = (event: FetchEvent) => Promisable<Response>;
 export type FetchHandler = (event: FetchEvent, request?: Request | string) => void;
 
-interface CronEvent {
+export interface CronEvent {
 	type: 'scheduled';
 	/**
 	 * The CRON trigger
@@ -25,6 +26,10 @@ interface CronEvent {
 	 * Method wrapper for event's action handler.
 	 */
 	waitUntil(f: Promisable<any>): void;
+}
+
+export interface Bindings {
+	[name: string]: string | CryptoKey | KV.Namespace;
 }
 
 declare global {
