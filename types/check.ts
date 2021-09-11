@@ -14,8 +14,6 @@ import type { UID, UUID, ULID } from 'worktop/utils';
 import type { CronEvent, FetchHandler, RouteParams } from 'worktop';
 import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
 
-declare function assert<T>(value: T): void;
-
 /**
  * WORKTOP/RESPONSE
  */
