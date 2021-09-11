@@ -1,5 +1,9 @@
 /// <reference lib="webworker" />
 
+/**
+ * Status text messages for common 4xx & 5xx status codes.
+ * @NOTE Mutable dictionary; add or customize as needed.
+ */
 export declare var STATUS_CODES: Record<string|number, string>;
 
 export function finalize(res: Response, isHEAD?: boolean): Response;

@@ -1,13 +1,37 @@
 import { byteLength } from 'worktop/utils';
-import { CLENGTH, CTYPE } from './internal/constants';
-
 import type { HeadersObject, ServerResponse as SR } from 'worktop/response';
 
 type Writable<T> = {
 	-readonly [P in keyof T]: T[P]
 };
 
-export { STATUS_CODES } from './internal/constants';
+const CTYPE = /*#__PURE__*/ 'content-type';
+const CLENGTH = /*#__PURE__*/ 'content-length';
+
+/**
+ * Common Error Codes
+ */
+export const STATUS_CODES: Record<string|number, string> = {
+	'400': 'Bad Request',
+	'401': 'Unauthorized',
+	'403': 'Forbidden',
+	'404': 'Not Found',
+	'405': 'Method Not Allowed',
+	'406': 'Not Acceptable',
+	'409': 'Conflict',
+	'410': 'Gone',
+	'411': 'Length Required',
+	'413': 'Payload Too Large',
+	'422': 'Unprocessable Entity',
+	'426': 'Upgrade Required',
+	'428': 'Precondition Required',
+	'429': 'Too Many Requests',
+	'500': 'Internal Server Error',
+	'501': 'Not Implemented',
+	'502': 'Bad Gateway',
+	'503': 'Service Unavailable',
+	'504': 'Gateway Timeout',
+};
 
 export function send(status: number, data: any, headers?: HeadersObject) {
 }
@@ -19,8 +43,8 @@ export function finalize(res: Response, isHEAD?: boolean): Response {
 	if (!isHEAD && !isEmpty) return res;
 
 	let copy = new Response(null, res);
-	if (isEmpty) copy.headers.delete('content-length');
-	if (res.status === 205) copy.headers.set('content-length', '0');
+	if (isEmpty) copy.headers.delete(CLENGTH);
+	if (res.status === 205) copy.headers.set(CLENGTH, '0');
 	return copy;
 }
 
