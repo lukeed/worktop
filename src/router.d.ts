@@ -44,21 +44,17 @@ export interface ModuleContext {
   passThroughOnException?(): void;
 }
 
-export interface Context<
-	B extends Bindings = Bindings,
-	P extends Params = Params,
-> extends ModuleContext {
+export interface Context extends ModuleContext {
 	url: URL;
-	params: OmitIndex<P>;
-	bindings: OmitIndex<B>;
+	params: Params;
 }
 
 export type Handler<
-  C extends Context<Bindings>,
-  P extends Params = Params,
+	C extends Context = Context,
+	P extends Params = Params,
 > = (
 	request: Request,
-	context: C & { params: OmitIndex<P> }
+	context: Omit<C, 'params'> & { params: OmitIndex<P> }
 ) => Promisable<Response | void>;
 
 export type RouteParams<T extends string> =
@@ -76,9 +72,12 @@ export type RouteParams<T extends string> =
 		? { wild: string }
 	: {};
 
-export type Initializer<C extends Context> = (
+export type Initializer<
+	C extends Context,
+	B extends Bindings = Bindings
+> = (
 	request: Request,
-	context: Partial<C> & ModuleContext
+	context: C & { bindings: OmitIndex<B> }
 ) => Promise<Response>;
 
 export declare class Router<C extends Context = Context> {
@@ -93,7 +92,7 @@ export declare class Router<C extends Context = Context> {
  * Compose multiple `Handler` functions together, creating a final handler.
  */
 export function compose<
-	C extends Context<Bindings>,
+	C extends Context = Context,
 	P extends Params = Params,
 >(...handlers: Handler<C, P>[]): Handler<C, P>;
 
@@ -101,7 +100,7 @@ export function compose<
  * Cloudflare Request Metadata/Properties
  * @see https://developers.cloudflare.com/workers/runtime-apis/request#incomingrequestcfproperties
  */
- export interface IncomingCloudflareProperties {
+export interface IncomingCloudflareProperties {
 	/**
 	 * The ASN of the incoming request
 	 * @example "395747"

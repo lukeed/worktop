@@ -1,8 +1,8 @@
-import type { Context, Initializer } from 'worktop';
+import type { Bindings, Context, Initializer } from 'worktop';
 import type { ResponseHandler } from 'worktop/sw';
 
 // Convert a Module `Initializer` into a Service Worker `ResponseHandler` type.
-export function convert(run: Initializer<Context>): ResponseHandler {
+export function convert(run: Initializer<Context, Bindings>): ResponseHandler {
 	return function (event) {
 		let { request, ...ctx } = event;
 		return run(request, ctx);

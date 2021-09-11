@@ -4,7 +4,7 @@ import { finalize, STATUS_CODES } from 'worktop/response';
 import type { Handler, Router as RR } from 'worktop';
 import type { Method, Params, Context } from 'worktop';
 
-type HC = Handler<Context>;
+type HC = Handler;
 type PC = Omit<Context, 'params'>;
 type EC = Context & {
 	status?: number;
@@ -93,8 +93,8 @@ export function Router(): RR<Context> {
 			try {
 				context = context || {};
 				context.url = new URL(req.url);
-				context.bindings = context.bindings || {};
-				context.params = new Error;
+				// context.bindings = context.bindings || {};
+				// context.params = new Error;
 
 				var res = $.prepare && await $.prepare(req, context as PC);
 				if (res && res instanceof Response) return res;

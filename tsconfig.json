@@ -6,6 +6,7 @@
     "checkJs": true,
     "target": "esnext",
     "module": "esnext",
+    "keyofStringsOnly": true,
     "moduleResolution": "node",
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,

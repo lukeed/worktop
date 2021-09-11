@@ -1,5 +1,5 @@
 import type { Params } from 'worktop';
-import type { Promisable } from 'worktop/utils';
+import type { OmitIndex, Promisable } from 'worktop/utils';
 
 declare global {
 	const WebSocketPair: {
@@ -36,6 +36,7 @@ export interface Socket<C extends Context = Context> {
 		| { type: 'error' } & Event;
 }
 
+// TODO: needs route context
 export type SocketHandler<
 	P extends Params = Params,
 	C extends Context = Context,
@@ -55,4 +56,9 @@ export function connect(req: Request): Response | void;
 export function listen<
 	P extends Params = Params,
 	C extends Context = Context,
->(handler: SocketHandler<P, C>): (req: ServerRequest<P>) => Response;
+>(handler: SocketHandler<P, C>): (
+	request: Request,
+	context: Omit<C, 'params'> & {
+		params: OmitIndex<P>;
+	}
+) => Response;

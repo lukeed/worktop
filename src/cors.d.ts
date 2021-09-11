@@ -1,4 +1,4 @@
-import type { Bindings, Context, Params } from 'worktop';
+import type { Context, Params } from 'worktop';
 import type { OmitIndex } from 'worktop/utils';
 
 export interface Config {
@@ -69,9 +69,11 @@ type PreflightConfig = Omit<Config, 'origin'> & {
  * Will also handle preflight (aka, OPTIONS) requests.
  */
 export function preflight(options?: PreflightConfig): <
-	C extends Context<Bindings>,
-  P extends Params = Params,
+	C extends Context = Context,
+	P extends Params = Params,
 >(
 	request: Request,
-	context: C & { params: OmitIndex<P> }
+	context: Omit<C, 'params'> & {
+		params: OmitIndex<P & C['params']>;
+	}
 ) => void;

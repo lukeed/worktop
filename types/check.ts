@@ -194,11 +194,10 @@ Cache.reply(API.run);
 
 // @ts-expect-error
 addEventListener('fetch', API.add);
-addEventListener('fetch', SW.reply(API.run));
-addEventListener('fetch', Cache.reply(API.run));
 
 const reply$1 = reply(API.run);
 const reply$2 = Cache.reply(API.run);
+
 addEventListener('fetch', event => {
 	const { method } = event.request;
 	if (method === 'GET') {
@@ -421,8 +420,15 @@ reply(event => {
 	// @ts-expect-error
 	Cache.save(123);
 
+	// @ts-expect-error
+	Cache.save(new Request('/'), new Response);
+
 	assert<Response>(
-		Cache.save(event, new Response)
+		Cache.save(new Request('/'), new Response, {
+			waitUntil() {
+				//
+			}
+		})
 	);
 
 	assert<Response>(
