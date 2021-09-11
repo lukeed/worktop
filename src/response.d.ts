@@ -1,5 +1,9 @@
 /// <reference lib="webworker" />
 
+export declare var STATUS_CODES: Record<string|number, string>;
+
+export function finalize(res: Response, isHEAD?: boolean): Response;
+
 type Arrayable<T> = T[] | T;
 export type HeadersObject = Record<string, string>;
 

@@ -1,5 +1,5 @@
-import type { ServerRequest, Params } from 'worktop/request';
-import type { ServerResponse } from 'worktop/response';
+import type { Bindings, Context, Params } from 'worktop';
+import type { OmitIndex } from 'worktop/utils';
 
 export interface Config {
 	/**
@@ -51,7 +51,7 @@ export const config: Config;
  * Conditionallyy sets headers for preflight (aka OPTIONS) requests.
  * @NOTE Values in `options` are given priority, otherwise the `config` defaults are used.
  */
-export function headers(res: ServerResponse, options?: Partial<Config>, isPreflight?: boolean): void;
+export function headers(res: Response, options?: Partial<Config>, isPreflight?: boolean): void;
 
 type PreflightConfig = Omit<Config, 'origin'> & {
 	/**
@@ -68,4 +68,10 @@ type PreflightConfig = Omit<Config, 'origin'> & {
  * Apply all CORS headers (see `headers` export)
  * Will also handle preflight (aka, OPTIONS) requests.
  */
-export function preflight(options?: PreflightConfig): <P extends Params = Params>(req: ServerRequest<P>, res: ServerResponse) => void;
+export function preflight(options?: PreflightConfig): <
+	C extends Context<Bindings>,
+  P extends Params = Params,
+>(
+	request: Request,
+	context: C & { params: OmitIndex<P> }
+) => void;

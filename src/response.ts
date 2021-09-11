@@ -7,6 +7,23 @@ type Writable<T> = {
 	-readonly [P in keyof T]: T[P]
 };
 
+export { STATUS_CODES } from './internal/constants';
+
+export function send(status: number, data: any, headers?: HeadersObject) {
+}
+
+// NOTE: cloudflare handles all this automatically...
+const EMPTYs = /*#__PURE__*/ new Set([101, 204, 205, 304]);
+export function finalize(res: Response, isHEAD?: boolean): Response {
+	let isEmpty = EMPTYs.has(res.status);
+	if (!isHEAD && !isEmpty) return res;
+
+	let copy = new Response(null, res);
+	if (isEmpty) copy.headers.delete('content-length');
+	if (res.status === 205) copy.headers.set('content-length', '0');
+	return copy;
+}
+
 export function ServerResponse(this: Writable<SR>, method: string): SR {
 	var $ = this, hh = $.headers = new Headers({
 		'Cache-Control': 'private, no-cache'

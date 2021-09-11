@@ -1,16 +1,20 @@
 /// <reference lib="webworker" />
 
-import type { Bindings, CronEvent } from 'worktop';
+import type { Bindings, CronEvent, ModuleContext } from 'worktop';
+import type { Promisable, OmitIndex } from 'worktop/utils';
+import type { ResponseHandler } from 'worktop/sw';
 
-export type ModuleContext = Pick<FetchEvent, 'waitUntil'>;
-export type FetchContext = ModuleContext & Pick<FetchEvent, 'passThroughOnException'>;
+export type FetchHandler<B extends Bindings = Bindings> = (
+	request: Request,
+	bindings: OmitIndex<B>,
+	context: Required<ModuleContext>
+) => Promisable<Response>;
 
-type OmitIndex<T> = {
-	[K in keyof T as {} extends Record<K, 1> ? never : K]: T[K];
-};
-
-export type FetchHandler<B extends Bindings = Bindings> = (request: Request, env: OmitIndex<B>, ctx: FetchContext) => Promise<Response> | Response;
-export type CronHandler<B extends Bindings = Bindings> = (event: Omit<CronEvent, 'waitUntil'>, env: OmitIndex<B>, ctx: ModuleContext) => Promise<void> | void;
+export type CronHandler<B extends Bindings = Bindings> = (
+	event: Omit<CronEvent, 'waitUntil'>,
+	bindings: OmitIndex<B>,
+	context: Pick<ModuleContext, 'waitUntil'>
+) => Promisable<void>;
 
 export interface ModuleWorker<B extends Bindings = Bindings> {
 	fetch?: FetchHandler<B>;

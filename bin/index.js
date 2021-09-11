@@ -32,10 +32,10 @@ async function bundle(input, files) {
  */
 Promise.all([
 	bundle('src/router.ts', pkg.exports['.']),
+	bundle('src/sw.ts', pkg.exports['./sw']),
 	bundle('src/cache.ts', pkg.exports['./cache']),
 	bundle('src/cookie.ts', pkg.exports['./cookie']),
 	bundle('src/base64.ts', pkg.exports['./base64']),
-	bundle('src/request.ts', pkg.exports['./request']),
 	bundle('src/response.ts', pkg.exports['./response']),
 	bundle('src/modules.ts', pkg.exports['./modules']),
 	bundle('src/crypto.ts', pkg.exports['./crypto']),

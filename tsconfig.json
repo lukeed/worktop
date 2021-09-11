@@ -6,7 +6,6 @@
     "checkJs": true,
     "target": "esnext",
     "module": "esnext",
-    "skipLibCheck": true,
     "moduleResolution": "node",
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
@@ -28,6 +27,7 @@
       "worktop/cookie": ["./cookie.d.ts", "./cookie.ts"],
       "worktop/utils": ["./utils.d.ts", "./utils.ts"],
       "worktop/cors": ["./cors.d.ts", "./cors.ts"],
+      "worktop/sw": ["./sw.d.ts", "./sw.ts"],
       "worktop/kv": ["./kv.d.ts", "./kv.ts"],
       "worktop/ws": ["./ws.d.ts", "./ws.ts"],
     }

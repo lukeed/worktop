@@ -1,3 +1,9 @@
+export type Arrayable<T> = T[] | T;
+export type Promisable<T> = Promise<T> | T;
+export type OmitIndex<T> = {
+	[K in keyof T as {} extends Record<K, 1> ? never : K]: T[K];
+};
+
 declare global {
 	interface Crypto {
 		randomUUID(): string;

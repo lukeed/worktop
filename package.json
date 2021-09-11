@@ -56,6 +56,10 @@
       "import": "./utils/index.mjs",
       "require": "./utils/index.js"
     },
+    "./sw": {
+      "import": "./sw/index.mjs",
+      "require": "./sw/index.js"
+    },
     "./ws": {
       "import": "./ws/index.mjs",
       "require": "./ws/index.js"

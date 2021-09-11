@@ -1,4 +1,5 @@
-import type { ServerRequest, Params } from 'worktop/request';
+import type { Params } from 'worktop';
+import type { Promisable } from 'worktop/utils';
 
 declare global {
 	const WebSocketPair: {
@@ -38,13 +39,13 @@ export interface Socket<C extends Context = Context> {
 export type SocketHandler<
 	P extends Params = Params,
 	C extends Context = Context,
-> = (req: ServerRequest<P>, socket: Socket<C>) => Promise<void>|void;
+> = (req: Request, socket: Socket<C>) => Promisable<void>;
 
 /**
  * Ensure the incoming `Request` can be upgraded to a Websocket connection.
  * @NOTE This is called automatically within the `listen()` method.
  */
-export function connect<P extends Params = Params>(req: ServerRequest<P> | Request): Response | void;
+export function connect(req: Request): Response | void;
 
 /**
  * Establish a Websocket connection.

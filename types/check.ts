@@ -1,10 +1,11 @@
+import * as SW from 'worktop/sw';
 import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
 import * as Base64 from 'worktop/base64';
-import { ServerResponse } from 'worktop/response';
+import { Router, compose, Initializer } from 'worktop';
 import { Database, list, paginate, until } from 'worktop/kv';
+import { ServerResponse, STATUS_CODES } from 'worktop/response';
 import { byteLength, HEX, uid, uuid, ulid, randomize } from 'worktop/utils';
-import { listen, reply, Router, compose, STATUS_CODES } from 'worktop';
 import { timingSafeEqual } from 'worktop/crypto';
 import * as modules from 'worktop/modules';
 import * as ws from 'worktop/ws';
@@ -12,8 +13,8 @@ import * as ws from 'worktop/ws';
 import type { KV } from 'worktop/kv';
 import type { WebSocket } from 'worktop/ws';
 import type { UID, UUID, ULID } from 'worktop/utils';
-import type { Bindings, CronEvent, FetchHandler, RouteParams } from 'worktop';
-import type { Params, ServerRequest, IncomingCloudflareProperties } from 'worktop/request';
+import type { Bindings, Context, CronEvent } from 'worktop';
+import type { Params, RouteParams, IncomingCloudflareProperties } from 'worktop';
 import type { ModuleWorker } from 'worktop/modules';
 
 declare function assert<T>(value: T): void;
@@ -113,87 +114,89 @@ assert<void>(
 	API.add('GET', '/asd', console.log)
 );
 
-API.add('POST', '/items', async (req, res) => {
-	// Assert `req` & `res` types
-	assert<ServerRequest>(req);
-	assert<ServerResponse>(res);
-
-	// Assert `req` properties
+API.add('POST', '/items', async (req, context) => {
+	assert<Request>(req);
 	assert<string>(req.url);
-	assert<string>(req.path);
-	assert<object>(req.params);
-	assert<string>(req.hostname);
-	assert<string>(req.origin);
 	assert<string>(req.method);
-	assert<URLSearchParams>(req.query);
-	assert<()=>Promise<unknown>>(req.body);
-	assert<(f:any)=>void>(req.extend);
 	assert<Headers>(req.headers);
-	assert<string>(req.search);
+	assert<ReadableStream|null>(req.body);
+
+	// @ts-expect-error
+	await req.body.json();
+
+	assert<Context>(context);
+	assert<URL>(context.url);
+	assert<string>(context.url.origin);
+	assert<string>(context.url.pathname);
+	assert<string>(context.url.search);
+	assert<URLSearchParams>(context.url.searchParams);
+	// TODO? alias :: context.url.query
 
 	// Assert `req.body` types
 	let output1 = await req.body();
-	assert<unknown>(output1);
+	// assert<unknown>(output1);
 
-	type Foo = { bar: string };
-	let output2 = await req.body<Foo>();
-	assert<Foo|void>(output2);
+	// type Foo = { bar: string };
+	// let output2 = await req.body<Foo>();
+	// assert<Foo|void>(output2);
 
-	// Assert raw body parsers
-	assert<any>(await req.body.json());
-	assert<Foo>(await req.body.json<Foo>());
-	assert<ArrayBuffer>(await req.body.arrayBuffer());
-	assert<FormData>(await req.body.formData());
-	assert<string>(await req.body.text());
-	assert<Blob>(await req.body.blob());
+	// // Assert raw body parsers
+	// assert<any>(await req.body.json());
+	// assert<Foo>(await req.body.json<Foo>());
+	// assert<ArrayBuffer>(await req.body.arrayBuffer());
+	// assert<FormData>(await req.body.formData());
+	// assert<string>(await req.body.text());
+	// assert<Blob>(await req.body.blob());
 
 	// Assert `req.extend` usage
-	req.extend(async function () {}());
-	req.extend(fetch('/analytics'));
-	req.extend(function () {}());
+	context.waitUntil(async function () {}());
+	context.waitUntil(fetch('/analytics'));
+	context.waitUntil(function () {}());
 
 	// Assert `req.cf` properties
 	assert<IncomingCloudflareProperties>(req.cf);
 	assert<string>(req.cf.httpProtocol);
 	assert<string>(req.cf.asn);
 
+	assert<string|undefined>(req.cf.city);
 	// @ts-expect-error -> string | undefined
 	assert<string>(req.cf.city);
-	assert<string|undefined>(req.cf.city);
 
 	// @ts-expect-error
 	assert<string>(req.cf.country);
 	assert<string|null>(req.cf.country);
 
 	// @ts-expect-error
-	tsd.expectError(req.cf.tlsClientAuth.certFingerprintSHA1);
+	req.cf.tlsClientAuth.certFingerprintSHA1;
 	assert<string>(req.cf.tlsClientAuth!.certFingerprintSHA1);
 });
 
 reply(API.run);
 
-reply(event => {
-	return API.run(event);
-});
+declare let rhandler: SW.ResponseHandler;
+declare let minit: Initializer<Context>;
+
+SW.reply(minit);
 
 async function foo1(event: FetchEvent) {
 	// @ts-expect-error
-	await API.run('hello');
+	await rhandler('hello');
 
-	const res1 = await API.run(event);
+	const res1 = await rhandler(event);
 	assert<Response>(res1);
 
-	const res2 = API.run(event);
-	assert<Promise<Response>>(res2);
+	const res2 = rhandler(event);
+	assert<Promise<Response> | Response>(res2);
 }
 
 // @ts-expect-error
-reply(API.onerror);
-reply(API.run);
+SW.reply(API.onerror);
+
+Cache.reply(API.run);
 
 // @ts-expect-error
 addEventListener('fetch', API.add);
-addEventListener('fetch', reply(API.run));
+addEventListener('fetch', SW.reply(API.run));
 addEventListener('fetch', Cache.reply(API.run));
 
 const reply$1 = reply(API.run);
@@ -319,44 +322,44 @@ assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ bar, baz });
 assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ bar, baz, wild });
 assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ foo, bar, baz, wild });
 
-API.add('GET', '/foo', (req) => {
-	assert<{}>(req.params);
+API.add('GET', '/foo', (req, context) => {
+	assert<{}>(context.params);
 	// @ts-expect-error
-	req.params.anything;
+	context.params.anything;
 });
 
-API.add('GET', '/foo/:bar', (req) => {
-	assert<{ bar: string }>(req.params);
-	assert<string>(req.params.bar);
+API.add('GET', '/foo/:bar', (req, context) => {
+	assert<{ bar: string }>(context.params);
+	assert<string>(context.params.bar);
 	// @ts-expect-error
-	req.params.hello;
+	context.params.hello;
 });
 
-API.add('GET', '/foo/:bar?/:baz', (req) => {
-	assert<{ bar?: string, baz: string }>(req.params);
-	assert<string|undefined>(req.params.bar);
-	assert<string>(req.params.baz);
+API.add('GET', '/foo/:bar?/:baz', (req, context) => {
+	assert<{ bar?: string, baz: string }>(context.params);
+	assert<string|undefined>(context.params.bar);
+	assert<string>(context.params.baz);
 	// @ts-expect-error
-	assert<string>(req.params.bar);
+	assert<string>(context.params.bar);
 	// @ts-expect-error
-	req.params.hello;
+	context.params.hello;
 });
 
-API.add('GET', '/foo/:bar?/*/:baz', (req) => {
-	assert<{ bar?: string, baz: string, wild: string }>(req.params);
-	assert<string|undefined>(req.params.bar);
-	assert<string>(req.params.wild);
-	assert<string>(req.params.baz);
+API.add('GET', '/foo/:bar?/*/:baz', (req, context) => {
+	assert<{ bar?: string, baz: string, wild: string }>(context.params);
+	assert<string|undefined>(context.params.bar);
+	assert<string>(context.params.wild);
+	assert<string>(context.params.baz);
 	// @ts-expect-error
-	assert<string>(req.params.bar);
+	assert<string>(context.params.bar);
 	// @ts-expect-error
-	req.params.hello;
+	context.params.hello;
 });
 
-API.add('GET', /^[/]foobar[/]?/, (req) => {
-	assert<{}>(req.params);
-	assert<Params>(req.params);
-	assert<string>(req.params.anything);
+API.add('GET', /^[/]foobar[/]?/, (req, context) => {
+	assert<{}>(context.params);
+	assert<Params>(context.params);
+	assert<string>(context.params.anything); // TODO :: revert?
 });
 
 /**
@@ -365,31 +368,31 @@ API.add('GET', /^[/]foobar[/]?/, (req) => {
  */
 
 API.add('GET', '/foo/:bar?', compose(
-	(req, res) => {
-		assert<string|void>(req.params.bar);
+	(req, context) => {
+		assert<string|void>(context.params.bar);
 	},
-	async (req, res) => {
-		assert<string|void>(req.params.bar);
-		res.end('hello');
+	async (req, context) => {
+		assert<string|void>(context.params.bar);
+		return new Response;
 	},
 	// @ts-expect-error
-	(req, res) => {
-		assert<string|void>(req.params.bar);
+	(req, context) => {
+		assert<string|void>(context.params.bar);
 		return 123;
 	}
 ));
 
 // Can be a Handler
 API.prepare = compose(
-	(req, res) => {},
-	(req, res) => {},
-	(req, res) => {},
+	(req, ctx) => {},
+	(req, ctx) => {},
+	(req, ctx) => {},
 );
 
 // Can be a Handler
-API.prepare = function (req, res) {
+API.prepare = function (req, context) {
 	// @ts-expect-error
-	req.params; // does not exist
+	context.params; // does not exist
 	// can now return Response instance~!
 	return new Response(null, { status: 204 });
 }
@@ -399,12 +402,12 @@ API.prepare = (req, res) => 123;
 
 API.add('GET', '/static/:group/*', compose(
   CORS.preflight({ maxage: 86400 }),
-  async (req, res) => {
+  async (req, context) => {
 		// @ts-expect-error
-		req.params.foobar // is not defined
-		assert<{ group: string; wild: string }>(req.params);
-		assert<string>(req.params.group);
-		assert<string>(req.params.wild);
+		context.params.foobar // is not defined
+		assert<{ group: string; wild: string }>(context.params);
+		assert<string>(context.params.group);
+		assert<string>(context.params.wild);
   }
 ));
 
@@ -660,7 +663,7 @@ assert<string[]>(CORS.config.expose!);
 assert<Function>(CORS.headers);
 assert<Function>(CORS.preflight);
 
-declare const request: ServerRequest;
+declare var request: Request;
 
 // @ts-expect-error
 CORS.headers(request);
