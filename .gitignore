@@ -12,6 +12,7 @@ node_modules
 /request
 /response
 /modules
+/durable
 /router
 /utils
 /ws

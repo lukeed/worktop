@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import type { Bindings, CronEvent } from 'worktop';
+import type { Bindings, CronEvent, ResponseHandler } from 'worktop';
 
 export type ModuleContext = Pick<FetchEvent, 'waitUntil'>;
 export type FetchContext = ModuleContext & Pick<FetchEvent, 'passThroughOnException'>;

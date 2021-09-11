@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
 import type { KV } from 'worktop/kv';
+import type { Durable } from 'worktop/durable';
 import type { ServerResponse } from 'worktop/response';
 import type { ServerRequest, Params, Method } from 'worktop/request';
 
@@ -29,7 +30,7 @@ export interface CronEvent {
 }
 
 export interface Bindings {
-	[name: string]: string | CryptoKey | KV.Namespace;
+	[name: string]: string | CryptoKey | KV.Namespace | Durable.Namespace;
 }
 
 declare global {

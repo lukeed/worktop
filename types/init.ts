@@ -1,9 +1,14 @@
 import { reply, listen } from 'worktop';
+import * as modules from 'worktop/modules';
 import * as Cache from 'worktop/cache';
 
 import type { Router, CronEvent } from 'worktop';
 
 declare const API: Router;
+
+/**
+ * init: plain
+ */
 
 // @ts-expect-error
 reply(API.onerror);
@@ -17,6 +22,10 @@ reply(event => {
 listen(reply(API.run));
 listen(API.run);
 
+/**
+ * init: Cache
+ */
+
 // @ts-expect-error
 Cache.reply(API.onerror);
 Cache.reply(API.run);
@@ -24,6 +33,12 @@ Cache.reply(API.run);
 // @ts-expect-error
 Cache.listen(reply(API.run));
 Cache.listen(API.run);
+
+/**
+ * init: Module Worker
+ */
+
+modules.listen(API.run);
 
 /**
  * Event: fetch
