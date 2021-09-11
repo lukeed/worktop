@@ -106,3 +106,10 @@ export function byteLength(input?: string): number;
  * @NOTE Converts `FormData` into an object.
  */
 export function body<T=unknown>(req: Request): Promise<T|ArrayBuffer|string|void>;
+
+
+/**
+ * Converts an `Iterable` into an object.
+ * @NOTE Like `Object.fromEntries`, but can collect multiple values for same key.
+ */
+export function toObject<T>(iter: Iterable<[string, T]>): Record<string, Arrayable<T>>;

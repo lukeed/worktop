@@ -87,3 +87,15 @@ export async function body<T=unknown>(req: Request): Promise<T|ArrayBuffer|strin
 	if (!!~ctype.indexOf('application/x-www-form-urlencoded')) return req.formData().then(toObject) as Promise<T>;
 	return !!~ctype.indexOf('text/') ? req.text() : req.arrayBuffer();
 }
+
+/**
+ * Converts an `Iterable` into an object.
+ * @NOTE Like `Object.fromEntries`, but can collect multiple values for same key.
+ */
+export function toObject<T>(iter: Iterable<[string, T]>): Record<string, T|T[]> {
+	let key: string, val: T, tmp: T|T[], out: Record<string, T|T[]> = {};
+	for ([key, val] of iter) {
+    out[key] = (tmp=out[key]) === void 0 ? val : ([] as T[]).concat(tmp, val);
+	}
+	return out;
+}
