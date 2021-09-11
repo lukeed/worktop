@@ -117,3 +117,128 @@ class Counter4 extends Actor {
 		} as FetchEvent);
 	}
 }
+
+
+/**
+ * NATIVE
+ */
+
+// NOTE: `implements D.O` is optional
+class Native implements Durable.Object {
+	id: string;
+	#env: Bindings;
+	#storage: Durable.Storage;
+
+	constructor(state: Durable.State, env: Bindings) {
+		this.id = state.id.toString();
+
+		this.#storage = state.storage;
+		this.#env = env;
+	}
+
+	async fetch(input: RequestInfo, init?: RequestInit) {
+		let request = new Request(input, init);
+		let { pathname } = new URL(request.url);
+
+		let prefix = this.#env.prefix as string;
+		let key = prefix + ':' + pathname.replace(/[^a-z]/g, '.');
+		let result = await this.#storage.get<number>(key);
+		assert<number | void>(result);
+
+		if (result && result > 0) {
+			let txt = String(result);
+			return new Response(txt);
+		}
+
+		return new Response;
+	}
+}
+
+/**
+ * STORAGE
+ */
+
+declare const storage: Durable.Storage;
+
+interface Item {
+	foo: string;
+}
+
+let single = await storage.get<Item>('key', {
+	allowConcurrency: true,
+	noCache: true,
+});
+
+assert<Item | void>(single);
+
+let results = await storage.get<Item>(['foo', 'bar'], {
+	allowConcurrency: false,
+	noCache: true,
+});
+
+assert<Map<string, Item>>(results);
+
+// @ts-expect-error - value type
+await storage.put<Item>('foo', 123);
+await storage.put<Item>('foo', { foo: 'bar' });
+assert<void>(
+	await storage.put<Item>('foo', { foo: 'bar' }, {
+		allowUnconfirmed: true,
+		noCache: true,
+	})
+);
+
+// @ts-expect-error - value type
+await storage.put<Item>({ foo: 123 });
+
+await storage.put<Item>({
+	// @ts-expect-error
+	hello: { foo: 123 },
+	// @ts-expect-error
+	world: { foo: ['bar'] },
+	// this one is valid
+	howdy: { foo: 'bar' },
+});
+
+// @ts-expect-error - key type
+await storage.delete(123123);
+assert<boolean>(
+	await storage.delete('foobar', {
+		allowUnconfirmed: true,
+		noCache: true,
+	})
+);
+
+// @ts-expect-error - key type
+await storage.delete([1, 2, 3]);
+assert<number>(
+	await storage.delete(['foo', 'bar'], {
+		allowUnconfirmed: true,
+		noCache: true,
+	})
+);
+
+// @ts-expect-error
+await storage.deleteAll('foobar');
+assert<void>(
+	await storage.deleteAll()
+);
+assert<void>(
+	await storage.deleteAll({
+		allowUnconfirmed: true,
+		noCache: true,
+	})
+);
+
+// @ts-expect-error
+await storage.list('foobar');
+
+let items = await storage.list<Item>({
+	limit: 12,
+	reverse: true,
+	prefix: 'foobar',
+	start: 'foobar01',
+	end: 'foobar99',
+});
+
+assert<Map<string, Item>>(items);
