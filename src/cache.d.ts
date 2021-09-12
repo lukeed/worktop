@@ -1,8 +1,8 @@
 /// <reference lib="webworker" />
 
 import type { Bindings, Context } from 'worktop';
-import type { Initializer, ModuleContext } from 'worktop';
 import type { ModuleWorker } from 'worktop/modules';
+import type { Initializer, ModuleContext } from 'worktop';
 
 export const Cache: Cache;
 export function save(req: Request | string, res: Response, context: ModuleContext): Response;
