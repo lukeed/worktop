@@ -105,7 +105,7 @@ export function byteLength(input?: string): number;
  * Parse `Request.body` according to its `Content-Type` header.
  * @NOTE Converts `FormData` into an object.
  */
-export function body<T=unknown>(req: Request): Promise<T|ArrayBuffer|string|void>;
+export function body<T>(req: Request): Promise<T|void>;
 
 
 /**

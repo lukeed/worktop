@@ -1,6 +1,8 @@
 import { Router } from 'worktop';
 import { Actor } from 'worktop/durable';
 import * as cookies from 'worktop/cookie';
+import * as utils from 'worktop/utils';
+
 import type { Durable } from 'worktop/durable';
 import type { WebSocket } from 'worktop/ws';
 import type { Bindings } from 'worktop';
@@ -100,13 +102,13 @@ class Counter4 extends Actor {
 		// NOTE: don't actually need this
 		this.#wait = state.waitUntil.bind(state);
 
-		this.#router.add('GET', '/', (req, res) => {
-			res.end('OK');
+		this.#router.add('GET', '/', (req, ctx) => {
+			return new Response;
 		});
 
-		this.#router.add('POST', '/', async (req, res) => {
-			let input = await req.body<number[]>();
-			res.send(200, Math.max(...input!));
+		this.#router.add('POST', '/', async (req, ctx) => {
+			let input = await utils.body<number[]>(req);
+			return new Response('' + Math.max(...input!));
 		});
 	}
 
@@ -159,10 +161,6 @@ class Native implements Durable.Object {
  */
 
 declare const storage: Durable.Storage;
-
-interface Item {
-	foo: string;
-}
 
 let single = await storage.get<Item>('key', {
 	allowConcurrency: true,

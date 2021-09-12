@@ -4,8 +4,6 @@ import type { Params, Context } from 'worktop';
 import type { IncomingCloudflareProperties } from 'worktop';
 import type { RouteParams } from 'worktop';
 
-type Foo = { foo: string };
-
 declare const mcontext: Context;
 declare const request: Request;
 
@@ -46,7 +44,7 @@ API.add('POST', '/items', async (req, context) => {
 
 	// Assert body parsers
 	assert<any>(await req.json());
-	assert<Foo>(await req.json() as Foo);
+	assert<Item>(await req.json() as Item);
 	assert<ArrayBuffer>(await req.arrayBuffer());
 	assert<FormData>(await req.formData());
 	assert<string>(await req.text());
