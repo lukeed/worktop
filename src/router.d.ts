@@ -8,6 +8,11 @@ declare global {
 	interface Request {
 		cf: IncomingCloudflareProperties;
 	}
+
+	interface Headers {
+		append(name: string, value: { toString(): string }): void;
+		set(name: string, value: { toString(): string }): void;
+	}
 }
 
 export type Params = Record<string, string>;
