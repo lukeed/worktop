@@ -1,4 +1,4 @@
-import type { Params } from 'worktop';
+import type { Context, Params } from 'worktop';
 import type { OmitIndex, Promisable } from 'worktop/utils';
 
 declare global {
@@ -25,22 +25,26 @@ export interface WebSocket {
 	addEventListener(type: 'message', listener: (this: WebSocket, ev: MessageEvent<string>) => any): void;
 }
 
-type Context = Record<string, any>;
-export interface Socket<C extends Context = Context> {
+type State = Record<string, any>;
+export interface Socket<S extends State = State> {
 	send: WebSocket['send'];
 	close: WebSocket['close'];
-	context: C;
+	state: S; // todo: not happy w/ name
 	event:
 		| { type: 'close' } & CloseEvent
 		| { type: 'message' } & MessageEvent<string>
 		| { type: 'error' } & Event;
 }
 
-// TODO: needs route context
 export type SocketHandler<
-	P extends Params = Params,
 	C extends Context = Context,
-> = (req: Request, socket: Socket<C>) => Promisable<void>;
+	P extends Params = Params,
+	S extends State = State,
+> = (
+	request: Request,
+	context: C, // todo: omit
+	socket: Socket<S>
+) => Promisable<void>;
 
 /**
  * Ensure the incoming `Request` can be upgraded to a Websocket connection.
@@ -54,9 +58,9 @@ export function connect(req: Request): Response | void;
  * @NOTE Invokes the `connect()` middleware automatically.
  */
 export function listen<
-	P extends Params = Params,
 	C extends Context = Context,
->(handler: SocketHandler<P, C>): (
+	P extends Params = Params,
+>(handler: SocketHandler<C, P>): (
 	request: Request,
 	context: Omit<C, 'params'> & {
 		params: OmitIndex<P>;
