@@ -1,9 +1,13 @@
 import { Router, compose } from 'worktop';
 
-import type { Params, ServerRequest } from 'worktop/request';
-import type { IncomingCloudflareProperties } from 'worktop/request';
-import type { ServerResponse } from 'worktop/response';
+import type { Params, Context } from 'worktop';
+import type { IncomingCloudflareProperties } from 'worktop';
 import type { RouteParams } from 'worktop';
+
+type Foo = { foo: string };
+
+declare const mcontext: Context;
+declare const request: Request;
 
 // @ts-expect-error
 const invalid = Router();
@@ -11,6 +15,13 @@ const invalid = Router();
 // valid instantiation
 const API = new Router();
 assert<Router>(API);
+
+// @ts-expect-error
+await API.run('hello');
+
+const res1 = API.run(request, mcontext);
+assert<Promise<Response>>(res1);
+assert<Response>(await res1);
 
 // @ts-expect-error
 API.add(123, 'asd', console.log)
@@ -23,39 +34,34 @@ assert<void>(
 	API.add('GET', '/asd', console.log)
 );
 
-API.add('POST', '/items', async (req, res) => {
-	// Assert `req` & `res` types
-	assert<ServerRequest>(req);
-	assert<ServerResponse>(res);
+API.add('POST', '/items', async (req, context) => {
+	assert<Request>(req);
+	assert<Context>(context);
 
 	// Assert `req` properties
 	assert<string>(req.url);
-	assert<string>(req.path);
-	assert<object>(req.params);
-	assert<string>(req.hostname);
-	assert<string>(req.origin);
 	assert<string>(req.method);
-	assert<URLSearchParams>(req.query);
-	assert<()=>Promise<unknown>>(req.body);
-	assert<(f:any)=>void>(req.extend);
 	assert<Headers>(req.headers);
-	assert<string>(req.search);
+	assert<ReadableStream<Uint8Array>|null>(req.body);
 
-	// Assert `req.body` types
-	let output1 = await req.body();
-	assert<unknown>(output1);
+	// Assert body parsers
+	assert<any>(await req.json());
+	assert<Foo>(await req.json() as Foo);
+	assert<ArrayBuffer>(await req.arrayBuffer());
+	assert<FormData>(await req.formData());
+	assert<string>(await req.text());
+	assert<Blob>(await req.blob());
 
-	type Foo = { bar: string };
-	let output2 = await req.body<Foo>();
-	assert<Foo|void>(output2);
-
-	// Assert raw body parsers
-	assert<any>(await req.body.json());
-	assert<Foo>(await req.body.json<Foo>());
-	assert<ArrayBuffer>(await req.body.arrayBuffer());
-	assert<FormData>(await req.body.formData());
-	assert<string>(await req.body.text());
-	assert<Blob>(await req.body.blob());
+	// Assert context properties
+	assert<object>(context.params);
+	assert<URL>(context.url);
+	assert<string>(context.url.origin);
+	assert<string>(context.url.hostname);
+	assert<string>(context.url.search);
+	assert<URLSearchParams>(context.url.searchParams);
+	// assert<URLSearchParams>(context.url.query); // TODO: alias
+	assert<Function|void>(context.passThroughOnException);
+	assert<(f:any)=>void>(context.waitUntil);
 
 	// Assert `req.extend` usage
 	req.extend(async function () {}());
@@ -79,17 +85,6 @@ API.add('POST', '/items', async (req, res) => {
 	tsd.expectError(req.cf.tlsClientAuth.certFingerprintSHA1);
 	assert<string>(req.cf.tlsClientAuth!.certFingerprintSHA1);
 });
-
-declare const event: FetchEvent;
-
-// @ts-expect-error
-await API.run('hello');
-
-const res1 = await API.run(event);
-assert<Response>(res1);
-
-const res2 = API.run(event);
-assert<Promise<Response>>(res2);
 
 /**
  * PARAMS / RouteParams
@@ -176,44 +171,44 @@ assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ foo, bar, baz, wild });
  * ROUTES w/ RouteParams
  */
 
-API.add('GET', '/foo', (req) => {
-	assert<{}>(req.params);
+API.add('GET', '/foo', (req, context) => {
+	assert<{}>(context.params);
 	// @ts-expect-error
-	req.params.anything;
+	context.params.anything;
 });
 
-API.add('GET', '/foo/:bar', (req) => {
-	assert<{ bar: string }>(req.params);
-	assert<string>(req.params.bar);
+API.add('GET', '/foo/:bar', (req, context) => {
+	assert<{ bar: string }>(context.params);
+	assert<string>(context.params.bar);
 	// @ts-expect-error
-	req.params.hello;
+	context.params.hello;
 });
 
-API.add('GET', '/foo/:bar?/:baz', (req) => {
-	assert<{ bar?: string, baz: string }>(req.params);
-	assert<string|undefined>(req.params.bar);
-	assert<string>(req.params.baz);
+API.add('GET', '/foo/:bar?/:baz', (req, context) => {
+	assert<{ bar?: string, baz: string }>(context.params);
+	assert<string|undefined>(context.params.bar);
+	assert<string>(context.params.baz);
 	// @ts-expect-error
-	assert<string>(req.params.bar);
+	assert<string>(context.params.bar);
 	// @ts-expect-error
-	req.params.hello;
+	context.params.hello;
 });
 
-API.add('GET', '/foo/:bar?/*/:baz', (req) => {
-	assert<{ bar?: string, baz: string, wild: string }>(req.params);
-	assert<string|undefined>(req.params.bar);
-	assert<string>(req.params.wild);
-	assert<string>(req.params.baz);
+API.add('GET', '/foo/:bar?/*/:baz', (req, context) => {
+	assert<{ bar?: string, baz: string, wild: string }>(context.params);
+	assert<string|undefined>(context.params.bar);
+	assert<string>(context.params.wild);
+	assert<string>(context.params.baz);
 	// @ts-expect-error
-	assert<string>(req.params.bar);
+	assert<string>(context.params.bar);
 	// @ts-expect-error
-	req.params.hello;
+	context.params.hello;
 });
 
-API.add('GET', /^[/]foobar[/]?/, (req) => {
-	assert<{}>(req.params);
-	assert<Params>(req.params);
-	assert<string>(req.params.anything);
+API.add('GET', /^[/]foobar[/]?/, (req, context) => {
+	assert<{}>(context.params);
+	assert<Params>(context.params);
+	assert<string>(context.params.anything); // TODO: revert?
 });
 
 /**
@@ -221,16 +216,16 @@ API.add('GET', /^[/]foobar[/]?/, (req) => {
  */
 
 API.add('GET', '/foo/:bar?', compose(
-	(req, res) => {
-		assert<string|void>(req.params.bar);
+	(req, context) => {
+		assert<string|void>(context.params.bar);
 	},
-	async (req, res) => {
-		assert<string|void>(req.params.bar);
-		res.end('hello');
+	async (req, context) => {
+		assert<string|void>(context.params.bar);
+		return new Response;
 	},
 	// @ts-expect-error
-	(req, res) => {
-		assert<string|void>(req.params.bar);
+	(req, context) => {
+		assert<string|void>(context.params.bar);
 		return 123;
 	}
 ));

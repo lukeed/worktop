@@ -67,9 +67,6 @@ addEventListener('fetch', event => {
  * Event: scheduled
  */
 
-// @ts-expect-error
-addEventListener('scheduled', API.find);
-
 addEventListener('scheduled', event => {
 	assert<CronEvent>(event);
 	assert<string>(event.type);

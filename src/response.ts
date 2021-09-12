@@ -1,5 +1,6 @@
 import { byteLength } from 'worktop/utils';
-import type { HeadersObject, ServerResponse as SR } from 'worktop/response';
+import type { HeadersObject } from 'worktop/response';
+import type { ServerResponse as SR } from 'worktop/response';
 
 type Writable<T> = {
 	-readonly [P in keyof T]: T[P]
