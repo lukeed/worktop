@@ -51,7 +51,7 @@ export const config: Config;
  * Conditionallyy sets headers for preflight (aka OPTIONS) requests.
  * @NOTE Values in `options` are given priority, otherwise the `config` defaults are used.
  */
-export function headers(res: Response, options?: Partial<Config>, isPreflight?: boolean): void;
+export function headers(res: Response, options?: Partial<Config>): Config;
 
 type PreflightConfig = Omit<Config, 'origin'> & {
 	/**
@@ -76,4 +76,4 @@ export function preflight(options?: PreflightConfig): <
 	context: Omit<C, 'params'> & {
 		params: Strict<P & C['params']>;
 	}
-) => void;
+) => Response | void;

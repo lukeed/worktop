@@ -1,12 +1,11 @@
 import { compose } from 'worktop';
 import * as CORS from 'worktop/cors';
-import type { ServerRequest } from 'worktop/request';
-import type { ServerResponse } from 'worktop/response';
-import type { Router } from 'worktop';
+import type { Router, Context } from 'worktop';
 
 declare const API: Router;
-declare const request: ServerRequest;
-declare const response: ServerResponse;
+declare const request: Request;
+declare const response: Response;
+declare const context: Context;
 
 assert<CORS.Config>(CORS.config);
 assert<string>(CORS.config.origin);
@@ -28,8 +27,8 @@ CORS.headers(response, {
 });
 
 // @ts-expect-error
-CORS.preflight(request, response);
-CORS.preflight()(request, response);
+CORS.preflight(request, context);
+CORS.preflight()(request, context);
 CORS.preflight({ origin: true });
 
 /**
@@ -50,11 +49,11 @@ API.prepare = compose(
 // does not lose `Params` information
 API.add('GET', '/static/:group/*', compose(
   CORS.preflight({ maxage: 86400 }),
-  async (req, res) => {
+  async (req, context) => {
 		// @ts-expect-error
-		req.params.foobar // is not defined
-		assert<{ group: string; wild: string }>(req.params);
-		assert<string>(req.params.group);
-		assert<string>(req.params.wild);
+		context.params.foobar // is not defined
+		assert<{ group: string; wild: string }>(context.params);
+		assert<string>(context.params.group);
+		assert<string>(context.params.wild);
   }
 ));
