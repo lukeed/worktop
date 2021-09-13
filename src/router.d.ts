@@ -46,17 +46,20 @@ export interface Bindings {
 }
 
 export interface ModuleContext {
-  waitUntil(f: any): void;
-  passThroughOnException?(): void;
+	waitUntil(f: any): void;
+	passThroughOnException?(): void;
 }
 
 // TODO: move to utils?
 type Merge<C extends Context, P> = Omit<C, 'params'> & { params: P };
 
+export type Deferral = (res: Response) => Promisable<void>;
+
 export interface Context extends ModuleContext {
 	url: URL;
 	params: Params;
 	bindings?: Bindings;
+	defer(f: Deferral): void;
 }
 
 export type Handler<

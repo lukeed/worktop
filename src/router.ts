@@ -1,7 +1,7 @@
 import { parse } from 'regexparam';
 import { finalize, STATUS_CODES } from 'worktop/response';
 
-import type { Handler, Router as RR } from 'worktop';
+import type { Handler, Deferral, Router as RR } from 'worktop';
 import type { Method, Params, Context } from 'worktop';
 import type { Dict } from 'worktop/utils';
 
@@ -92,8 +92,12 @@ export function Router(): RR<Context> {
 
 		async run(req, context) {
 			try {
+				var defer: Deferral | void;
+				var queue: Deferral[] = [];
+
 				context = context || {};
 				context.url = new URL(req.url);
+				context.defer = f => { queue.push(f) };
 				context.bindings = context.bindings || {};
 
 				var res = $.prepare && await $.prepare(req, context as PC);
@@ -109,7 +113,8 @@ export function Router(): RR<Context> {
 				(context as EC).error = err as Error;
 				res = await $.onerror(req, context as Context);
 			} finally {
-				res = res || new Response('OK');
+				res = new Response(res ? res.body : 'OK', res!);
+				while (defer = queue!.pop()) await defer(res);
 				return finalize(res, req.method === 'HEAD');
 			}
 		}
