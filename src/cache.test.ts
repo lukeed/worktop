@@ -36,32 +36,26 @@ lookup('should be a function', () => {
 
 lookup('should call `Cache.match` with arguments', async () => {
 	Storage.match = Mock();
-	const event = { request: 123 };
-
-	await Cache.lookup(event as any);
+	await Cache.lookup(123 as any);
 	assert.equal(Storage.match.args(), [123]);
 });
 
 lookup('should allow custom `request` value :: string', async () => {
 	Storage.match = Mock();
-	const event = { request: 123 };
-
-	await Cache.lookup(event as any, '/foo/bar');
+	await Cache.lookup('/foo/bar');
 	assert.equal(Storage.match.args(), ['/foo/bar']);
 });
 
 lookup('should allow custom `request` value :: Request', async () => {
 	Storage.match = Mock();
 	const request = { foo: 456 } as any;
-	const event = { request: 123 } as any;
 
-	await Cache.lookup(event, request);
+	await Cache.lookup(request);
 	assert.equal(Storage.match.args(), [request]);
 });
 
 lookup('should treat HEAD as GET', async () => {
 	const request = { method: 'HEAD', url: '/foobar' } as any;
-	const event = { request } as any;
 
 	let args: any[] = [];
 	Storage.match = (...x: any[]) => {
@@ -69,7 +63,8 @@ lookup('should treat HEAD as GET', async () => {
 		return new Response('hello');
 	}
 
-	let res = await Cache.lookup(event);
+	let res = await Cache.lookup(request);
+
 	assert.instance(res, Response);
 	assert.is.not(res!.body, 'hello');
 	assert.is(res!.body, null); // because HEAD
@@ -183,11 +178,11 @@ save('should be a function', () => {
 
 save('should call `event.waitUntil` and `Cache.put` when Response is cacheable', () => {
 	let waited=0, res = new Response();
-	const request = { method: 'GET' };
+	const request = { method: 'GET' } as Request;
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = Mock();
 
-	const output = Cache.save(event, res);
+	const output = Cache.save(request, res, event);
 	assert.ok(output === res);
 
 	assert.equal(
@@ -200,11 +195,10 @@ save('should call `event.waitUntil` and `Cache.put` when Response is cacheable',
 
 save('should treat custom `request`-string as GET', () => {
 	let waited=0, res = new Response();
-	const request = { method: 'POST' };
-	const event: any = { request, waitUntil: () => waited=1 };
+	const event = { waitUntil: () => waited=1 };
 	Storage.put = Mock();
 
-	const output = Cache.save(event, res, '/foo/bar');
+	const output = Cache.save('/foo/bar', res, event);
 	assert.ok(output === res);
 
 	assert.equal(
@@ -218,11 +212,11 @@ save('should treat custom `request`-string as GET', () => {
 save('should not save Response if not GET method :: POST', () => {
 	let waited=0, saved=0;
 	const res = new Response();
-	const request = { method: 'POST' };
+	const request = { method: 'POST' } as Request;
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
 
-	const output = Cache.save(event, res);
+	const output = Cache.save(request, res, event);
 	assert.ok(output === res);
 
 	assert.is(saved, 0);
@@ -236,7 +230,7 @@ save('should not save Response if not GET method :: HEAD', () => {
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
 
-	const output = Cache.save(event, res);
+	const output = Cache.save(event.request, res, event);
 	assert.ok(output === res);
 
 	assert.is(saved, 0);
@@ -250,7 +244,7 @@ save('should not save Response if not cacheable', () => {
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
 
-	const output = Cache.save(event, res);
+	const output = Cache.save(event.request, res, event);
 	assert.ok(output === res);
 
 	assert.is(saved, 0);
@@ -268,7 +262,7 @@ save('should mark `private=set-cookie` :: write', () => {
 	res.headers.set('set-cookie', 'foo=bar');
 
 	assert.ok(Cache.isCacheable(res));
-	const output = Cache.save(event, res);
+	const output = Cache.save(event.request, res, event);
 	assert.is.not(output, res); // res = res.clone()
 
 	assert.equal(
@@ -296,7 +290,7 @@ save('should mark `private=set-cookie` :: append', () => {
 	res.headers.set('cache-control', 'public,max-age=0');
 
 	assert.ok(Cache.isCacheable(res));
-	const output = Cache.save(event, res);
+	const output = Cache.save(event.request, res, event);
 	assert.is.not(output, res); // res = res.clone()
 
 	assert.equal(
