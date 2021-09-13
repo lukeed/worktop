@@ -50,6 +50,9 @@ export interface ModuleContext {
   passThroughOnException?(): void;
 }
 
+// TODO: move to utils?
+type Merge<C extends Context, P> = Omit<C, 'params'> & { params: P };
+
 export interface Context extends ModuleContext {
 	url: URL;
 	params: Params;
@@ -58,10 +61,10 @@ export interface Context extends ModuleContext {
 
 export type Handler<
 	C extends Context = Context,
-	P extends Params = Params,
+	P = Params,
 > = (
 	request: Request,
-	context: Omit<C, 'params'> & { params: OmitIndex<P> }
+	context: Merge<C, P>
 ) => Promisable<Response | void>;
 
 export type RouteParams<T extends string> =
@@ -88,7 +91,7 @@ export type Initializer<C extends Context> = (
 
 export declare class Router<C extends Context = Context> {
 	add<T extends RegExp>(method: Method, route: T, handler: Handler<C, Params>): void;
-	add<T extends string>(method: Method, route: T, handler: Handler<C, RouteParams<T>>): void;
+	add<T extends string>(method: Method, route: T, handler: Handler<C, Strict<RouteParams<T>>>): void;
 	onerror(req: Request, context: C & { status?: number; error?: Error }): Promisable<Response>;
 	prepare?(req: Request, context: Omit<C, 'params'>): Promisable<Response|void>;
 	run: Initializer<C>;

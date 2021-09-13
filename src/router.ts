@@ -93,8 +93,7 @@ export function Router(): RR<Context> {
 			try {
 				context = context || {};
 				context.url = new URL(req.url);
-				// context.bindings = context.bindings || {};
-				// context.params = new Error;
+				context.bindings = context.bindings || {};
 
 				var res = $.prepare && await $.prepare(req, context as PC);
 				if (res && res instanceof Response) return res;

@@ -62,9 +62,9 @@ API.add('POST', '/items', async (req, context) => {
 	assert<(f:any)=>void>(context.waitUntil);
 
 	// Assert `req.extend` usage
-	req.extend(async function () {}());
-	req.extend(fetch('/analytics'));
-	req.extend(function () {}());
+	// req.extend(async function () {}());
+	// req.extend(fetch('/analytics'));
+	// req.extend(function () {}());
 
 	// Assert `req.cf` properties
 	assert<IncomingCloudflareProperties>(req.cf);
@@ -206,7 +206,7 @@ API.add('GET', '/foo/:bar?/*/:baz', (req, context) => {
 API.add('GET', /^[/]foobar[/]?/, (req, context) => {
 	assert<{}>(context.params);
 	assert<Params>(context.params);
-	assert<string>(context.params.anything); // TODO: revert?
+	assert<string>(context.params.anything);
 });
 
 /**
