@@ -18,11 +18,9 @@ export function finalize(res: Response, isHEAD?: boolean): Response;
 export function send(status: number, data: any, headers?: HeadersObject): Response;
 
 export declare class ServerResponse {
-	constructor(method: string);
+	readonly headers: Headers;
+	readonly body: BodyInit | null;
 	readonly finished: boolean;
-
-	headers: Headers;
-	body: BodyInit | null;
 
 	statusCode: number;
 	get status(): number;

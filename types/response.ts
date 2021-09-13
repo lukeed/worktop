@@ -1,11 +1,11 @@
 import { ServerResponse, STATUS_CODES } from 'worktop/response';
 
 // @ts-expect-error
-new ServerResponse();
+ServerResponse();
 // @ts-expect-error
 ServerResponse('GET');
 
-const response = new ServerResponse('GET');
+const response = new ServerResponse;
 
 assert<ServerResponse>(response);
 

@@ -76,7 +76,7 @@ export function finalize(res: Response, isHEAD?: boolean): Response {
 	return copy;
 }
 
-export function ServerResponse(this: Writable<SR>, method: string): SR {
+export function ServerResponse(this: Writable<SR>): SR {
 	var $ = this, hh = $.headers = new Headers({
 		'Cache-Control': 'private, no-cache'
 	});
