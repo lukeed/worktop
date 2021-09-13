@@ -34,7 +34,34 @@ export const STATUS_CODES: Record<string|number, string> = {
 	'504': 'Gateway Timeout',
 };
 
-export function send(status: number, data: any, headers?: HeadersObject) {
+/**
+ * Auto-serialize `data` to a `Response` object.
+ * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
+ */
+export function send(status: number, data: any, headers?: HeadersObject): Response {
+	let obj: HeadersObject = {};
+	for (let key in headers) {
+		obj[key.toLowerCase()] = headers[key];
+	}
+
+	let type = obj[CTYPE];
+	let dtype = typeof data;
+
+	if (data == null) {
+		data = '';
+	} else if (dtype === 'object') {
+		data = JSON.stringify(data);
+		type = type || 'application/json;charset=utf-8';
+	} else if (dtype !== 'string') {
+		data = String(data);
+	}
+
+	obj[CTYPE] = type || 'text/plain';
+	obj[CLENGTH] = obj[CLENGTH] || String(
+		data.byteLength || byteLength(data)
+	);
+
+	return new Response(data, { status, headers: obj });
 }
 
 // NOTE: cloudflare handles all this automatically...
@@ -84,43 +111,16 @@ export function ServerResponse(this: Writable<SR>, method: string): SR {
 		}
 	}
 
-	/**
-	 * @TODO Remove / extract?
-	 * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
-	 */
 	$.send = (code, data, headers) => {
-		let dtype = typeof data, obj: HeadersObject = {};
-		for (let key in headers) obj[key.toLowerCase()] = headers[key];
-		let len = obj[CLENGTH] || $.getHeader(CLENGTH);
-		let type = obj[CTYPE] || $.getHeader(CTYPE);
-
-		if (data == null) {
-			data = '';
-		} else if (dtype === 'object') {
-			data = JSON.stringify(data);
-			type = type || 'application/json;charset=utf-8';
-		} else if (dtype !== 'string') {
-			data = String(data);
-		}
-
-		obj[CTYPE] = type || 'text/plain';
-		obj[CLENGTH] = len || String(
-			data.byteLength || byteLength(data)
-		);
-
-		if (code === 204 || code === 205 || code === 304) {
-			$.removeHeader(CLENGTH);
-			$.removeHeader(CTYPE);
-			delete obj[CLENGTH];
-			delete obj[CTYPE];
-			data = null;
-		} else if (method === 'HEAD') {
-			data = null;
-		}
-
-		$.writeHead(code, obj);
-		$.end(data);
-	}
+		let k, v, res = send(code, data, {
+			[CLENGTH]: $.getHeader(CLENGTH)!,
+			[CTYPE]: $.getHeader(CTYPE)!,
+			...headers,
+		});
+		for ([k,v] of res.headers) hh.set(k, v);
+		$.statusCode = res.status;
+		$.end(res.body);
+	};
 
 	return $;
 }
