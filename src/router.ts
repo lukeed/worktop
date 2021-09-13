@@ -3,6 +3,7 @@ import { finalize, STATUS_CODES } from 'worktop/response';
 
 import type { Handler, Router as RR } from 'worktop';
 import type { Method, Params, Context } from 'worktop';
+import type { Dict } from 'worktop/utils';
 
 type HC = Handler;
 type PC = Omit<Context, 'params'>;
@@ -27,7 +28,7 @@ interface Entry {
 
 interface Branch {
 	__d: Map<RegExp, Entry>;
-	__s: Record<string, Entry>;
+	__s: Dict<Entry>;
 }
 
 type Tree = Partial<Record<Method, Branch>>;

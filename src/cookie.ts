@@ -1,11 +1,12 @@
 import type { Attributes } from 'worktop/cookie';
+import type { Dict } from 'worktop/utils';
 
 const ATTRS = new Set([
 	'domain', 'path', 'max-age', 'expires',
 	'samesite', 'secure', 'httponly',
 ]);
 
-type Cookie = Attributes & Record<string, string>;
+type Cookie = Attributes & Dict<string>;
 export function parse(cookie: string): Cookie {
 	let out: Cookie = {}, idx: number, tmp: string;
 	let i=0, arr=cookie.split(/;\s*/g);

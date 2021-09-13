@@ -2,6 +2,7 @@ import { abort } from './internal/ws';
 
 import type { SocketHandler } from 'worktop/ws';
 import type { Context, Params } from 'worktop';
+import type { Dict } from 'worktop/utils';
 
 // TODO: Might need to only be 400 code?
 // @see https://datatracker.ietf.org/doc/rfc6455/?include_text=1
@@ -19,7 +20,7 @@ export function connect(req: Request) {
 	if (value !== '13') return abort(400);
 }
 
-type State = Record<string, any>;
+type State = Dict<any>;
 
 export function listen<
 	C extends Context = Context,

@@ -1,4 +1,5 @@
 import type { Bindings } from 'worktop';
+import type { Dict } from 'worktop/utils';
 import type { WebSocket } from 'worktop/ws';
 
 export namespace Durable {
@@ -65,7 +66,7 @@ export namespace Durable {
 		get<T>(keys: string[], options?: Storage.Options.Get): Promise<Map<string, T>>;
 
 		put<T>(key: string, value: T, options?: Storage.Options.Put): Promise<void>;
-		put<T>(entries: Record<string, T>, options?: Storage.Options.Put): Promise<void>;
+		put<T>(entries: Dict<T>, options?: Storage.Options.Put): Promise<void>;
 
 		delete(key: string, options?: Storage.Options.Put): Promise<boolean>;
 		delete(keys: string[], options?: Storage.Options.Put): Promise<number>;

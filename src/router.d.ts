@@ -2,7 +2,7 @@
 
 import type { KV } from 'worktop/kv';
 import type { Durable } from 'worktop/durable';
-import type { Promisable, Strict } from 'worktop/utils';
+import type { Promisable, Strict, Dict } from 'worktop/utils';
 
 declare global {
 	interface Request {
@@ -15,7 +15,7 @@ declare global {
 	}
 }
 
-export type Params = Record<string, string>;
+export type Params = Dict<string>;
 
 /**
  * All valid HTTP methods

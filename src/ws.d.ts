@@ -1,5 +1,5 @@
 import type { Context, Params } from 'worktop';
-import type { Strict, Promisable } from 'worktop/utils';
+import type { Dict, Strict, Promisable } from 'worktop/utils';
 
 declare global {
 	const WebSocketPair: {
@@ -25,7 +25,8 @@ export interface WebSocket {
 	addEventListener(type: 'message', listener: (this: WebSocket, ev: MessageEvent<string>) => any): void;
 }
 
-type State = Record<string, any>;
+type State = Dict<any>;
+
 export interface Socket<S extends State = State> {
 	send: WebSocket['send'];
 	close: WebSocket['close'];

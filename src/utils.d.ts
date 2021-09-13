@@ -1,5 +1,6 @@
-export type Arrayable<T> = T[] | T;
 export type Promisable<T> = Promise<T> | T;
+export type Dict<T> = Record<string, T>;
+export type Arrayable<T> = T[] | T;
 export type Strict<T> = {
 	[K in keyof T as {} extends Record<K, 1> ? never : K]: T[K];
 };
@@ -112,4 +113,4 @@ export function body<T>(req: Request): Promise<T|void>;
  * Converts an `Iterable` into an object.
  * @NOTE Like `Object.fromEntries`, but can collect multiple values for same key.
  */
-export function toObject<T>(iter: Iterable<[string, T]>): Record<string, Arrayable<T>>;
+export function toObject<T>(iter: Iterable<[string, T]>): Dict<Arrayable<T>>;

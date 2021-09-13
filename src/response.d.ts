@@ -1,4 +1,7 @@
 /// <reference lib="webworker" />
+import type { Arrayable, Dict } from 'worktop/utils';
+
+export type HeadersObject = Dict<string>;
 
 /**
  * Status text messages for common 4xx & 5xx status codes.
@@ -7,9 +10,6 @@
 export declare var STATUS_CODES: Record<string|number, string>;
 
 export function finalize(res: Response, isHEAD?: boolean): Response;
-
-type Arrayable<T> = T[] | T;
-export type HeadersObject = Record<string, string>;
 
 export declare class ServerResponse {
 	constructor(method: string);
