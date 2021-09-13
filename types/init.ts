@@ -105,6 +105,21 @@ modules.define({
 		assert<Bindings>(bindings);
 		assert<Strict<Bindings>>(bindings);
 		return API.run(req, { ...ctx, bindings });
+	},
+	async scheduled(event, bindings, ctx) {
+		assert<ModuleContext>(ctx);
+
+		assert<Omit<CronEvent, 'waitUntil'>>(event);
+		assert<number>(event.scheduledTime);
+		assert<string>(event.cron);
+
+		assert<Bindings>(bindings);
+		assert<Strict<Bindings>>(bindings);
+
+		await API.run(
+			new Request('/foobar'),
+			{ ...ctx, bindings }
+		);
 	}
 });
 
