@@ -94,6 +94,7 @@
   "devDependencies": {
     "@types/node": "16.7.10",
     "esbuild": "0.11.14",
+    "fetchy": "next",
     "is-uuid": "1.0.2",
     "kleur": "4.1.4",
     "rewrite-imports": "2.0.3",

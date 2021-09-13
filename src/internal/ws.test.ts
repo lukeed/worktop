@@ -2,9 +2,6 @@ import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import * as ws from './ws';
 
-// @ts-ignore -> workaround for bad/lazy Response mock
-const toHeaders = (h: Headers): Record<string, string> => h;
-
 const abort = suite('abort');
 
 abort('should be a function', () => {
@@ -12,47 +9,47 @@ abort('should be a function', () => {
 });
 
 abort('should return `Response` instance', () => {
-	let out = ws.abort(400);
-	assert.instance(out, Response);
+	let res = ws.abort(400);
+	assert.instance(res, Response);
 
-	let headers = toHeaders(out.headers);
-	assert.is(headers['Content-Type'], 'text/plain');
-	assert.is(headers['Connection'], 'close');
+	let headers = Object.fromEntries(res.headers);
+	assert.is(headers['content-type'], 'text/plain');
+	assert.is(headers['connection'], 'close');
 });
 
-abort('should handle `400` status', () => {
+abort('should handle `400` status', async () => {
 	let text = 'Bad Request';
 	let res = ws.abort(400);
 
 	assert.is(res.status, 400);
 	assert.is(res.statusText, text);
-	assert.is(res.body, text);
+	assert.is(await res.text(), text);
 
-	let clen = toHeaders(res.headers)['Content-Length'];
+	let clen = res.headers.get('Content-Length');
 	assert.is(clen, '' + text.length);
 });
 
-abort('should handle `405` status', () => {
+abort('should handle `405` status', async () => {
 	let text = 'Method Not Allowed';
 	let res = ws.abort(405);
 
 	assert.is(res.status, 405);
 	assert.is(res.statusText, text);
-	assert.is(res.body, text);
+	assert.is(await res.text(), text);
 
-	let clen = toHeaders(res.headers)['Content-Length'];
+	let clen = res.headers.get('Content-Length');
 	assert.is(clen, '' + text.length);
 });
 
-abort('should handle `426` status', () => {
+abort('should handle `426` status', async () => {
 	let text = 'Upgrade Required';
 	let res = ws.abort(426);
 
 	assert.is(res.status, 426);
 	assert.is(res.statusText, text);
-	assert.is(res.body, text);
+	assert.is(await res.text(), text);
 
-	let clen = toHeaders(res.headers)['Content-Length'];
+	let clen = res.headers.get('Content-Length');
 	assert.is(clen, '' + text.length);
 });
 
