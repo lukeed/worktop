@@ -1,5 +1,5 @@
 import type { Context, Params } from 'worktop';
-import type { OmitIndex, Promisable } from 'worktop/utils';
+import type { Strict, Promisable } from 'worktop/utils';
 
 declare global {
 	const WebSocketPair: {
@@ -63,6 +63,6 @@ export function listen<
 >(handler: SocketHandler<C, P>): (
 	request: Request,
 	context: Omit<C, 'params'> & {
-		params: OmitIndex<P>;
+		params: Strict<P>;
 	}
 ) => Response;

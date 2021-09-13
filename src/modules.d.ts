@@ -1,18 +1,18 @@
 /// <reference lib="webworker" />
 
 import type { Bindings, CronEvent, ModuleContext } from 'worktop';
-import type { Promisable, OmitIndex } from 'worktop/utils';
+import type { Promisable, Strict } from 'worktop/utils';
 import type { ResponseHandler } from 'worktop/sw';
 
 export type FetchHandler<B extends Bindings = Bindings> = (
 	request: Request,
-	bindings: OmitIndex<B>,
+	bindings: Strict<B>,
 	context: Required<ModuleContext>
 ) => Promisable<Response>;
 
 export type CronHandler<B extends Bindings = Bindings> = (
 	event: Omit<CronEvent, 'waitUntil'>,
-	bindings: OmitIndex<B>,
+	bindings: Strict<B>,
 	context: Pick<ModuleContext, 'waitUntil'>
 ) => Promisable<void>;
 

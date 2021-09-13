@@ -2,7 +2,7 @@
 
 import type { KV } from 'worktop/kv';
 import type { Durable } from 'worktop/durable';
-import type { Promisable, OmitIndex } from 'worktop/utils';
+import type { Promisable, Strict } from 'worktop/utils';
 
 declare global {
 	interface Request {

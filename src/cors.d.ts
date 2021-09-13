@@ -1,5 +1,5 @@
 import type { Context, Params } from 'worktop';
-import type { OmitIndex } from 'worktop/utils';
+import type { Strict } from 'worktop/utils';
 
 export interface Config {
 	/**
@@ -74,6 +74,6 @@ export function preflight(options?: PreflightConfig): <
 >(
 	request: Request,
 	context: Omit<C, 'params'> & {
-		params: OmitIndex<P & C['params']>;
+		params: Strict<P & C['params']>;
 	}
 ) => void;
