@@ -1,10 +1,12 @@
 import * as Cache from 'worktop/cache';
-import type { ModuleContext } from 'worktop';
+import type { ModuleWorker } from 'worktop/modules';
+import type { ModuleContext, Router } from 'worktop';
 
 declare const event: FetchEvent;
 declare const request: Request;
 declare const response: Response;
 declare const context: ModuleContext;
+declare const API: Router;
 
 /**
  * SAVE
@@ -69,15 +71,9 @@ Cache.isCacheable(request);
  * REPLY
  */
 
-Cache.reply()
-
-/**
- * Attempt to `lookup` the `event.request`, otherwise run the `handler` and attempt to `save` the Response.
- */
- export function reply<
- B extends Bindings = Bindings,
- C extends Context = Context
->(run: Initializer<C, B>): ModuleWorker<B>;
+assert<ModuleWorker>(
+	Cache.reply(API.run)
+);
 
 /**
  * LISTEN

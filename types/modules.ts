@@ -1,7 +1,7 @@
 import type { Bindings, CronEvent, ModuleContext } from 'worktop';
 import type { IncomingCloudflareProperties } from 'worktop';
 import type { ModuleWorker } from 'worktop/modules';
-import type { OmitIndex } from 'worktop/utils';
+import type { Strict } from 'worktop/utils';
 import type { KV } from 'worktop/kv';
 
 /**
@@ -51,7 +51,7 @@ const worker2: ModuleWorker<CustomBindings> = {
 	fetch(req, env, ctx) {
 		assert<Request>(req);
 		assert<ModuleContext>(ctx);
-		assert<OmitIndex<CustomBindings>>(env);
+		assert<Strict<CustomBindings>>(env);
 
 		// @ts-expect-error - missing
 		assert<undefined>(env.missing);

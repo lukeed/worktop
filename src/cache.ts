@@ -42,9 +42,9 @@ export function isCacheable(res: Response): boolean {
 
 // Generate a Module Worker definition from an `Initializer` type.
 export function reply<
-	B extends Bindings = Bindings,
 	C extends Context = Context,
->(run: Initializer<C, B>): ModuleWorker<B> {
+	B extends Bindings = Bindings,
+>(run: Initializer<C>): ModuleWorker<B> {
 	return {
 		async fetch(req, env, ctx) {
 			let res = await lookup(req);

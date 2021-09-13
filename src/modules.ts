@@ -1,7 +1,7 @@
-import type { Bindings, Context, Initializer, Handler } from 'worktop';
 import type { ModuleWorker } from 'worktop/modules';
+import type { Bindings, Context, Initializer, Handler } from 'worktop';
 import type { ResponseHandler } from 'worktop/sw';
-import type { OmitIndex } from 'worktop/utils';
+import type { Strict } from 'worktop/utils';
 
 // Tiny helper for TypeScript definition
 export function define<B extends Bindings = Bindings>(worker: ModuleWorker<B>): ModuleWorker<B> {
@@ -23,8 +23,8 @@ export function convert<C extends Context = Context>(handler: ResponseHandler): 
 export function reply<
 	B extends Bindings = Bindings,
 	C extends Context = Context
->(run: Initializer<C, B>): ModuleWorker<B> {
-	type BC = C & { bindings: OmitIndex<B> };
+>(run: Initializer<C>): ModuleWorker<B> {
+	type BC = C & { bindings: Strict<B> };
 	return {
 		fetch(req, env, ctx) {
 			(ctx as BC).bindings = env;

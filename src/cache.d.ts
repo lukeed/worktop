@@ -15,9 +15,9 @@ export type ResponseHandler = (event: FetchEvent) => Promise<Response>;
  * Attempt to `lookup` the `event.request`, otherwise run the `handler` and attempt to `save` the Response.
  */
 export function reply<
+	C extends Context = Context,
 	B extends Bindings = Bindings,
-	C extends Context = Context
->(run: Initializer<C, B>): ModuleWorker<B>;
+>(run: Initializer<C>): ModuleWorker<B>;
 
 /**
  * Assign the `handler` to the "fetch" event.

@@ -53,6 +53,7 @@ export interface ModuleContext {
 export interface Context extends ModuleContext {
 	url: URL;
 	params: Params;
+	bindings?: Bindings;
 }
 
 export type Handler<
@@ -78,12 +79,11 @@ export type RouteParams<T extends string> =
 		? { wild: string }
 	: {};
 
-export type Initializer<
-	C extends Context,
-	B extends Bindings = Bindings
-> = (
+export type Initializer<C extends Context> = (
 	request: Request,
-	context: C & { bindings: OmitIndex<B> }
+	context: Partial<C> & ModuleContext & {
+		bindings?: Bindings;
+	}
 ) => Promise<Response>;
 
 export declare class Router<C extends Context = Context> {

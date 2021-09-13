@@ -1,8 +1,10 @@
-import type { Bindings, Context, Initializer } from 'worktop';
+import type { Context, Initializer } from 'worktop';
 import type { ResponseHandler } from 'worktop/sw';
 
 // Convert a Module `Initializer` into a Service Worker `ResponseHandler` type.
-export function convert(run: Initializer<Context, Bindings>): ResponseHandler {
+export function convert<
+	C extends Context = Context
+>(run: Initializer<C>): (event: FetchEvent) => Promise<Response> {
 	return function (event) {
 		let { request, ...ctx } = event;
 		return run(request, ctx);
@@ -17,7 +19,7 @@ export function listen(handler: ResponseHandler): void {
 }
 
 // Wrap an `Initializer` and assign as "fetch" listener
-export function reply(run: Initializer<Context>) {
+export function reply<C extends Context = Context>(run: Initializer<C>): void {
 	let handler = convert(run);
 	listen(handler);
 }

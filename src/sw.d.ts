@@ -18,15 +18,19 @@ export type CronHandler = (event: CronEvent) => Promisable<void>;
 
 /**
  * Convert a Module `Initializer` into a Service Worker `ResponseHandler` type.
+ * @example let handler = sw.convert(API.run);
  */
-export function convert(run: Initializer<Context>): ResponseHandler;
+export function convert<
+	C extends Context = Context
+>(run: Initializer<C>): (event: FetchEvent) => Promise<Response>
 
 
 /**
  * Assign the Module `Initializer` as the "fetch" event listener.
- * @NOTE Will `convert()` the `Initializer` automatically.
+ * @note Will `convert()` the `Initializer` automatically.
+ * @example sw.reply(API.run);
  */
-export function reply(init: Initializer<Context>): void;
+export function reply<C extends Context = Context>(run: Initializer<C>): void;
 
 
 /**
