@@ -2,6 +2,7 @@ import * as utils from 'worktop/utils';
 import type { UID, UUID, ULID } from 'worktop/utils';
 
 declare let request: Request;
+declare let response: Response;
 
 /**
  * HEX
@@ -76,7 +77,7 @@ assert<Uint8Array>(utils.randomize());
 assert<Uint32Array>(utils.randomize(1));
 
 /**
- * BODY
+ * BODY (REQUEST)
  */
 
 assert<unknown>(
@@ -93,4 +94,24 @@ assert<string|void>(
 
 assert<Item|void>(
 	await utils.body<Item>(request)
+);
+
+/**
+ * BODY (RESPONSE)
+ */
+
+assert<unknown>(
+	await utils.body(response)
+);
+
+assert<ArrayBuffer|void>(
+	await utils.body<ArrayBuffer>(response)
+);
+
+assert<string|void>(
+	await utils.body<string>(response)
+);
+
+assert<Item|void>(
+	await utils.body<Item>(response)
 );

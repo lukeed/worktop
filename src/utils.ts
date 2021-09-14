@@ -77,17 +77,17 @@ export function byteLength(input?: string): number {
 }
 
 /**
- * Parse `Request.body` according to its `Content-Type` header.
+ * Parse `Request|Response` body according to its `Content-Type` header.
  * @NOTE Converts `FormData` into an object.
  */
-export async function body<T>(req: Request): Promise<T|void> {
-	let ctype = req.headers.get('content-type');
+export async function body<T>(input: Request | Response): Promise<T|void> {
+	let ctype = input.headers.get('content-type');
 
-	if (!req.body || !ctype) return;
-	if (!!~ctype.indexOf('application/json')) return req.json() as Promise<T>;
-	if (!!~ctype.indexOf('multipart/form-data')) return req.formData().then(toObject) as Promise<T>;
-	if (!!~ctype.indexOf('application/x-www-form-urlencoded')) return req.formData().then(toObject) as Promise<T>;
-	return !!~ctype.indexOf('text/') ? req.text() : req.arrayBuffer() as Promise<any>;
+	if (!input.body || !ctype) return;
+	if (!!~ctype.indexOf('application/json')) return input.json() as Promise<T>;
+	if (!!~ctype.indexOf('multipart/form-data')) return input.formData().then(toObject) as Promise<T>;
+	if (!!~ctype.indexOf('application/x-www-form-urlencoded')) return input.formData().then(toObject) as Promise<T>;
+	return !!~ctype.indexOf('text/') ? input.text() : input.arrayBuffer() as Promise<any>;
 }
 
 /**

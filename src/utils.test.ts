@@ -452,4 +452,24 @@ body('should react to content-type :: arrayBuffer()', async () => {
 	assert.is(output, 'arrayBuffer');
 });
 
+body('should parse Response body :: text()', async () => {
+	let res = new Response('[1,2,3]');
+	res.headers.set('content-type', 'text/plain');
+	let output = await utils.body(res);
+	assert.equal(output, '[1,2,3]');
+});
+
+body('should parse Response body :: json()', async () => {
+	let res = new Response('[1,2,3]');
+	res.headers.set('content-type', 'application/json');
+	let output = await utils.body(res);
+	assert.equal(output, [1, 2, 3]);
+});
+
+body('should parse Response w/ null body', async () => {
+	let res = new Response(null);
+	let output = await utils.body(res);
+	assert.is(output, undefined);
+});
+
 body.run();
