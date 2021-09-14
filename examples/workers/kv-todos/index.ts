@@ -1,5 +1,5 @@
 import { Router } from 'worktop';
-import { listen } from 'worktop/cache';
+import * as Cache from 'worktop/cache';
 import * as Todos from './routes';
 
 const API = new Router();
@@ -13,4 +13,5 @@ API.add('GET', '/users/:username/todos/:uid', Todos.show);
 API.add('PUT', '/users/:username/todos/:uid', Todos.update);
 API.add('DELETE', '/users/:username/todos/:uid', Todos.destroy);
 
-listen(API.run);
+// Module Worker
+export default Cache.reply(API.run);
