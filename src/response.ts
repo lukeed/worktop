@@ -61,7 +61,7 @@ export function send(status: number, data: any, headers?: HeadersObject): Respon
 		data.byteLength || byteLength(data)
 	);
 
-	return new Response(data, { status, headers: obj });
+	return new Response(data, { status, headers: obj as HeadersInit });
 }
 
 // NOTE: cloudflare handles all this automatically...

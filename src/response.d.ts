@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import type { Arrayable, Dict } from 'worktop/utils';
 
-export type HeadersObject = Dict<string>;
+export type HeadersObject = Dict<{ toString(): string }>;
 
 /**
  * Status text messages for common 4xx & 5xx status codes.
