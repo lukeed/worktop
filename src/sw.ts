@@ -7,7 +7,7 @@ export function convert<
 >(run: Initializer<C>): (event: FetchEvent) => Promise<Response> {
 	return function (event) {
 		let { request, ...ctx } = event;
-		return run(request, ctx);
+		return run(request, ctx as any);
 	};
 }
 
