@@ -78,6 +78,7 @@
     "utils",
     "cors",
     "kv",
+    "sw",
     "ws"
   ],
   "engines": {
