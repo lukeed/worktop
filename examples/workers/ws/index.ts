@@ -1,4 +1,5 @@
-import { Router, listen } from 'worktop';
+import { Router } from 'worktop';
+import * as sworker from 'worktop/sw';
 import * as ws from 'worktop/ws';
 
 const API = new Router;
@@ -8,15 +9,15 @@ function reply(socket: ws.Socket, type: string, data: number|string) {
 	socket.send(message);
 }
 
-API.add('GET', '/counter/:name', ws.listen(function (req, socket) {
-	let { name } = req.params;
-	let { event, context } = socket;
+API.add('GET', '/counter/:name', ws.listen(function (req, context, socket) {
+	let { name } = context.params;
+	let { event, state } = socket;
 
 	// ignore non-'message' events
 	if (event.type !== 'message') return;
 
 	// initialize context on start
-	context.count = context.count || 0;
+	state.count = state.count || 0;
 
 	// parse & react to incoming message data
 	let { type, value=1 } = JSON.parse(event.data);
@@ -26,13 +27,13 @@ API.add('GET', '/counter/:name', ws.listen(function (req, socket) {
 	}
 
 	if (type === 'incr') {
-		context.count += value;
-		return reply(socket, name, context.count);
+		state.count += value;
+		return reply(socket, name, state.count);
 	}
 
 	if (type === 'decr') {
-		context.count -= value;
-		return reply(socket, name, context.count);
+		state.count -= value;
+		return reply(socket, name, state.count);
 	}
 
 	if (type === 'exit') {
@@ -44,9 +45,8 @@ API.add('GET', '/counter/:name', ws.listen(function (req, socket) {
 /**
  * send HTML page
  */
-API.add('GET', '/', (req, res) => {
-	res.setHeader('Content-Type', 'text/html');
-	res.end(`
+API.add('GET', '/', (req, context) => {
+	return new Response(`
 		<html lang="en">
 			<head>
 				<meta charset="utf-8"/>
@@ -191,7 +191,14 @@ API.add('GET', '/', (req, res) => {
 				</script>
 			</body>
 		</html>
-	`);
+	`, {
+		status: 200,
+		headers: {
+			'Content-Type': 'text/html'
+		}
+	});
 });
 
-listen(API.run);
+// Format: Service Worker
+// Wraps w/ addEventListener('fetch', ...)
+sworker.reply(API.run);

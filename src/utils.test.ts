@@ -359,3 +359,117 @@ decode('should return decoded values', () => {
 });
 
 decode.run();
+
+// ---
+
+const toObject = suite('toObject');
+
+toObject('should be a function', () => {
+	assert.type(utils.toObject, 'function');
+});
+
+toObject('should match `Object.fromEntries` for simple values', () => {
+	let input = new URLSearchParams();
+	input.set('hello', 'world');
+	input.set('foo', 'bar');
+
+	assert.equal(
+		utils.toObject(input),
+		Object.fromEntries(input)
+	);
+});
+
+toObject('should keep multiple values per key', () => {
+	let input = new URLSearchParams();
+	input.append('hello', 'world');
+	input.append('hello', 'there');
+	input.set('foo', 'bar');
+
+	const output = utils.toObject(input);
+	assert.not.equal(output, Object.fromEntries(input));
+
+	assert.equal(output, {
+		foo: 'bar',
+		hello: ['world', 'there']
+	});
+});
+
+toObject.run();
+
+// ---
+
+const body = suite('body');
+
+const Request = (type?: string): any => ({
+	body: true,
+	headers: new Map([['content-type', type]]),
+	json: () => 'json',
+	arrayBuffer: () => 'arrayBuffer',
+	formData: () => Promise.resolve(new URLSearchParams),
+	text: () => 'text',
+});
+
+body('should be a function', () => {
+	assert.type(utils.body, 'function');
+});
+
+body('should return nothing if nullish `ctype` value', async () => {
+	const req = Request();
+	const output = await utils.body(req);
+	assert.is(output, undefined);
+});
+
+body('should return nothing if missing `req.body` value', async () => {
+	const req = Request('foo');
+	req.body = false; // should not happen
+	const output = await utils.body(req);
+	assert.is(output, undefined);
+});
+
+body('should react to content-type :: json()', async () => {
+	const req = Request('application/json');
+	const output = await utils.body(req);
+	assert.is(output, 'json');
+});
+
+body('should react to content-type :: formData()', async () => {
+	const foo = Request('multipart/form-data');
+	assert.equal(await utils.body(foo), {});
+
+	const bar = Request('application/x-www-form-urlencoded');
+	assert.equal(await utils.body(bar), {});
+});
+
+body('should react to content-type :: text()', async () => {
+	const req = Request('text/plain');
+	const output = await utils.body(req);
+	assert.is(output, 'text');
+});
+
+body('should react to content-type :: arrayBuffer()', async () => {
+	const req = Request('anything/fallback');
+	const output = await utils.body(req);
+	assert.is(output, 'arrayBuffer');
+});
+
+body('should parse Response body :: text()', async () => {
+	let res = new Response('[1,2,3]');
+	res.headers.set('content-type', 'text/plain');
+	let output = await utils.body(res);
+	assert.equal(output, '[1,2,3]');
+});
+
+body('should parse Response body :: json()', async () => {
+	let res = new Response('[1,2,3]');
+	res.headers.set('content-type', 'application/json');
+	let output = await utils.body(res);
+	assert.equal(output, [1, 2, 3]);
+});
+
+body('should parse Response w/ null body', async () => {
+	let res = new Response(null);
+	let output = await utils.body(res);
+	assert.is(output, undefined);
+});
+
+body.run();

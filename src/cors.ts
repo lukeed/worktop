@@ -1,6 +1,5 @@
 import type { Handler } from 'worktop';
 import type { Config } from 'worktop/cors';
-import type { ServerResponse } from 'worktop/response';
 
 export const config: Config = {
 	origin: '*',
@@ -11,19 +10,15 @@ export const config: Config = {
 
 // NOTE: Allow `credentials` + `origin:*` to error naturally. Must fix config.
 // @see https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
-export function headers(res: ServerResponse, options?: Partial<Config>, isPreflight?: boolean) {
+export function headers(res: Response, options?: Partial<Config>): Config {
 	let opts = (options ? { ...config, ...options } : config) as Required<Config>;
 
-	res.setHeader('Access-Control-Allow-Origin', opts.origin);
+	res.headers.set('Access-Control-Allow-Origin', opts.origin);
 	if (opts.origin !== '*') res.headers.append('Vary', 'Origin');
-	if (opts.credentials) res.setHeader('Access-Control-Allow-Credentials', 'true');
-	if (opts.expose.length) res.setHeader('Access-Control-Expose-Headers', opts.expose);
+	if (opts.credentials) res.headers.set('Access-Control-Allow-Credentials', 'true');
+	if (opts.expose.length) res.headers.set('Access-Control-Expose-Headers', opts.expose);
 
-	if (isPreflight) {
-		if (opts.maxage != null) res.setHeader('Access-Control-Max-Age', opts.maxage);
-		if (opts.methods.length) res.setHeader('Access-Control-Allow-Methods', opts.methods);
-		if (opts.headers.length) res.setHeader('Access-Control-Allow-Headers', opts.headers);
-	}
+	return opts;
 }
 
 type Options = Omit<Config, 'origin'> & { origin?: boolean | string | RegExp };
@@ -31,9 +26,8 @@ export function preflight(options: Options = {}): Handler {
 	let origin = (options.origin = options.origin || '*');
 	let isStatic = typeof origin === 'string';
 
-	return function (req, res) {
+	return function (req, context) {
 		let tmp: string | null;
-		let isPreflight = req.method === 'OPTIONS';
 
 		if (!isStatic) {
 			tmp = req.headers.get('Origin') || '';
@@ -41,17 +35,26 @@ export function preflight(options: Options = {}): Handler {
 			options.origin = origin === true && tmp || origin instanceof RegExp && origin.test(tmp) && tmp || 'false';
 		}
 
-		headers(res, options as Config, isPreflight);
+		if (req.method === 'OPTIONS') {
+			let res = new Response(null, { status: 204 });
+			let c = headers(res, options as Config);
 
-		if (isPreflight) {
-			if (!options.headers) {
+			if (c.headers!.length) {
+				res.headers.set('Access-Control-Allow-Headers', c.headers!);
+			} else {
 				tmp = req.headers.get('Access-Control-Request-Headers');
-				if (tmp) res.setHeader('Access-Control-Allow-Headers', tmp);
+				if (tmp) res.headers.set('Access-Control-Allow-Headers', tmp);
 				res.headers.append('Vary', 'Access-Control-Request-Headers'); // reflects
 			}
 
-			res.statusCode = 204;
-			res.end(null);
+			if (c.maxage != null) res.headers.set('Access-Control-Max-Age', c.maxage);
+			if (c.methods!.length) res.headers.set('Access-Control-Allow-Methods', c.methods!);
+
+			return res;
 		}
+
+		context.defer(res => {
+			headers(res, options as Config);
+		});
 	};
 }

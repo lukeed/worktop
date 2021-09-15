@@ -1,6 +1,9 @@
 import * as utils from 'worktop/utils';
 import type { UID, UUID, ULID } from 'worktop/utils';
 
+declare let request: Request;
+declare let response: Response;
+
 /**
  * HEX
  */
@@ -72,3 +75,43 @@ assert<Uint8Array>(utils.randomize(11));
 assert<Uint8Array>(utils.randomize());
 // @ts-expect-error
 assert<Uint32Array>(utils.randomize(1));
+
+/**
+ * BODY (REQUEST)
+ */
+
+assert<unknown>(
+	await utils.body(request)
+);
+
+assert<ArrayBuffer|void>(
+	await utils.body<ArrayBuffer>(request)
+);
+
+assert<string|void>(
+	await utils.body<string>(request)
+);
+
+assert<Item|void>(
+	await utils.body<Item>(request)
+);
+
+/**
+ * BODY (RESPONSE)
+ */
+
+assert<unknown>(
+	await utils.body(response)
+);
+
+assert<ArrayBuffer|void>(
+	await utils.body<ArrayBuffer>(response)
+);
+
+assert<string|void>(
+	await utils.body<string>(response)
+);
+
+assert<Item|void>(
+	await utils.body<Item>(response)
+);

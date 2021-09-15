@@ -15,6 +15,7 @@ node_modules
 /durable
 /router
 /utils
+/sw
 /ws
 
 /examples/build

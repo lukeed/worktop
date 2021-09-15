@@ -9,9 +9,6 @@ const Mock = (x?: any) => {
 	return f.args = () => args,f;
 }
 
-// @ts-ignore - just for instanceof check
-globalThis.ReadableStream = class ReadableStream {}
-
 const read = suite('read');
 
 read('should be a function', () => {

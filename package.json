@@ -40,10 +40,6 @@
       "import": "./durable/index.mjs",
       "require": "./durable/index.js"
     },
-    "./request": {
-      "import": "./request/index.mjs",
-      "require": "./request/index.js"
-    },
     "./response": {
       "import": "./response/index.mjs",
       "require": "./response/index.js"
@@ -60,6 +56,10 @@
       "import": "./utils/index.mjs",
       "require": "./utils/index.js"
     },
+    "./sw": {
+      "import": "./sw/index.mjs",
+      "require": "./sw/index.js"
+    },
     "./ws": {
       "import": "./ws/index.mjs",
       "require": "./ws/index.js"
@@ -72,7 +72,6 @@
     "crypto",
     "cookie",
     "durable",
-    "request",
     "response",
     "modules",
     "router",
@@ -95,6 +94,7 @@
   "devDependencies": {
     "@types/node": "16.7.10",
     "esbuild": "0.11.14",
+    "fetchy": "next",
     "is-uuid": "1.0.2",
     "kleur": "4.1.4",
     "rewrite-imports": "2.0.3",

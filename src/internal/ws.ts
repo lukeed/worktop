@@ -1,4 +1,4 @@
-import { STATUS_CODES } from 'worktop';
+import { STATUS_CODES } from 'worktop/response';
 import { byteLength } from 'worktop/utils';
 
 export function abort(code: number): Response {

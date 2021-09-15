@@ -1,8 +1,16 @@
+export type Promisable<T> = Promise<T> | T;
+export type Dict<T> = Record<string, T>;
+export type Arrayable<T> = T[] | T;
+export type Strict<T> = {
+	[K in keyof T as {} extends Record<K, 1> ? never : K]: T[K];
+};
+
 declare global {
 	interface Crypto {
 		randomUUID(): string;
 	}
 }
+
 
 /**
  * All 256 hexadecimal pairs
@@ -10,11 +18,13 @@ declare global {
  */
 export const HEX: readonly string[];
 
+
 /**
  * Convert an `ArrayBuffer` to a hexadecimal string.
  * @param {ArrayBuffer} input
  */
 export function toHEX(input: ArrayBuffer): string;
+
 
 /**
  * Decode a hexadecimal string into an `Uint8Array` instance.
@@ -22,6 +32,7 @@ export function toHEX(input: ArrayBuffer): string;
  * @param {string} input
  */
 export function viaHEX(input: string): Uint8Array;
+
 
 /**
  * Generate a unique string of `len` length.
@@ -31,12 +42,14 @@ export function viaHEX(input: string): Uint8Array;
 export function uid<N extends number = 11>(len?: N): UID<N>;
 export type UID<N extends number> = { 0: string; length: N } & string;
 
+
 /**
  * Generate a new UUID.V4 value.
  * @NOTE Relies on `crypto` to produce cryptographically secure (CSPRNG) values.
  */
 export function uuid(): UUID;
 export type UUID = { 0: string; length: 36 } & string;
+
 
 /**
  * Generate a universally unique lexicographically sortable identifier (ulid).
@@ -46,16 +59,19 @@ export type UUID = { 0: string; length: 36 } & string;
 export function ulid(): ULID;
 export type ULID = { 0: string; length: 26 } & string;
 
+
 /**
  * Generate a specified number of cryptographically strong random values.
  * @NOTE Throws a `QuotaExceededError` error if `length` exceeds 65,536 bytes.
  */
 export function randomize(length: number): Uint8Array;
 
+
 /**
  * Reusable `TextEncoder` instance.
  */
 export const Encoder: TextEncoder;
+
 
 /**
  * Reusable `TextDecoder` instance.
@@ -63,11 +79,13 @@ export const Encoder: TextEncoder;
  */
 export const Decoder: TextDecoder;
 
+
 /**
  * Encode a string as an `Uint8Array` containing UTF-8 encoded text.
  * @param {string} input
  */
 export function encode(input: string): Uint8Array;
+
 
 /**
  * Decode a UTF-8 text string from an `ArrayBuffer` or an `ArrayBufferView` input.
@@ -76,8 +94,23 @@ export function encode(input: string): Uint8Array;
  */
 export function decode(input: ArrayBufferView | ArrayBuffer, isStream?: boolean): string;
 
+
 /**
  * Calculate the length (in bytes) of an input string.
  * @param {string} [input]
  */
 export function byteLength(input?: string): number;
+
+
+/**
+ * Parse a `Request` or `Response` body according to its `Content-Type` header.
+ * @NOTE Converts `FormData` into an object.
+ */
+export function body<T>(input: Request | Response): Promise<T|void>;
+
+
+/**
+ * Converts an `Iterable` into an object.
+ * @NOTE Like `Object.fromEntries`, but can collect multiple values for same key.
+ */
+export function toObject<T>(iter: Iterable<[string, T]>): Dict<Arrayable<T>>;

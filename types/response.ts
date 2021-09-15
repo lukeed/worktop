@@ -1,21 +1,11 @@
-import { reply } from 'worktop';
-import { ServerResponse } from 'worktop/response';
-import type { FetchHandler } from 'worktop';
-
-assert<FetchHandler>(
-	reply(event => {
-		assert<FetchEvent>(event);
-		assert<Request>(event.request);
-		return fetch(event.request);
-	})
-);
+import { ServerResponse, STATUS_CODES } from 'worktop/response';
 
 // @ts-expect-error
-new ServerResponse();
+ServerResponse();
 // @ts-expect-error
 ServerResponse('GET');
 
-const response = new ServerResponse('GET');
+const response = new ServerResponse;
 
 assert<ServerResponse>(response);
 
@@ -63,3 +53,12 @@ assert<void>(response.send(200, undefined));
 assert<void>(response.send(200, null, { foo: 'bar' }));
 assert<void>(response.send(200, new FormData));
 assert<void>(response.send(200));
+
+
+/**
+ * STATUS CODES
+ */
+
+assert<string>(STATUS_CODES[200]);
+assert<string>(STATUS_CODES['200']);
+STATUS_CODES['404'] = 'Custom Error Message';

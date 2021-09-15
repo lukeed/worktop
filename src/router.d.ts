@@ -2,14 +2,26 @@
 
 import type { KV } from 'worktop/kv';
 import type { Durable } from 'worktop/durable';
-import type { ServerResponse } from 'worktop/response';
-import type { ServerRequest, Params, Method } from 'worktop/request';
+import type { Promisable, Strict, Dict } from 'worktop/utils';
 
-type Promisable<T> = Promise<T> | T;
+declare global {
+	interface Request {
+		cf: IncomingCloudflareProperties;
+	}
 
-export type CronHandler = (event: CronEvent) => Promisable<void>;
-export type ResponseHandler = (event: FetchEvent) => Promisable<Response>;
-export type FetchHandler = (event: FetchEvent, request?: Request | string) => void;
+	interface Headers {
+		append(name: string, value: { toString(): string }): void;
+		set(name: string, value: { toString(): string }): void;
+	}
+}
+
+export type Params = Dict<string>;
+
+/**
+ * All valid HTTP methods
+ * @see {require('http').METHODS}
+ */
+export type Method = 'ACL' | 'BIND' | 'CHECKOUT' | 'CONNECT' | 'COPY' | 'DELETE' | 'GET' | 'HEAD' | 'LINK' | 'LOCK' | 'M-SEARCH' | 'MERGE' | 'MKACTIVITY' | 'MKCALENDAR' | 'MKCOL' | 'MOVE' | 'NOTIFY' | 'OPTIONS' | 'PATCH' | 'POST' | 'PRI' | 'PROPFIND' | 'PROPPATCH' | 'PURGE' | 'PUT' | 'REBIND' | 'REPORT' | 'SEARCH' | 'SOURCE' | 'SUBSCRIBE' | 'TRACE' | 'UNBIND' | 'UNLINK' | 'UNLOCK' | 'UNSUBSCRIBE';
 
 export interface CronEvent {
 	type: 'scheduled';
@@ -33,29 +45,30 @@ export interface Bindings {
 	[name: string]: string | CryptoKey | KV.Namespace | Durable.Namespace;
 }
 
-declare global {
-	function addEventListener(type: 'fetch', handler: FetchHandler): void;
-	function addEventListener(type: 'scheduled', handler: CronHandler): void;
-
-	interface FetchEvent {
-		passThroughOnException(): void;
-	}
+export interface ModuleContext {
+	waitUntil(f: any): void;
+	passThroughOnException?(): void;
 }
 
-/**
- * Return the `handler` with an `event.respondWith` wrapper.
- * @param {ResponseHandler} handler
- */
-export function reply(handler: ResponseHandler): FetchHandler;
+// TODO: move to utils?
+type Merge<C extends Context, P> = Omit<C, 'params'> & { params: P };
 
-/**
- * Assign the `handler` to the "fetch" event.
- * @note Your `handler` will be wrapped by `reply` automatically.
- * @param {ResponseHandler} handler
- */
-export function listen(handler: ResponseHandler): void;
+export type Deferral = (res: Response) => Promisable<void>;
 
-export type Handler<P extends Params = Params> = (req: ServerRequest<P>, res: ServerResponse) => Promisable<Response|void>;
+export interface Context extends ModuleContext {
+	url: URL;
+	params: Params;
+	bindings?: Bindings;
+	defer(f: Deferral): void;
+}
+
+export type Handler<
+	C extends Context = Context,
+	P = Params,
+> = (
+	request: Request,
+	context: Merge<C, P>
+) => Promisable<Response | void>;
 
 export type RouteParams<T extends string> =
 	T extends `${infer Prev}/*/${infer Rest}`
@@ -72,18 +85,131 @@ export type RouteParams<T extends string> =
 		? { wild: string }
 	: {};
 
-export declare class Router {
-	add<T extends RegExp>(method: Method, route: T, handler: Handler<Params>): void;
-	add<T extends string>(method: Method, route: T, handler: Handler<RouteParams<T>>): void;
-	run(event: FetchEvent): Promise<Response>;
-	onerror(req: ServerRequest, res: ServerResponse, status?: number, error?: Error): Promisable<Response>;
-	prepare?(req: Omit<ServerRequest, 'params'>, res: ServerResponse): Promisable<Response|void>;
-}
+export type Initializer<C extends Context> = (
+	request: Request,
+	context: Partial<C> & ModuleContext & {
+		bindings?: Bindings;
+	}
+) => Promise<Response>;
 
-// TODO?: worktop/status | worktop/errors
-export declare var STATUS_CODES: Record<string|number, string>;
+export declare class Router<C extends Context = Context> {
+	add<T extends RegExp>(method: Method, route: T, handler: Handler<C, Params>): void;
+	add<T extends string>(method: Method, route: T, handler: Handler<C, Strict<RouteParams<T>>>): void;
+	onerror(req: Request, context: C & { status?: number; error?: Error }): Promisable<Response>;
+	prepare?(req: Request, context: Omit<C, 'params'>): Promisable<Response|void>;
+	run: Initializer<C>;
+}
 
 /**
  * Compose multiple `Handler` functions together, creating a final handler.
  */
-export function compose<P extends Params = Params>(...handlers: Handler<P>[]): Handler<P>;
+export function compose<
+	C extends Context = Context,
+	P extends Params = Params,
+>(...handlers: Handler<C, P>[]): Handler<C, P>;
+
+/**
+ * Cloudflare Request Metadata/Properties
+ * @see https://developers.cloudflare.com/workers/runtime-apis/request#incomingrequestcfproperties
+ */
+export interface IncomingCloudflareProperties {
+	/**
+	 * The ASN of the incoming request
+	 * @example "395747"
+	 **/
+	asn: string;
+	/**
+	 * The three-letter `IATA` airport code of the data center that the request hit
+	 * @example "DFW"
+	 */
+	colo: string;
+	/**
+	 * The two-letter country code in the request.
+	 * @note This is the same value as that provided in the `CF-IPCountry` header
+	 * @example "US"
+	 */
+	country: string | null;
+	/**
+	 * The HTTP Protocol
+	 * @example "HTTP/2"
+	 */
+	httpProtocol: string;
+	/**
+	 * The browser-requested prioritization information in the request object
+	 * @example "weight=192;exclusive=0;group=3;group-weight=127"
+	 */
+	requestPriority?: string;
+	/**
+	 * The cipher for the connection to Cloudflare
+	 * @example "AEAD-AES128-GCM-SHA256"
+	 */
+	tlsCipher: string;
+	/**
+	 * @note Requires Cloudflare Access or API Shield
+	 */
+	tlsClientAuth?: {
+		certIssuerDN: string;
+		certIssuerDNLegacy: string;
+		certPresented: '0' | '1';
+		certSubjectDNLegacy: string;
+		certSubjectDN: string;
+		/** @example "Dec 22 19:39:00 2018 GMT" */
+		certNotBefore: string;
+		/** @example "Dec 22 19:39:00 2018 GMT" */
+		certNotAfter: string;
+		certFingerprintSHA1: string;
+		certSerial: string;
+		/** @example "SUCCESS", "FAILED:reason", "NONE" */
+		certVerified: string;
+	};
+	/**
+	 * The TLS version of the connection to Cloudflare
+	 * @example "TLSv1.3"
+	 */
+	tlsVersion: string;
+	/**
+	 * City of the incoming request
+	 * @example "Austin"
+	 **/
+	city?: string;
+	/**
+	 * Continent of the incoming request
+	 * @example "NA"
+	 **/
+	continent?: string;
+	/**
+	 * Latitude of the incoming request
+	 * @example "30.27130"
+	 **/
+	latitude?: string;
+	/**
+	 * Longitude of the incoming request
+	 * @example "-97.74260"
+	 **/
+	longitude?: string;
+	/**
+	 * Postal code of the incoming request
+	 * @example "78701"
+	 **/
+	postalCode?: string;
+	/**
+	 * Metro code (DMA) of the incoming request
+	 * @example "635"
+	 **/
+	metroCode?: string;
+	/**
+	 * If known, the `ISO 3166-2` name for the first level region associated with the IP address of the incoming request
+	 * @example "Texas"
+	 **/
+	region?: string;
+	/**
+	 * If known, the `ISO 3166-2` code for the first level region associated with the IP address of the incoming request
+	 * @example "TX"
+	 **/
+	regionCode?: string;
+	/**
+	 * Timezone of the incoming request
+	 * @example "America/Chicago".
+	 **/
+	timezone: string;
+}

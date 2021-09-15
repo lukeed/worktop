@@ -1,20 +1,28 @@
 import { Router } from 'worktop';
-import { listen } from 'worktop/modules';
+import { send } from 'worktop/response';
+import * as Cache from 'worktop/cache';
+import type { Context  } from 'worktop';
 
-// binding: ENV variable
-declare const FALLBACK: string;
+interface Custom extends Context {
+	bindings: {
+		FALLBACK: string;
+	}
+}
 
-const API = new Router();
+const API = new Router<Custom>();
 
-API.add('GET', '/greet/:name?', (req, res) => {
-	res.end(`Hello via Module, ${req.params.name || FALLBACK}!`);
+API.add('GET', '/greet/:name?', (req, context) => {
+	let name = context.params.name || context.bindings.FALLBACK;
+	return new Response(`Hello, ${name}!`);
 });
 
-API.add('GET', '/', (req, res) => {
-	const command = `$ curl https://${req.hostname}/greet/lukeed`;
+API.add('GET', '/', (req, context) => {
+	let command = `$ curl https://${context.url.hostname}/greet/lukeed`;
+	let text = `Howdy~! Please greet yourself; for example:\n\n  ${command}\n`;
 
-	res.setHeader('Cache-Control', 'public,max-age=60');
-	res.end(`Howdy Module Worker~! Please greet yourself; for example:\n\n  ${command}\n`);
+	return send(200, text, {
+		'Cache-Control': 'public,max-age=60'
+	});
 });
 
-export default listen(API.run);
+export default Cache.reply(API.run);

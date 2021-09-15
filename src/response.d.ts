@@ -1,14 +1,26 @@
 /// <reference lib="webworker" />
+import type { Arrayable, Dict } from 'worktop/utils';
 
-type Arrayable<T> = T[] | T;
-export type HeadersObject = Record<string, string>;
+export type HeadersObject = Dict<{ toString(): string }>;
+
+/**
+ * Status text messages for common 4xx & 5xx status codes.
+ * @NOTE Mutable dictionary; add or customize as needed.
+ */
+export declare var STATUS_CODES: Record<string|number, string>;
+
+export function finalize(res: Response, isHEAD?: boolean): Response;
+
+/**
+ * Auto-serialize `data` to a `Response` object.
+ * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
+ */
+export function send(status: number, data?: any, headers?: HeadersObject): Response;
 
 export declare class ServerResponse {
-	constructor(method: string);
+	readonly headers: Headers;
+	readonly body: BodyInit | null;
 	readonly finished: boolean;
-
-	headers: Headers;
-	body: BodyInit | null;
 
 	statusCode: number;
 	get status(): number;
@@ -22,8 +34,7 @@ export declare class ServerResponse {
 	setHeader(key: string, value: Arrayable<string|number>): void;
 	removeHeader(key: string): void;
 
-	writeHead(code: number, headers?: HeadersObject): void;
+	send(status: number, data?: any, headers?: HeadersObject): void;
+	writeHead(status: number, headers?: HeadersObject): void;
 	end(data: BodyInit | null): void;
-
-	send(code: number, data?: any, headers?: HeadersObject): void;
 }

@@ -13,6 +13,8 @@ globalThis.crypto = require('crypto').webcrypto;
 globalThis.btoa = (x) => Buffer.from(x).toString('base64');
 globalThis.atob = (x) => Buffer.from(x, 'base64').toString();
 
+require('fetchy/polyfill');
+
 require.extensions['.ts'] = function (Module, filename) {
 	const pitch = Module._compile.bind(Module);
 

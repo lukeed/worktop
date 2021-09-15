@@ -1,53 +1,38 @@
 import { parse } from 'regexparam';
-import { ServerRequest } from 'worktop/request';
-import { ServerResponse } from 'worktop/response';
-import { STATUS_CODES } from './internal/constants';
+import { finalize, STATUS_CODES } from 'worktop/response';
 
-import type { FetchHandler, ResponseHandler } from 'worktop';
-import type { Handler, Router as RR } from 'worktop';
-import type { Method, Params } from 'worktop/request';
+import type { Handler, Deferral, Router as RR } from 'worktop';
+import type { Method, Params, Context } from 'worktop';
+import type { Dict } from 'worktop/utils';
 
-export { STATUS_CODES };
+type HC = Handler;
+type PC = Omit<Context, 'params'>;
+type EC = Context & {
+	status?: number;
+	error?: Error;
+};
 
-export function reply(handler: ResponseHandler): FetchHandler {
-	return (event) => event.respondWith(
-		handler(event)
-	);
-}
-
-export function listen(handler: ResponseHandler): void {
-	addEventListener('fetch', reply(handler));
-}
-
-let isPrepare = false; // @see #43 (revisit @ subrouter)
-export function compose(...handlers: Handler[]): Handler {
-	return async function (req, res) {
-		let fn: Handler, tmp: Response|void, len=handlers.length;
-		for (fn of handlers) if (tmp = await call(fn, --len<=0&&!isPrepare, req, res)) return tmp;
+export function compose(...handlers: HC[]): HC {
+	return async function (req, context) {
+		let fn: HC, tmp: Response|void;
+		for (fn of handlers) {
+			if (tmp = await fn(req, context)) return tmp;
+		}
 	};
 }
 
 interface Entry {
 	keys: string[];
-	handler: Handler;
+	handler: HC;
 }
 
 interface Branch {
 	__d: Map<RegExp, Entry>;
-	__s: Record<string, Entry>;
+	__s: Dict<Entry>;
 }
 
 type Tree = Partial<Record<Method, Branch>>;
-type Route = { params: Params; handler: Handler };
-
-async function call(fn: Function, isEnd: true, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response>;
-async function call(fn: Function, isEnd: false, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response|void>;
-async function call(fn: Function, isEnd: boolean, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response|void>;
-async function call(fn: Function, isEnd: boolean, req: ServerRequest, res: ServerResponse, ...args: any[]): Promise<Response|void> {
-	const output = await fn(req, res, ...args);
-	if (output instanceof Response) return output;
-	if (isEnd || res.finished) return new Response(res.body, res);
-}
+type Route = { params: Params; handler: HC };
 
 function find(tree: Tree, method: Method, pathname: string): Route|void {
 	let params: Params = {};
@@ -75,11 +60,11 @@ function find(tree: Tree, method: Method, pathname: string): Route|void {
 	}
 }
 
-export function Router(): RR {
-	let $: RR, tree: Tree = {};
+export function Router(): RR<Context> {
+	let $: RR<Context>, tree: Tree = {};
 
 	return $ = {
-		add(method: Method, route: RegExp | string, handler: Handler) {
+		add(method: Method, route: RegExp | string, handler: HC) {
 			let dict = tree[method];
 
 			if (dict === void 0) {
@@ -99,29 +84,39 @@ export function Router(): RR {
 			}
 		},
 
-		onerror(req, res, status, error) {
-			const statusText = STATUS_CODES[status = status || 500];
-			const body = error && error.message || statusText || String(status);
-			return new Response(body, { status, statusText });
+		onerror(req, context) {
+			let { error, status=500 } = context;
+			let body = error && error.message || STATUS_CODES[status];
+			return new Response(body || String(status), { status });
 		},
 
-		async run(event) {
-			let tmp, req = new ServerRequest(event);
-			const res = new ServerResponse(req.method);
+		async run(req, context) {
+			try {
+				var defer: Deferral | void;
+				var queue: Deferral[] = [];
 
-			if (isPrepare = !!$.prepare) {
-				tmp = await call($.prepare, false, req, res);
-				if (tmp) return tmp;
-				isPrepare = false;
+				context = context || {};
+				context.url = new URL(req.url);
+				context.defer = f => { queue.push(f) };
+				context.bindings = context.bindings || {};
+
+				var res = $.prepare && await $.prepare(req, context as PC);
+				if (res && res instanceof Response) return res;
+
+				let tmp = find(tree, req.method as Method, context.url.pathname);
+				if (!tmp) return (context as EC).status=404, res=await $.onerror(req, context as Context);
+
+				context.params = tmp.params;
+				res = await tmp.handler(req, context as Context);
+			} catch (err) {
+				(context as EC).status = 500;
+				(context as EC).error = err as Error;
+				res = await $.onerror(req, context as Context);
+			} finally {
+				res = new Response(res ? res.body : 'OK', res!);
+				while (defer = queue!.pop()) await defer(res);
+				return finalize(res, req.method === 'HEAD');
 			}
-
-			tmp = find(tree, req.method, req.path);
-			if (!tmp) return call($.onerror, true, req, res, 404);
-
-			req.params = tmp.params;
-			return call(tmp.handler, true, req, res).catch(err => {
-				return call($.onerror, true, req, res, 500, err);
-			});
 		}
 	};
 }

@@ -1,28 +1,87 @@
 import * as Cache from 'worktop/cache';
+import type { ModuleWorker } from 'worktop/modules';
+import type { ModuleContext, Router } from 'worktop';
 
 declare const event: FetchEvent;
+declare const request: Request;
+declare const response: Response;
+declare const context: ModuleContext;
+declare const API: Router;
+
+/**
+ * SAVE
+ */
+
+Cache.save(event.request, response, context);
+Cache.save('/foo/bar', response, context);
+Cache.save(request, response, context);
+
+// event has `waitUntil` on it
+Cache.save(request, response, event);
 
 // @ts-expect-error
-Cache.save(event, 123);
+Cache.save(event, response, context);
+
 // @ts-expect-error
-Cache.save(123, event);
+Cache.save(123, response, context);
+
 // @ts-expect-error
-Cache.save(123);
+Cache.save(request, 123, context);
 
 assert<Response>(
-	Cache.save(event, new Response)
+	Cache.save(request, response, event)
 );
 
-assert<Response>(
-	Cache.save(event, new Response, '/custom')
+/**
+ * SAVE
+ */
+
+Cache.lookup(request);
+Cache.lookup('/foo/bar');
+Cache.lookup(event.request);
+
+// @ts-expect-error
+Cache.lookup(event);
+
+assert<Promise<Response|void>>(
+	Cache.lookup(request)
 );
 
-assert<Response>(
-	Cache.save(event, new Response, new Request('/custom'))
+assert<Response | void>(
+	await Cache.lookup(request)
+);
+
+/**
+ * isCacheable
+ */
+
+Cache.isCacheable(response);
+
+assert<boolean>(
+	Cache.isCacheable(response)
 );
 
 // @ts-expect-error
-Cache.lookup(event, new Response);
+Cache.isCacheable(123);
 
-Cache.lookup(event, '/custom');
-Cache.lookup(event, new Request('/custom'));
+// @ts-expect-error
+Cache.isCacheable(request);
+
+/**
+ * REPLY
+ */
+
+assert<ModuleWorker>(
+	Cache.reply(API.run)
+);
+
+/**
+ * LISTEN
+ */
+
+assert<void>(
+	Cache.listen(event => {
+		assert<FetchEvent>(event);
+		return Promise.resolve(response);
+	})
+);

@@ -1,3 +1,5 @@
+import type { Dict } from 'worktop/utils';
+
 export interface Attributes {
 	maxage?: number;
 	expires?: Date;
@@ -8,5 +10,5 @@ export interface Attributes {
 	path?: string;
 }
 
-export function parse(cookie: string): Attributes & Record<string, string>;
+export function parse(cookie: string): Attributes & Dict<string>;
 export function stringify(name: string, value: string, options?: Omit<Attributes, 'expires'> & { expires?: Date | number | string }): string;

@@ -1,24 +1,24 @@
 import * as ws from 'worktop/ws';
 import { compose } from 'worktop';
 
-import type { Router } from 'worktop';
-import type { WebSocket } from 'worktop/ws';
-import type { Params, ServerRequest } from 'worktop/request';
+import type { Router, Context } from 'worktop';
 
-declare const API: Router;
+declare let API: Router;
+declare let websocket: ws.WebSocket;
+declare let listener: EventListener;
 
 /**
  * HANDLER
  */
 
-const onEvent1: ws.SocketHandler = async function (req, socket) {
+const onEvent1: ws.SocketHandler = async function (req, context, socket) {
+	assert<Request>(req);
+	assert<Context>(context);
 	assert<ws.Socket>(socket);
-	assert<ServerRequest<Params>>(req);
-	assert<ServerRequest>(req);
 
-	let { context, event } = socket;
+	let { state, event } = socket;
 	assert<Event>(event);
-	assert<ws.Context>(context);
+	assert<ws.State>(state);
 	assert<'open'|'close'|'message'|'error'>(event.type);
 
 	if (event.type === 'message') {
@@ -30,26 +30,25 @@ const onEvent1: ws.SocketHandler = async function (req, socket) {
 }
 
 type CustomParams = { game?: string };
-type CustomContext = { score?: number };
-const onEvent2: ws.SocketHandler<CustomParams, CustomContext> = function (req, socket) {
-	let { event, context } = socket;
+type CustomState = { score?: number };
+const onEvent2: ws.SocketHandler<Context, CustomParams, CustomState> = function (req, context, socket) {
+	let { event, state } = socket;
+	if (event.type !== 'message') return;
 
-	if (event.type !== 'message') {
-		return;
-	}
+	let { game } = context.params;
+	assert<string|void>(context.params.game);
 
-	let { game } = req.params;
 	let data = JSON.parse(event.data);
-	context.score = context.score || 0;
+	state.score = state.score || 0;
 
 	switch (data.type) {
 		case '+1':
 		case 'incr': {
-			return socket.send(`${game} score: ${++context.score}`);
+			return socket.send(`${game} score: ${++state.score}`);
 		}
 		case '-1':
 		case 'decr': {
-			return socket.send(`${game} score: ${--context.score}`);
+			return socket.send(`${game} score: ${--state.score}`);
 		}
 	}
 }
@@ -60,7 +59,7 @@ const onEvent2: ws.SocketHandler<CustomParams, CustomContext> = function (req, s
 
 API.add('GET', '/score/:game', ws.listen(onEvent2));
 API.add('GET', /^[/]foobar[/]/, compose(
-	(req, res) => {},
+	(req, context) => {},
 	ws.listen(onEvent1)
 ));
 
@@ -68,14 +67,11 @@ API.add('GET', /^[/]foobar[/]/, compose(
  * EVENTS
  */
 
-declare let websocket1: WebSocket;
-declare let listener1: EventListener;
-
 // @ts-expect-error - "open" not allowed
-websocket1.addEventListener('open', listener1);
-websocket1.addEventListener('close', listener1);
-websocket1.addEventListener('error', listener1);
-websocket1.addEventListener('message', evt => {
+websocket.addEventListener('open', listener);
+websocket.addEventListener('close', listener);
+websocket.addEventListener('error', listener);
+websocket.addEventListener('message', evt => {
 	assert<MessageEvent>(evt);
 	assert<string>(evt.data);
 });

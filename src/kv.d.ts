@@ -1,5 +1,7 @@
+import type { Dict } from 'worktop/utils';
+
 export namespace KV {
-	type Metadata = Record<string, any>;
+	type Metadata = Dict<any>;
 	type Value = string | ReadableStream | ArrayBuffer;
 
 	type GetFormat = 'text' | 'json' | 'arrayBuffer' | 'stream';

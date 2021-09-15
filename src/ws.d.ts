@@ -1,4 +1,5 @@
-import type { ServerRequest, Params } from 'worktop/request';
+import type { Context, Params } from 'worktop';
+import type { Dict, Strict, Promisable } from 'worktop/utils';
 
 declare global {
 	const WebSocketPair: {
@@ -24,11 +25,12 @@ export interface WebSocket {
 	addEventListener(type: 'message', listener: (this: WebSocket, ev: MessageEvent<string>) => any): void;
 }
 
-type Context = Record<string, any>;
-export interface Socket<C extends Context = Context> {
+type State = Dict<any>;
+
+export interface Socket<S extends State = State> {
 	send: WebSocket['send'];
 	close: WebSocket['close'];
-	context: C;
+	state: S; // todo: not happy w/ name
 	event:
 		| { type: 'close' } & CloseEvent
 		| { type: 'message' } & MessageEvent<string>
@@ -36,15 +38,20 @@ export interface Socket<C extends Context = Context> {
 }
 
 export type SocketHandler<
-	P extends Params = Params,
 	C extends Context = Context,
-> = (req: ServerRequest<P>, socket: Socket<C>) => Promise<void>|void;
+	P extends Params = Params,
+	S extends State = State,
+> = (
+	request: Request,
+	context: C, // todo: omit
+	socket: Socket<S>
+) => Promisable<void>;
 
 /**
  * Ensure the incoming `Request` can be upgraded to a Websocket connection.
  * @NOTE This is called automatically within the `listen()` method.
  */
-export function connect<P extends Params = Params>(req: ServerRequest<P> | Request): Response | void;
+export function connect(req: Request): Response | void;
 
 /**
  * Establish a Websocket connection.
@@ -52,6 +59,11 @@ export function connect<P extends Params = Params>(req: ServerRequest<P> | Reque
  * @NOTE Invokes the `connect()` middleware automatically.
  */
 export function listen<
-	P extends Params = Params,
 	C extends Context = Context,
->(handler: SocketHandler<P, C>): (req: ServerRequest<P>) => Response;
+	P extends Params = Params,
+>(handler: SocketHandler<C, P>): (
+	request: Request,
+	context: Omit<C, 'params'> & {
+		params: Strict<P>;
+	}
+) => Response;

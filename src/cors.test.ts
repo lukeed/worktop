@@ -2,45 +2,29 @@ import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import * as CORS from './cors';
 
-import type { ServerResponse } from 'worktop/response';
-import type { ServerRequest } from 'worktop/request';
+import type { Context, Deferral } from 'worktop';
 
-const Headers = () => {
-	let raw = new Map;
-	let set = raw.set.bind(raw);
-	// @ts-ignore - mutating
-	raw.set = (k, v) => set(k, String(v));
-	// @ts-ignore - mutating
-	raw.append = (k, v) => {
-		let val = raw.get(k) || '';
-		if (val) val += ', ';
-		val += String(v);
-		set(k, val);
-	}
-	// @ts-ignore - ctor
-	return raw as Headers;
-}
-
-const Response = () => {
-	let headers = Headers();
-	let body: any, finished = false;
+const toContext = () => {
+	let queue: Deferral[] = [];
 	// @ts-ignore
 	return {
-		headers,
-		finished,
-		statusCode: 0,
-		setHeader: headers.set,
-		body: () => body,
-		end(val: any) {
-			finished = true;
-			body = val;
+		run(res: Response) {
+			let x: Deferral | void;
+			while (x = queue.pop()) x(res);
+		},
+		defer(f: Deferral) {
+			queue.push(f);
 		}
-	} as ServerResponse;
+	} as Context;
 }
 
-const Request = (method = 'GET'): ServerRequest => {
-	let headers = Headers();
-	return { method, headers } as ServerRequest;
+function runner(method: string, handler: Function, headers = {}): Response {
+	let context = toContext();
+	let req = new Request('/', { method, headers });
+	let res = handler(req, context) || new Response('OTHER');
+	// @ts-ignore
+	context.run(res);
+	return res;
 }
 
 // ---
@@ -82,43 +66,35 @@ headers('should be a function', () => {
 });
 
 headers('defaults :: request', () => {
-	let res = Response();
+	let res = new Response;
 
-	assert.is(
+	assert.equal(
 		CORS.headers(res),
-		undefined
+		CORS.config // defaults
 	);
 
 	let headers = Object.fromEntries(res.headers);
 
-	assert.is(headers['Vary'], undefined);
-	assert.is(headers['Access-Control-Allow-Origin'], '*');
-	assert.is(headers['Access-Control-Expose-Headers'], undefined);
-	assert.is(headers['Access-Control-Allow-Credentials'], undefined);
-
-	assert.is(headers['Access-Control-Max-Age'], undefined); // preflight only
-	assert.is(headers['Access-Control-Allow-Headers'], undefined); // preflight only
-	assert.is(headers['Access-Control-Allow-Methods'], undefined); // preflight only
+	assert.is(headers['vary'], undefined);
+	assert.is(headers['access-control-allow-origin'], '*');
+	assert.is(headers['access-control-expose-headers'], undefined);
+	assert.is(headers['access-control-allow-credentials'], undefined);
 });
 
 headers('defaults :: preflight', () => {
-	let res = Response();
-	CORS.headers(res, undefined, true);
+	let res = new Response();
+	CORS.headers(res);
 
 	let headers = Object.fromEntries(res.headers);
 
-	assert.is(headers['Vary'], undefined);
-	assert.is(headers['Access-Control-Allow-Origin'], '*');
-	assert.is(headers['Access-Control-Expose-Headers'], undefined);
-	assert.is(headers['Access-Control-Allow-Credentials'], undefined);
-
-	assert.is(headers['Access-Control-Max-Age'], undefined);
-	assert.is(headers['Access-Control-Allow-Headers'], undefined);
-	assert.is(headers['Access-Control-Allow-Methods'], 'GET,HEAD,PUT,PATCH,POST,DELETE');
+	assert.is(headers['vary'], undefined);
+	assert.is(headers['access-control-allow-origin'], '*');
+	assert.is(headers['access-control-expose-headers'], undefined);
+	assert.is(headers['access-control-allow-credentials'], undefined);
 });
 
 headers('config :: request', () => {
-	let res = Response();
+	let res = new Response();
 
 	CORS.headers(res, {
 		origin: 'https://foobar.com',
@@ -129,42 +105,14 @@ headers('config :: request', () => {
 
 	let headers = Object.fromEntries(res.headers);
 
-	assert.is(headers['Vary'], 'Origin'); // static origin
-	assert.is(headers['Access-Control-Allow-Origin'], 'https://foobar.com');
-	assert.is(headers['Access-Control-Expose-Headers'], 'X-My-Custom-Header,X-Another-Custom-Header');
-	assert.is(headers['Access-Control-Allow-Credentials'], 'true');
-
-	assert.is(headers['Access-Control-Max-Age'], undefined); // not preflight
-	assert.is(headers['Access-Control-Allow-Headers'], undefined); // not preflight
-	assert.is(headers['Access-Control-Allow-Methods'], undefined); // not preflight
-});
-
-headers('config :: preflight', () => {
-	let res = Response();
-
-	CORS.headers(res, {
-		origin: 'https://foobar.com',
-		expose: ['X-My-Custom-Header', 'X-Another-Custom-Header'],
-		headers: ['X-PINGOTHER', 'Content-Type'],
-		methods: ['POST', 'PUT', 'DELETE'],
-		credentials: true,
-		maxage: 123
-	}, true);
-
-	let headers = Object.fromEntries(res.headers);
-
-	assert.is(headers['Vary'], 'Origin'); // static origin
-	assert.is(headers['Access-Control-Allow-Origin'], 'https://foobar.com');
-	assert.is(headers['Access-Control-Expose-Headers'], 'X-My-Custom-Header,X-Another-Custom-Header');
-	assert.is(headers['Access-Control-Allow-Credentials'], 'true');
-
-	assert.is(headers['Access-Control-Max-Age'], '123');
-	assert.is(headers['Access-Control-Allow-Headers'], 'X-PINGOTHER,Content-Type');
-	assert.is(headers['Access-Control-Allow-Methods'], 'POST,PUT,DELETE');
+	assert.is(headers['vary'], 'Origin'); // static origin
+	assert.is(headers['access-control-allow-origin'], 'https://foobar.com');
+	assert.is(headers['access-control-expose-headers'], 'X-My-Custom-Header,X-Another-Custom-Header');
+	assert.is(headers['access-control-allow-credentials'], 'true');
 });
 
 headers('merge :: request', () => {
-	let res = Response();
+	let res = new Response();
 
 	CORS.headers(res, {
 		credentials: true,
@@ -173,34 +121,14 @@ headers('merge :: request', () => {
 
 	let headers = Object.fromEntries(res.headers);
 
-	assert.is(headers['Vary'], undefined); // "*" default
-	assert.is(headers['Access-Control-Allow-Origin'], '*');
-	assert.is(headers['Access-Control-Expose-Headers'], undefined);
-	assert.is(headers['Access-Control-Allow-Credentials'], 'true');
+	assert.is(headers['vary'], undefined); // "*" default
+	assert.is(headers['access-control-allow-origin'], '*');
+	assert.is(headers['access-control-expose-headers'], undefined);
+	assert.is(headers['access-control-allow-credentials'], 'true');
 
-	assert.is(headers['Access-Control-Max-Age'], undefined); // not preflight
-	assert.is(headers['Access-Control-Allow-Headers'], undefined); // not preflight
-	assert.is(headers['Access-Control-Allow-Methods'], undefined); // not preflight
-});
-
-headers('merge :: preflight', () => {
-	let res = Response();
-
-	CORS.headers(res, {
-		credentials: true,
-		maxage: 0
-	}, true);
-
-	let headers = Object.fromEntries(res.headers);
-
-	assert.is(headers['Vary'], undefined); // "*" default
-	assert.is(headers['Access-Control-Allow-Origin'], '*');
-	assert.is(headers['Access-Control-Expose-Headers'], undefined);
-	assert.is(headers['Access-Control-Allow-Credentials'], 'true');
-
-	assert.is(headers['Access-Control-Max-Age'], '0'); // allows 0
-	assert.is(headers['Access-Control-Allow-Headers'], undefined);
-	assert.is(headers['Access-Control-Allow-Methods'], 'GET,HEAD,PUT,PATCH,POST,DELETE'); // default
+	// assert.is(headers['access-control-max-age'], undefined); // not preflight
+	// assert.is(headers['access-control-allow-headers'], undefined); // not preflight
+	// assert.is(headers['access-control-allow-methods'], undefined); // not preflight
 });
 
 headers.run();
@@ -213,152 +141,185 @@ preflight('should be a function', () => {
 	assert.type(CORS.preflight, 'function');
 });
 
-preflight('defaults :: standard', () => {
-	let req=Request(), res=Response();
+preflight('defaults :: GET', async () => {
 	let handler = CORS.preflight();
-
 	assert.type(handler, 'function');
-	let out = handler(req, res);
-	assert.is(out, undefined);
 
+	let res = runner('GET', handler);
 	let headers = Object.fromEntries(res.headers);
 
-	assert.is(headers['Vary'], undefined);
-	assert.is(headers['Access-Control-Allow-Origin'], '*');
-	assert.is(headers['Access-Control-Expose-Headers'], undefined);
-	assert.is(headers['Access-Control-Allow-Credentials'], undefined);
+	assert.is(headers['vary'], undefined);
+	assert.is(headers['access-control-allow-origin'], '*');
+	assert.is(headers['access-control-expose-headers'], undefined);
+	assert.is(headers['access-control-allow-credentials'], undefined);
 
-	assert.is(headers['Access-Control-Max-Age'], undefined); // preflight only
-	assert.is(headers['Access-Control-Allow-Headers'], undefined); // preflight only
-	assert.is(headers['Access-Control-Allow-Methods'], undefined); // preflight only
+	assert.is(headers['access-control-max-age'], undefined); // preflight only
+	assert.is(headers['access-control-allow-headers'], undefined); // preflight only
+	assert.is(headers['access-control-allow-methods'], undefined); // preflight only
 
-	// @ts-ignore - no response handler
-	assert.is(res.body(), undefined);
-	assert.is(res.statusCode, 0);
+	assert.is(res.status, 200);
+	assert.is(await res.text(), 'OTHER');
 });
 
-preflight('defaults :: preflight', () => {
-	let req = Request('OPTIONS');
-	let res = Response();
-
-	CORS.preflight()(req, res);
-
+preflight('defaults :: OPTIONS', () => {
+	let handler = CORS.preflight();
+	let res = runner('OPTIONS', handler);
 	let headers = Object.fromEntries(res.headers);
 
 	// no headers config, must expect to be dynamic/varied
-	assert.is(headers['Vary'], 'Access-Control-Request-Headers');
+	assert.is(headers['vary'], 'Access-Control-Request-Headers');
 
-	assert.is(headers['Access-Control-Allow-Origin'], '*');
-	assert.is(headers['Access-Control-Expose-Headers'], undefined);
-	assert.is(headers['Access-Control-Allow-Credentials'], undefined);
+	assert.is(headers['access-control-allow-origin'], '*');
+	assert.is(headers['access-control-expose-headers'], undefined);
+	assert.is(headers['access-control-allow-credentials'], undefined);
 
-	assert.is(headers['Access-Control-Max-Age'], undefined); // no value
-	assert.is(headers['Access-Control-Allow-Headers'], undefined); // no value
-	assert.is(headers['Access-Control-Allow-Methods'], 'GET,HEAD,PUT,PATCH,POST,DELETE'); // default
+	assert.is(headers['access-control-max-age'], undefined); // no value
+	assert.is(headers['access-control-allow-headers'], undefined); // no value
+	assert.is(headers['access-control-allow-methods'], 'GET,HEAD,PUT,PATCH,POST,DELETE'); // default
 
-	// @ts-ignore
-	assert.is(res.body(), null);
-	assert.is(res.statusCode, 204);
+	assert.is(res.body, null);
+	assert.is(res.status, 204);
+});
+
+preflight('custom :: maxage :: OPTIONS', () => {
+	let handler = CORS.preflight({
+		credentials: true,
+		maxage: 0,
+	});
+
+	let res = runner('OPTIONS', handler);
+	let headers = Object.fromEntries(res.headers);
+
+	// no headers config, must expect to be dynamic/varied
+	assert.is(headers['vary'], 'Access-Control-Request-Headers');
+
+	assert.is(headers['access-control-allow-origin'], '*');
+	assert.is(headers['access-control-expose-headers'], undefined);
+	assert.is(headers['access-control-allow-credentials'], 'true');
+
+	assert.is(headers['access-control-max-age'], '0'); // allows 0
+	assert.is(headers['access-control-allow-headers'], undefined); // no value
+	assert.is(headers['access-control-allow-methods'], 'GET,HEAD,PUT,PATCH,POST,DELETE'); // default
+
+	assert.is(res.body, null);
+	assert.is(res.status, 204);
+})
+
+preflight('custom :: kitchen sink :: OPTIONS', () => {
+	let handler = CORS.preflight({
+		origin: 'https://foobar.com',
+		expose: ['X-My-Custom-Header', 'X-Another-Custom-Header'],
+		headers: ['X-PINGOTHER', 'Content-Type'],
+		methods: ['POST', 'PUT', 'DELETE'],
+		credentials: true,
+		maxage: 123
+	});
+
+	let res = runner('OPTIONS', handler);
+	let headers = Object.fromEntries(res.headers);
+
+	assert.is(headers['vary'], 'Origin'); // static origin
+	assert.is(headers['access-control-allow-origin'], 'https://foobar.com');
+	assert.is(headers['access-control-expose-headers'], 'X-My-Custom-Header,X-Another-Custom-Header');
+	assert.is(headers['access-control-allow-credentials'], 'true');
+
+	assert.is(headers['access-control-max-age'], '123');
+	assert.is(headers['access-control-allow-headers'], 'X-PINGOTHER,Content-Type');
+	assert.is(headers['access-control-allow-methods'], 'POST,PUT,DELETE');
 });
 
 preflight('custom :: headers :: static', () => {
-	let req = Request('OPTIONS');
-	let res = Response();
-
-	CORS.preflight({
+	let handler = CORS.preflight({
 		headers: ['X-PINGOTHER', 'Content-Type']
-	})(req, res);
+	});
 
+	let res = runner('OPTIONS', handler);
 	let headers = Object.fromEntries(res.headers);
 
 	// had static headers config
-	assert.is(headers['Vary'], undefined);
-	assert.is(headers['Access-Control-Allow-Headers'], 'X-PINGOTHER,Content-Type');
+	assert.is(headers['vary'], undefined);
+	assert.is(headers['access-control-allow-headers'], 'X-PINGOTHER,Content-Type');
 });
 
 preflight('custom :: headers :: reflect', () => {
-	let req = Request('OPTIONS');
-	let res = Response();
-
-	req.headers.set('Access-Control-Request-Headers', 'Content-Type');
-
-	CORS.preflight()(req, res);
+	let handler = CORS.preflight();
+	let res = runner('OPTIONS', handler, {
+		'Access-Control-Request-Headers': 'Content-Type',
+	});
 
 	let headers = Object.fromEntries(res.headers);
 
 	// no static headers config, must expect dynamic value
-	assert.is(headers['Vary'], 'Access-Control-Request-Headers');
-	assert.is(headers['Access-Control-Allow-Headers'], 'Content-Type');
+	assert.is(headers['vary'], 'Access-Control-Request-Headers');
+	assert.is(headers['access-control-allow-headers'], 'Content-Type');
 });
 
 preflight('custom :: origin :: string', () => {
-	let req = Request('OPTIONS');
-	let res = Response();
-
-	CORS.preflight({
+	let handler = CORS.preflight({
 		origin: 'https://foobar.com'
-	})(req, res);
+	});
 
+	let res = runner('OPTIONS', handler);
 	let headers = Object.fromEntries(res.headers);
+
 	// no static headers config, must expect dynamic value (append)
-	assert.is(headers['Vary'], 'Origin, Access-Control-Request-Headers');
-	assert.is(headers['Access-Control-Allow-Origin'], 'https://foobar.com');
-	assert.is(headers['Access-Control-Allow-Headers'], undefined);
+	assert.is(headers['vary'], 'Origin, Access-Control-Request-Headers');
+	assert.is(headers['access-control-allow-origin'], 'https://foobar.com');
+	assert.is(headers['access-control-allow-headers'], undefined);
 });
 
 preflight('custom :: origin :: false ("*")', () => {
-	let req = Request('OPTIONS');
-	let res = Response();
+	let handler = CORS.preflight({ origin: false });
 
-	CORS.preflight({ origin: false })(req, res);
-
+	let res = runner('OPTIONS', handler);
 	let headers = Object.fromEntries(res.headers);
 
 	// missing static headers config
-	assert.is(headers['Vary'], 'Access-Control-Request-Headers');
-	assert.is(headers['Access-Control-Allow-Origin'], '*');
+	assert.is(headers['vary'], 'Access-Control-Request-Headers');
+	assert.is(headers['access-control-allow-origin'], '*');
 });
 
 preflight('custom :: origin :: true (reflect)', () => {
-	let req = Request('OPTIONS');
-	let res = Response();
+	let handler = CORS.preflight({ origin: true });
 
-	req.headers.set('Origin', 'https://hello.com');
-	CORS.preflight({ origin: true })(req, res);
+	let res = runner('OPTIONS', handler, {
+		'Origin': 'https://hello.com'
+	});
 
 	let headers = Object.fromEntries(res.headers);
 
 	// missing static headers config
-	assert.is(headers['Vary'], 'Origin, Access-Control-Request-Headers');
-	assert.is(headers['Access-Control-Allow-Origin'], 'https://hello.com');
+	assert.is(headers['vary'], 'Origin, Access-Control-Request-Headers');
+	assert.is(headers['access-control-allow-origin'], 'https://hello.com');
 });
 
 preflight('custom :: origin :: RegExp (pass)', () => {
-	let req = Request('OPTIONS');
-	let res = Response();
-
-	req.headers.set('Origin', 'https://foobar.com');
-	CORS.preflight({ origin: /foobar/ })(req, res);
+	let handler = CORS.preflight({ origin: /foobar/ });
+	let res = runner('OPTIONS', handler, {
+		'Origin': 'https://foobar.com'
+	});
 
 	let headers = Object.fromEntries(res.headers);
 
 	// missing static headers config
-	assert.is(headers['Vary'], 'Origin, Access-Control-Request-Headers');
-	assert.is(headers['Access-Control-Allow-Origin'], 'https://foobar.com');
+	assert.is(headers['vary'], 'Origin, Access-Control-Request-Headers');
+	assert.is(headers['access-control-allow-origin'], 'https://foobar.com');
 });
 
 preflight('custom :: origin :: RegExp (fail)', () => {
-	let req = Request('OPTIONS');
-	let res = Response();
+	let handler = CORS.preflight({
+		origin: /hello/
+	});
 
-	req.headers.set('Origin', 'https://foobar.com');
-	CORS.preflight({ origin: /hello/ })(req, res);
+	let res = runner('OPTIONS', handler, {
+		'Origin': 'https://foobar.com'
+	});
 
 	let headers = Object.fromEntries(res.headers);
 
 	// missing static headers config
-	assert.is(headers['Vary'], 'Origin, Access-Control-Request-Headers');
-	assert.is(headers['Access-Control-Allow-Origin'], 'false');
+	assert.is(headers['vary'], 'Origin, Access-Control-Request-Headers');
+	assert.is(headers['access-control-allow-origin'], 'false');
 });
 
 preflight.run();
