@@ -44,9 +44,9 @@
       "import": "./response/index.mjs",
       "require": "./response/index.js"
     },
-    "./modules": {
-      "import": "./modules/index.mjs",
-      "require": "./modules/index.js"
+    "./module": {
+      "import": "./module/index.mjs",
+      "require": "./module/index.js"
     },
     "./base64": {
       "import": "./base64/index.mjs",
@@ -71,9 +71,9 @@
     "cache",
     "crypto",
     "cookie",
-    "durable",
     "response",
-    "modules",
+    "durable",
+    "module",
     "router",
     "utils",
     "cors",

@@ -1,5 +1,5 @@
 import { Router } from 'worktop';
-import * as modules from 'worktop/modules';
+import * as modules from 'worktop/module';
 import * as sw from 'worktop/sw';
 
 import type { Bindings, Context } from 'worktop';

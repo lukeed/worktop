@@ -1,6 +1,6 @@
 import { Router } from 'worktop';
 import * as CORS from 'worktop/cors';
-import * as modules from 'worktop/modules';
+import * as mod from 'worktop/module';
 import * as utils from 'worktop/utils';
 
 const API = new Router();
@@ -56,4 +56,4 @@ API.add('DELETE', '/', (req, context) => {
 });
 
 // Module Worker
-export default modules.reply(API.run);
+export default mod.reply(API.run);

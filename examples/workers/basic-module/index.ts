@@ -1,7 +1,7 @@
 import { Router } from 'worktop';
-import { send } from 'worktop/response';
 import * as Cache from 'worktop/cache';
-import type { Context  } from 'worktop';
+import { send } from 'worktop/response';
+import type { Context } from 'worktop';
 
 interface Custom extends Context {
 	bindings: {

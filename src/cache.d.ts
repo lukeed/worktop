@@ -1,11 +1,11 @@
 /// <reference lib="webworker" />
 
 import type { Bindings, Context } from 'worktop';
-import type { ModuleWorker } from 'worktop/modules';
-import type { Initializer, ModuleContext } from 'worktop';
+import type { Module } from 'worktop/module';
+import type { Initializer } from 'worktop';
 
 export const Cache: Cache;
-export function save(req: Request | string, res: Response, context: ModuleContext): Response;
+export function save(req: Request | string, res: Response, context: Module.Context): Response;
 export function lookup(request: Request | string): Promise<Response | void>;
 export function isCacheable(res: Response): boolean;
 
@@ -17,7 +17,7 @@ export type ResponseHandler = (event: FetchEvent) => Promise<Response>;
 export function reply<
 	C extends Context = Context,
 	B extends Bindings = Bindings,
->(run: Initializer<C>): ModuleWorker<B>;
+>(run: Initializer<C>): Module.Worker<B>;
 
 /**
  * Assign the `handler` to the "fetch" event.

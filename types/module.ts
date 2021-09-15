@@ -1,4 +1,4 @@
-import type { Module } from 'worktop/modules';
+import type { Module } from 'worktop/module';
 import type { Bindings, CronEvent } from 'worktop';
 import type { IncomingCloudflareProperties } from 'worktop';
 import type { Strict } from 'worktop/utils';

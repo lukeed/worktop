@@ -1,6 +1,6 @@
-import type { Bindings, Context, Initializer, Handler } from 'worktop';
+import type { Module } from 'worktop/module';
 import type { ResponseHandler } from 'worktop/sw';
-import type { Module } from 'worktop/modules';
+import type { Bindings, Context, Initializer, Handler } from 'worktop';
 import type { Strict } from 'worktop/utils';
 
 // Tiny helper for TypeScript definition

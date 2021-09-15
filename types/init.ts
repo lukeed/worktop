@@ -1,8 +1,8 @@
-import * as modules from 'worktop/modules';
+import * as modules from 'worktop/module';
 import * as Cache from 'worktop/cache';
 import * as sw from 'worktop/sw';
 
-import type { Module } from 'worktop/modules';
+import type { Module } from 'worktop/module';
 import type { Bindings, Context, Router, CronEvent } from 'worktop';
 import type { ResponseHandler } from 'worktop/sw';
 import type { Strict } from 'worktop/utils';

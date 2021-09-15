@@ -11,8 +11,8 @@ node_modules
 /base64
 /request
 /response
-/modules
 /durable
+/module
 /router
 /utils
 /sw
