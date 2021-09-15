@@ -1,11 +1,11 @@
 import * as Cache from 'worktop/cache';
-import type { ModuleWorker } from 'worktop/modules';
-import type { ModuleContext, Router } from 'worktop';
+import type { Module } from 'worktop/modules';
+import type { Router } from 'worktop';
 
 declare const event: FetchEvent;
 declare const request: Request;
 declare const response: Response;
-declare const context: ModuleContext;
+declare const context: Module.Context;
 declare const API: Router;
 
 /**
@@ -71,7 +71,7 @@ Cache.isCacheable(request);
  * REPLY
  */
 
-assert<ModuleWorker>(
+assert<Module.Worker>(
 	Cache.reply(API.run)
 );
 

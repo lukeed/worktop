@@ -2,9 +2,8 @@ import * as modules from 'worktop/modules';
 import * as Cache from 'worktop/cache';
 import * as sw from 'worktop/sw';
 
-import type { Bindings, Context } from 'worktop';
-import type { Router, CronEvent, ModuleContext } from 'worktop';
-import type { ModuleWorker } from 'worktop/modules';
+import type { Module } from 'worktop/modules';
+import type { Bindings, Context, Router, CronEvent } from 'worktop';
 import type { ResponseHandler } from 'worktop/sw';
 import type { Strict } from 'worktop/utils';
 
@@ -53,11 +52,11 @@ assert<void>(
  * init: Cache
  */
 
-assert<ModuleWorker>(
+assert<Module.Worker>(
 	Cache.reply(API.run)
 );
 
-assert<ModuleWorker>(
+assert<Module.Worker>(
 	Cache.reply(CUSTOM.run)
 );
 
@@ -75,24 +74,24 @@ assert<void>(
  */
 
 modules.reply(API.run);
-assert<ModuleWorker>(
+assert<Module.Worker>(
 	modules.reply(API.run)
 );
 
 modules.reply(CUSTOM.run);
-assert<ModuleWorker>(
+assert<Module.Worker>(
 	modules.reply(CUSTOM.run)
 );
 
 modules.reply(CUSTOM.run);
-assert<ModuleWorker<MyBindings>>(
+assert<Module.Worker<MyBindings>>(
 	modules.reply<MyContext, MyBindings>(CUSTOM.run)
 );
 
 // @ts-expect-error
 modules.listen(API.run);
 
-assert<ModuleWorker>(
+assert<Module.Worker>(
 	modules.listen(
 		sw.convert(API.run)
 	)
@@ -100,14 +99,14 @@ assert<ModuleWorker>(
 
 modules.define({
 	fetch(req, bindings, ctx) {
-		assert<ModuleContext>(ctx);
+		assert<Module.Context>(ctx);
 
 		assert<Bindings>(bindings);
 		assert<Strict<Bindings>>(bindings);
 		return API.run(req, { ...ctx, bindings });
 	},
 	async scheduled(event, bindings, ctx) {
-		assert<ModuleContext>(ctx);
+		assert<Module.Context>(ctx);
 
 		assert<Omit<CronEvent, 'waitUntil'>>(event);
 		assert<number>(event.scheduledTime);
@@ -125,7 +124,7 @@ modules.define({
 
 modules.define<MyBindings>({
 	fetch(req, bindings, ctx) {
-		assert<ModuleContext>(ctx);
+		assert<Module.Context>(ctx);
 
 		// base type match
 		assert<Bindings>(bindings);

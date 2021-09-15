@@ -1,7 +1,6 @@
-import type { Bindings, Context } from 'worktop';
-import type { Initializer, ModuleContext } from 'worktop';
+import type { Bindings, Context, Initializer } from 'worktop';
 import type { ResponseHandler } from 'worktop/cache';
-import type { ModuleWorker } from 'worktop/modules';
+import type { Module } from 'worktop/modules';
 
 export const Cache: Cache = /*#__PURE__*/ (caches as any).default;
 
@@ -14,7 +13,7 @@ export async function lookup(req: Request | string) {
 	return res;
 }
 
-export function save(req: Request | string, res: Response, context: ModuleContext) {
+export function save(req: Request | string, res: Response, context: Module.Context) {
 	let isGET = typeof req === 'string' || req.method === 'GET';
 
 	if (isGET && isCacheable(res)) {
@@ -44,7 +43,7 @@ export function isCacheable(res: Response): boolean {
 export function reply<
 	C extends Context = Context,
 	B extends Bindings = Bindings,
->(run: Initializer<C>): ModuleWorker<B> {
+>(run: Initializer<C>): Module.Worker<B> {
 	return {
 		async fetch(req, env, ctx) {
 			let res = await lookup(req);

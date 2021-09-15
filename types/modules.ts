@@ -1,6 +1,6 @@
-import type { Bindings, CronEvent, ModuleContext } from 'worktop';
+import type { Module } from 'worktop/modules';
+import type { Bindings, CronEvent } from 'worktop';
 import type { IncomingCloudflareProperties } from 'worktop';
-import type { ModuleWorker } from 'worktop/modules';
 import type { Strict } from 'worktop/utils';
 import type { KV } from 'worktop/kv';
 
@@ -8,14 +8,14 @@ import type { KV } from 'worktop/kv';
  * WORKTOP/MODULES
  */
 
-const worker1: ModuleWorker = {
+const worker1: Module.Worker = {
 	async fetch(req, env, ctx) {
 		assert<Request>(req);
 		assert<IncomingCloudflareProperties>(req.cf);
 
 		assert<Bindings>(env);
 
-		assert<ModuleContext>(ctx);
+		assert<Module.Context>(ctx);
 		assert<Function>(ctx.waitUntil);
 		assert<Function>(ctx.passThroughOnException);
 
@@ -33,7 +33,7 @@ const worker1: ModuleWorker = {
 
 		assert<Bindings>(env);
 
-		assert<ModuleContext>(ctx);
+		assert<Module.Context>(ctx);
 		assert<Function>(ctx.waitUntil);
 		// @ts-expect-error - missing
 		assert<undefined>(ctx.passThroughOnException);
@@ -47,10 +47,10 @@ interface CustomBindings extends Bindings {
 	COUNT: number;
 }
 
-const worker2: ModuleWorker<CustomBindings> = {
+const worker2: Module.Worker<CustomBindings> = {
 	fetch(req, env, ctx) {
 		assert<Request>(req);
-		assert<ModuleContext>(ctx);
+		assert<Module.Context>(ctx);
 		assert<Strict<CustomBindings>>(env);
 
 		// @ts-expect-error - missing

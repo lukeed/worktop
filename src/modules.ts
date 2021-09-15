@@ -1,10 +1,10 @@
-import type { ModuleWorker } from 'worktop/modules';
 import type { Bindings, Context, Initializer, Handler } from 'worktop';
 import type { ResponseHandler } from 'worktop/sw';
+import type { Module } from 'worktop/modules';
 import type { Strict } from 'worktop/utils';
 
 // Tiny helper for TypeScript definition
-export function define<B extends Bindings = Bindings>(worker: ModuleWorker<B>): ModuleWorker<B> {
+export function define<B extends Bindings = Bindings>(worker: Module.Worker<B>): Module.Worker<B> {
 	return worker;
 }
 
@@ -23,7 +23,7 @@ export function convert<C extends Context = Context>(handler: ResponseHandler): 
 export function reply<
 	B extends Bindings = Bindings,
 	C extends Context = Context
->(run: Initializer<C>): ModuleWorker<B> {
+>(run: Initializer<C>): Module.Worker<B> {
 	type BC = C & { bindings: Strict<B> };
 	return {
 		fetch(req, env, ctx) {
@@ -34,7 +34,7 @@ export function reply<
 }
 
 // Generate a Module Worker definition from a Service Worker `ResponseHandler` type.
-export function listen<B extends Bindings = Bindings>(handler: ResponseHandler): ModuleWorker<B> {
+export function listen<B extends Bindings = Bindings>(handler: ResponseHandler): Module.Worker<B> {
 	return {
 		fetch(req, env, ctx) {
 			// Not ideal; temporary
@@ -46,5 +46,5 @@ export function listen<B extends Bindings = Bindings>(handler: ResponseHandler):
 				passThroughOnException: ctx.passThroughOnException.bind(ctx),
 			} as FetchEvent);
 		}
-	} as ModuleWorker<B>;
+	} as Module.Worker<B>;
 }

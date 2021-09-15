@@ -3,6 +3,7 @@
 import type { KV } from 'worktop/kv';
 import type { Durable } from 'worktop/durable';
 import type { Promisable, Strict, Dict } from 'worktop/utils';
+import type { Module } from 'worktop/modules';
 
 declare global {
 	interface Request {
@@ -45,17 +46,12 @@ export interface Bindings {
 	[name: string]: string | CryptoKey | KV.Namespace | Durable.Namespace;
 }
 
-export interface ModuleContext {
-	waitUntil(f: any): void;
-	passThroughOnException?(): void;
-}
-
 // TODO: move to utils?
 type Merge<C extends Context, P> = Omit<C, 'params'> & { params: P };
 
 export type Deferral = (res: Response) => Promisable<void>;
 
-export interface Context extends ModuleContext {
+export interface Context extends Module.Context {
 	url: URL;
 	params: Params;
 	bindings?: Bindings;
@@ -87,7 +83,7 @@ export type RouteParams<T extends string> =
 
 export type Initializer<C extends Context> = (
 	request: Request,
-	context: Partial<C> & ModuleContext & {
+	context: Partial<C> & Module.Context & {
 		bindings?: Bindings;
 	}
 ) => Promise<Response>;
