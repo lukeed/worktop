@@ -24,6 +24,10 @@
       "import": "./cors/index.mjs",
       "require": "./cors/index.js"
     },
+    "./jwt": {
+      "import": "./jwt/index.mjs",
+      "require": "./jwt/index.js"
+    },
     "./cache": {
       "import": "./cache/index.mjs",
       "require": "./cache/index.js"
@@ -71,6 +75,7 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "cors",
     "base64",
     "buffer",
     "cache",
@@ -81,7 +86,7 @@
     "module",
     "router",
     "utils",
-    "cors",
+    "jwt",
     "kv",
     "sw",
     "ws"
