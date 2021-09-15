@@ -1,7 +1,7 @@
 import type { KV } from 'worktop/kv';
 import type { Context } from 'worktop';
 
-export async function serve(ns: KV.Namespace, req: Request | string, context: Context): Promise<Response | void> {
+export async function serve(ns: KV.Namespace, req: Request | `/${string}`, context: Context): Promise<Response | void> {
 	let isPath = typeof req === 'string';
 	let isHEAD = !isPath && (req as Request).method === 'HEAD';
 	let isGET = isPath || isHEAD || (req as Request).method === 'GET';
