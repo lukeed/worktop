@@ -37,6 +37,7 @@ Promise.all([
 	bundle('src/cookie.ts', pkg.exports['./cookie']),
 	bundle('src/base64.ts', pkg.exports['./base64']),
 	bundle('src/response.ts', pkg.exports['./response']),
+	bundle('src/kv.assets.ts', pkg.exports['./kv.assets']),
 	bundle('src/durable.ts', pkg.exports['./durable']),
 	bundle('src/module.ts', pkg.exports['./module']),
 	bundle('src/crypto.ts', pkg.exports['./crypto']),

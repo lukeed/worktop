@@ -11,6 +11,7 @@ node_modules
 /base64
 /request
 /response
+/kv.assets
 /durable
 /module
 /router

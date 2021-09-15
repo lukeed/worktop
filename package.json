@@ -16,9 +16,9 @@
       "import": "./router/index.mjs",
       "require": "./router/index.js"
     },
-    "./kv": {
-      "import": "./kv/index.mjs",
-      "require": "./kv/index.js"
+    "./sw": {
+      "import": "./sw/index.mjs",
+      "require": "./sw/index.js"
     },
     "./cors": {
       "import": "./cors/index.mjs",
@@ -56,9 +56,13 @@
       "import": "./utils/index.mjs",
       "require": "./utils/index.js"
     },
-    "./sw": {
-      "import": "./sw/index.mjs",
-      "require": "./sw/index.js"
+    "./kv": {
+      "import": "./kv/index.mjs",
+      "require": "./kv/index.js"
+    },
+    "./kv.assets": {
+      "import": "./kv.assets/index.mjs",
+      "require": "./kv.assets/index.js"
     },
     "./ws": {
       "import": "./ws/index.mjs",
@@ -72,6 +76,7 @@
     "crypto",
     "cookie",
     "response",
+    "kv.assets",
     "durable",
     "module",
     "router",
