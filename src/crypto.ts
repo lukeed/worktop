@@ -1,10 +1,11 @@
 import { encode, toHEX } from 'worktop/utils';
 import type { Algorithms, TypedArray } from 'worktop/crypto';
 
-export function digest(algo: Algorithms.Digest, message: string): Promise<string> {
+export function digest(algo: Algorithms.Digest | 'MD5', message: string): Promise<string> {
 	return crypto.subtle.digest(algo, encode(message)).then(toHEX);
 }
 
+export const MD5    = /*#__PURE__*/ digest.bind(0, 'MD5');
 export const SHA1   = /*#__PURE__*/ digest.bind(0, 'SHA-1');
 export const SHA256 = /*#__PURE__*/ digest.bind(0, 'SHA-256');
 export const SHA384 = /*#__PURE__*/ digest.bind(0, 'SHA-384');

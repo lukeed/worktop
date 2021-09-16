@@ -4,6 +4,12 @@ type NIST = 'P-256' | 'P-384' | 'P-521';
 
 export function digest(algorithm: SHA, message: string): Promise<string>;
 
+/**
+ * Generate a MD5 hash for an input message.
+ * @NOTE Only supported by Cloudflare Workers!
+ */
+export function MD5(message: string): Promise<string>;
+
 export function SHA1(message: string): Promise<string>;
 export function SHA256(message: string): Promise<string>;
 export function SHA384(message: string): Promise<string>;
