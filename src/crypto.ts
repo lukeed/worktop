@@ -5,6 +5,7 @@ export function digest(algo: Algorithms.Digest, message: string): Promise<string
 	return crypto.subtle.digest(algo, encode(message)).then(toHEX);
 }
 
+export const MD5    = /*#__PURE__*/ digest.bind(0, 'MD5');
 export const SHA1   = /*#__PURE__*/ digest.bind(0, 'SHA-1');
 export const SHA256 = /*#__PURE__*/ digest.bind(0, 'SHA-256');
 export const SHA384 = /*#__PURE__*/ digest.bind(0, 'SHA-384');
@@ -48,3 +49,11 @@ export async function PBKDF2(digest: Algorithms.Digest, password: string, salt: 
 
 	return crypto.subtle.deriveBits(algo, key, length << 3);
 }
+
+export function HMAC(hash: Algorithms.Digest, secret: string, data: string): Promise<ArrayBuffer> {
+	return keyload({ name: 'HMAC', hash }, secret, ['sign']).then(key => sign('HMAC', key, data));
+}
+
+export const HMAC256 = /*#__PURE__*/ HMAC.bind(0, 'SHA-256');
+export const HMAC384 = /*#__PURE__*/ HMAC.bind(0, 'SHA-384');
+export const HMAC512 = /*#__PURE__*/ HMAC.bind(0, 'SHA-512');

@@ -265,3 +265,59 @@ PBKDF2('should produce expected output', async ctx => {
 });
 
 PBKDF2.run();
+
+// ---
+
+const HMAC = suite('HMAC');
+
+HMAC('should be a function', () => {
+	assert.type(crypto.HMAC, 'function');
+	assert.type(crypto.HMAC256, 'function');
+	assert.type(crypto.HMAC384, 'function');
+	assert.type(crypto.HMAC512, 'function');
+});
+
+HMAC('should return ArrayBuffer', async () => {
+	let output = await crypto.HMAC('SHA-1', 'foo', 'bar');
+	assert.instance(output, ArrayBuffer);
+});
+
+HMAC('should produce expected output :: SHA-1', async () => {
+	let foo = await crypto.HMAC('SHA-1', 'hello', 'world').then(toHEX);
+	assert.is(foo, '8a3a84bcd0d0065e97f175d370447c7d02e00973');
+
+	let bar = await crypto.HMAC('SHA-1', 'world', 'hello').then(toHEX);
+	assert.is(bar, '5a0c67d922de0ca53e306250e6858c1f6d2c4943');
+});
+
+HMAC('should produce expected output :: SHA-256', async () => {
+	let foo = await crypto.HMAC('SHA-256', 'hello', 'world').then(toHEX);
+	assert.is(foo, 'f1ac9702eb5faf23ca291a4dc46deddeee2a78ccdaf0a412bed7714cfffb1cc4');
+	assert.is(foo, await crypto.HMAC256('hello', 'world').then(toHEX));
+
+	let bar = await crypto.HMAC('SHA-256', 'world', 'hello').then(toHEX);
+	assert.is(bar, '3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b');
+	assert.is(bar, await crypto.HMAC256('world', 'hello').then(toHEX));
+});
+
+HMAC('should produce expected output :: SHA-384', async () => {
+	let foo = await crypto.HMAC('SHA-384', 'hello', 'world').then(toHEX);
+	assert.is(foo, '80d036d9974e6f71ceabe493ee897d00235edcc4c72e046ddfc8bf68e86a477d63b9f7d26ad5b990aae6ac17db57ddcf');
+	assert.is(foo, await crypto.HMAC384('hello', 'world').then(toHEX));
+
+	let bar = await crypto.HMAC('SHA-384', 'world', 'hello').then(toHEX);
+	assert.is(bar, '2dc82db49e763d4f589d6b79c788a66ca27a708e8fba0014c36519f4c48e9cb5651d8c86ea6ca0c760219ac3bc009cf8');
+	assert.is(bar, await crypto.HMAC384('world', 'hello').then(toHEX));
+});
+
+HMAC('should produce expected output :: SHA-512', async () => {
+	let foo = await crypto.HMAC('SHA-512', 'hello', 'world').then(toHEX);
+	assert.is(foo, '6668ed2f7d016c5f12d7808fc4f2d1dc4851622d7f15616de947a823b3ee67d761b953f09560da301f832902020dd1c64f496df37eb7ac4fd2feeeb67d77ba9b');
+	assert.is(foo, await crypto.HMAC512('hello', 'world').then(toHEX));
+
+	let bar = await crypto.HMAC('SHA-512', 'world', 'hello').then(toHEX);
+	assert.is(bar, '2b83319d3e78544e4430c4f5621968fee8b6ffa1254678b2c6fb98f7f79ff16afee2da909a7bb741488ca3bacbbf6cec8fd226c5a52eef805ea65a352e2ece8e');
+	assert.is(bar, await crypto.HMAC512('world', 'hello').then(toHEX));
+});
+
+HMAC.run();
