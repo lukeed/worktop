@@ -40,6 +40,10 @@ assert<string>(
 	await crypto.digest('SHA-1', 'foobar')
 );
 
+assert<string>(
+	await crypto.digest('MD5', 'foobar')
+);
+
 /**
  * HMAC
  */
@@ -47,6 +51,7 @@ assert<string>(
 // @ts-expect-error
 crypto.HMAC('foobar', 'secret', 'data');
 
+crypto.HMAC('MD5', 'secret', 'data');
 crypto.HMAC('SHA-1', 'secret', 'data');
 crypto.HMAC('SHA-256', 'secret', 'data');
 crypto.HMAC('SHA-384', 'secret', 'data');
@@ -71,6 +76,7 @@ assert<string>(
 // @ts-expect-error
 crypto.PBKDF2('foobar', 'secret', 'salt', 1e3, 32);
 
+crypto.PBKDF2('MD5', 'secret', 'salt', 1e3, 32);
 crypto.PBKDF2('SHA-1', 'secret', 'salt', 1e3, 32);
 crypto.PBKDF2('SHA-256', 'secret', 'salt', 1e3, 32);
 crypto.PBKDF2('SHA-384', 'secret', 'salt', 10e3, 32);

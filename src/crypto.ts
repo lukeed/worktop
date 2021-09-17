@@ -1,7 +1,7 @@
 import { encode, toHEX } from 'worktop/utils';
 import type { Algorithms, TypedArray } from 'worktop/crypto';
 
-export function digest(algo: Algorithms.Digest | 'MD5', message: string): Promise<string> {
+export function digest(algo: Algorithms.Digest, message: string): Promise<string> {
 	return crypto.subtle.digest(algo, encode(message)).then(toHEX);
 }
 
