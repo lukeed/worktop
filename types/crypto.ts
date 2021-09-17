@@ -70,6 +70,25 @@ assert<string>(
 );
 
 /**
+ * HMAC256
+ */
+
+// @ts-expect-error
+crypto.HMAC256('SHA-256', 'secret', 'data');
+
+assert<Promise<ArrayBuffer>>(
+	crypto.HMAC256('secret', 'data')
+);
+
+assert<ArrayBuffer>(
+	await crypto.HMAC256('secret', 'data')
+);
+
+assert<string>(
+	await crypto.HMAC256('secret', 'data').then(toHEX)
+);
+
+/**
  * PBKDF2
  */
 

@@ -88,3 +88,7 @@ export function PBKDF2(digest: Algorithms.Digest, password: string, salt: string
  * HMAC is used to ensure both integrity and authentication.
  */
 export function HMAC(hash: Algorithms.Digest, secret: string, data: string): Promise<ArrayBuffer>;
+
+export function HMAC256(secret: string, message: string): Promise<ArrayBuffer>;
+export function HMAC384(secret: string, message: string): Promise<ArrayBuffer>;
+export function HMAC512(secret: string, message: string): Promise<ArrayBuffer>;
