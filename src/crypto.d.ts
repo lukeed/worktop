@@ -79,3 +79,9 @@ export function timingSafeEqual<T extends TypedArray>(a: T, b: T): boolean;
  * @param {number} length   The desired number of bits to derive.
  */
 export function PBKDF2(digest: Algorithms.Digest, password: string, salt: string, iters: number, length: number): Promise<ArrayBuffer>;
+
+/**
+ * Hash-based message authentication code (HMAC).
+ * HMAC is used to ensure both integrity and authentication.
+ */
+export function HMAC(hash: Algorithms.Digest, secret: string, data: string): Promise<ArrayBuffer>;

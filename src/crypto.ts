@@ -49,3 +49,7 @@ export async function PBKDF2(digest: Algorithms.Digest, password: string, salt: 
 
 	return crypto.subtle.deriveBits(algo, key, length << 3);
 }
+
+export async function HMAC(hash: Algorithms.Digest, secret: string, data: string): Promise<ArrayBuffer> {
+	return keyload({ name: 'HMAC', hash }, secret, ['sign']).then(key => sign('HMAC', key, data));
+}
