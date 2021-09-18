@@ -5,6 +5,8 @@ import * as Base64 from 'worktop/base64';
 import type { Factory, JWT, Options } from 'worktop/jwt';
 import type { Algorithms } from 'worktop/crypto';
 
+type SIZE = '256' | '384' | '512';
+
 // type: externals
 export const INVALID = /*#__PURE__*/ new Error('Invalid token');
 export const EXPIRED = /*#__PURE__*/ new Error('Expired token');
@@ -51,17 +53,13 @@ export function toContent(hh: string, pp: JWT.Payload, expires?: number): string
 }
 
 // type: template
-export function HMAC<P,H>(
-	alg: 'HS256' | 'HS384' | 'HS512',
-	digest: 'SHA-256' | 'SHA-384' | 'SHA-512',
-	options: Options.HMAC<H>
-): Factory<P,H> {
+export function HMAC<P,H>(bits: SIZE, options: Options.HMAC<H>): Factory<P,H> {
 	let $: Factory<P,H>, {
 		typ, kid, header={},
 		key, expires, ...rest
 	} = options;
 
-	(header as JWT.Header).alg = alg;
+	(header as JWT.Header).alg = 'HS' + bits;
 	(header as JWT.Header).typ = typ || 'JWT';
 	if (kid != null) (header as JWT.Header).kid = kid;
 
@@ -70,7 +68,7 @@ export function HMAC<P,H>(
 	return $ = {
 		async sign(payload) {
 			let out = toContent(HEADER, { ...rest, ...payload }, expires);
-			let sign = await wc.HMAC(digest, key, out);
+			let sign = await wc.HMAC(`SHA-${bits}`, key, out);
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
@@ -91,33 +89,33 @@ export function HMAC<P,H>(
 }
 
 // type: template
-export function RSA<P,H>(
-	alg: 'RS256' | 'RS384' | 'RS512',
-	digest: 'SHA-256' | 'SHA-384' | 'SHA-512',
-	options: Options.RSA<H>
-): Factory<P,H> {
+export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
 	let {
 		typ, kid, header={},
 		privkey, pubkey,
 		expires, ...rest
 	} = options;
 
-	(header as JWT.Header).alg = alg;
+	(header as JWT.Header).alg = 'RS' + bits;
 	(header as JWT.Header).typ = typ || 'JWT';
 	if (kid != null) (header as JWT.Header).kid = kid;
 
 	let HEADER = encode(header);
+	let hasher: Algorithms.Signing = 'RSASSA-PKCS1-v1_5';
+	let keyer: RsaHashedImportParams = {
+		name: 'RSASSA-PKCS1-v1_5',
+		hash: `SHA-${bits}`
+	};
 
 	return {
 		async sign(payload) {
 			let key = await crypto.subtle.importKey(
 				'pkcs8', utils.viaPEM(privkey),
-				{ name: 'RSASSA-PKCS1-v1_5', hash: digest },
-				false, ['sign']
+				keyer, false, ['sign']
 			);
 
 			let out = toContent(HEADER, { ...rest, ...payload }, expires);
-			let sign = await wc.sign('RSASSA-PKCS1-v1_5', key, out);
+			let sign = await wc.sign(hasher, key, out);
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
@@ -143,11 +141,10 @@ export function RSA<P,H>(
 
 			let key = await crypto.subtle.importKey(
 				'spki', utils.viaPEM(pubkey),
-				{ name: 'RSASSA-PKCS1-v1_5', hash: digest },
-				false, ['verify']
+				keyer, false, ['verify']
 			);
 
-			let bool = await wc.verify('RSASSA-PKCS1-v1_5', key, load, sign);
+			let bool = await wc.verify(hasher, key, load, sign);
 			if (bool) return data;
 			throw INVALID;
 		}
@@ -155,34 +152,38 @@ export function RSA<P,H>(
 }
 
 // type: template
-export function ECDSA<P,H>(
-	alg: 'ES256' | 'ES384' | 'ES512',
-	bytes: '256' | '384' | '512',
-	options: Options.ECDSA<H>
-): Factory<P,H> {
+export function ECDSA<P,H>(bits: SIZE, options: Options.ECDSA<H>): Factory<P,H> {
 	let {
 		typ, kid, header={},
 		privkey, pubkey,
 		expires, ...rest
 	} = options;
 
-	(header as JWT.Header).alg = alg;
+	(header as JWT.Header).alg = 'ES' + bits;
 	(header as JWT.Header).typ = typ || 'JWT';
 	if (kid != null) (header as JWT.Header).kid = kid;
 
 	let HEADER = encode(header);
 
+	let keyer: EcKeyImportParams = {
+		name: 'ECDSA',
+		namedCurve: `P-${bits}`,
+	};
+
+	let hasher: Algorithms.Signing = {
+		name: 'ECDSA',
+		hash: `SHA-${bits}`,
+	};
+
 	return {
 		async sign(payload) {
 			let key = await crypto.subtle.importKey(
 				'pkcs8', utils.viaPEM(privkey),
-				{ name: 'ECDSA', namedCurve: `P-${bytes}` },
-				false, ['sign']
+				keyer, false, ['sign']
 			);
 
-			let sha = `SHA-${bytes}` as Algorithms.Digest;
 			let out = toContent(HEADER, { ...rest, ...payload }, expires);
-			let sign = await wc.sign({ name: 'ECDSA', hash: sha }, key, out);
+			let sign = await wc.sign(hasher, key, out);
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
@@ -208,12 +209,10 @@ export function ECDSA<P,H>(
 
 			let key = await crypto.subtle.importKey(
 				'spki', utils.viaPEM(pubkey),
-				{ name: 'ECDSA', namedCurve: `P-${bytes}` },
-				false, ['verify']
+				keyer, false, ['verify']
 			);
 
-			let sha = `SHA-${bytes}` as Algorithms.Digest;
-			let bool = await wc.verify({ name: 'ECDSA', hash: sha }, key, load, sign);
+			let bool = await wc.verify(hasher, key, load, sign);
 			if (bool) return data;
 			throw INVALID;
 		}
