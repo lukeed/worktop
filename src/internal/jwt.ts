@@ -68,27 +68,39 @@ export function validate<P,H>(hh: string, input: string) {
 	return parts;
 }
 
+export function prepare<H>(
+	type: 'HS' | 'RS' | 'ES', bits: SIZE,
+	options: Omit<Options.Common<H>, 'expires'>
+): {
+	header: string,
+	config: JWT.Payload
+} {
+	let { kid, typ, header:claims, ...config } = options;
+
+	let hh: JWT.Header = {
+		...claims,
+		alg: type+bits,
+		typ: typ || 'JWT',
+	};
+	if (kid != null) hh.kid = kid;
+
+	let header = encode(hh);
+	return { header, config };
+}
+
 // type: template
 export function HMAC<P,H>(bits: SIZE, options: Options.HMAC<H>): Factory<P,H> {
-	let $: Factory<P,H>, {
-		typ, kid, header={},
-		key, expires, ...rest
-	} = options;
-
-	(header as JWT.Header).alg = 'HS' + bits;
-	(header as JWT.Header).typ = typ || 'JWT';
-	if (kid != null) (header as JWT.Header).kid = kid;
-
-	let HEADER = encode(header);
+	let $: Factory<P,H>, { key, expires, ...rest } = options;
+	let { header, config } = prepare<H>('HS', bits, rest);
 
 	return $ = {
 		async sign(payload) {
-			let out = toContent(HEADER, { ...rest, ...payload }, expires);
+			let out = toContent(header, { ...config, ...payload }, expires);
 			let sign = await wc.HMAC(`SHA-${bits}`, key, out);
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
-			let parts = validate<P,H>(HEADER, input);
+			let parts = validate<P,H>(header, input);
 			let check = await $.sign(parts.payload);
 			if (check !== input) throw INVALID;
 			return parts.payload;
@@ -98,17 +110,9 @@ export function HMAC<P,H>(bits: SIZE, options: Options.HMAC<H>): Factory<P,H> {
 
 // type: template
 export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
-	let {
-		typ, kid, header={},
-		privkey, pubkey,
-		expires, ...rest
-	} = options;
+	let { privkey, pubkey, expires, ...rest } = options;
+	let { header, config } = prepare<H>('RS', bits, rest);
 
-	(header as JWT.Header).alg = 'RS' + bits;
-	(header as JWT.Header).typ = typ || 'JWT';
-	if (kid != null) (header as JWT.Header).kid = kid;
-
-	let HEADER = encode(header);
 	let hasher: Algorithms.Signing = 'RSASSA-PKCS1-v1_5';
 	let keyer: RsaHashedImportParams = {
 		name: 'RSASSA-PKCS1-v1_5',
@@ -122,13 +126,13 @@ export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
 				keyer, false, ['sign']
 			);
 
-			let out = toContent(HEADER, { ...rest, ...payload }, expires);
+			let out = toContent(header, { ...config, ...payload }, expires);
 			let sign = await wc.sign(hasher, key, out);
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
 			let [hh, pp, ss] = input.split('.');
-			let parts = validate<P,H>(HEADER, input);
+			let parts = validate<P,H>(header, input);
 
 			ss = Base64.decode(ss);
 			let load = hh + '.' + pp;
@@ -155,17 +159,8 @@ export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
 
 // type: template
 export function ECDSA<P,H>(bits: SIZE, options: Options.ECDSA<H>): Factory<P,H> {
-	let {
-		typ, kid, header={},
-		privkey, pubkey,
-		expires, ...rest
-	} = options;
-
-	(header as JWT.Header).alg = 'ES' + bits;
-	(header as JWT.Header).typ = typ || 'JWT';
-	if (kid != null) (header as JWT.Header).kid = kid;
-
-	let HEADER = encode(header);
+	let { privkey, pubkey, expires, ...rest } = options;
+	let { header, config } = prepare<H>('ES', bits, rest);
 
 	let keyer: EcKeyImportParams = {
 		name: 'ECDSA',
@@ -184,13 +179,13 @@ export function ECDSA<P,H>(bits: SIZE, options: Options.ECDSA<H>): Factory<P,H> 
 				keyer, false, ['sign']
 			);
 
-			let out = toContent(HEADER, { ...rest, ...payload }, expires);
+			let out = toContent(header, { ...config, ...payload }, expires);
 			let sign = await wc.sign(hasher, key, out);
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
 			let [hh, pp, ss] = input.split('.');
-			let parts = validate<P,H>(HEADER, input);
+			let parts = validate<P,H>(header, input);
 
 			ss = Base64.decode(ss);
 			let load = hh + '.' + pp;
