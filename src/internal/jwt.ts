@@ -25,7 +25,11 @@ export function toASCII(buff: ArrayBuffer): string {
 }
 
 // type: external
-export function decode(input: string) {
+export function decode<P,H>(input: string): {
+	header: JWT.Header<H>;
+	payload: JWT.Payload<P>;
+	signature: string;
+} {
 	let segs = input.split('.');
 	if (segs.length !== 3) throw INVALID;
 
@@ -44,12 +48,24 @@ export function decode(input: string) {
 	};
 }
 
+// type: internal
 export function toContent(hh: string, pp: JWT.Payload, expires?: number): string {
 	pp.iat = pp.iat || Date.now() / 1e3 | 0;
 	if (pp.exp == null && expires != null) {
 		pp.exp = pp.iat + expires;
 	}
 	return hh + '.' + encode(pp);
+}
+
+// type: internal
+export function validate<P,H>(hh: string, input: string) {
+	let parts = decode<P,H>(input);
+	let pp = parts.payload;
+
+	if (!input.startsWith(hh + '.')) throw INVALID;
+	if (pp.exp != null && pp.exp < Date.now() / 1e3) throw EXPIRED;
+
+	return parts;
 }
 
 // type: template
@@ -72,18 +88,10 @@ export function HMAC<P,H>(bits: SIZE, options: Options.HMAC<H>): Factory<P,H> {
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
-			let bits = decode(input);
-			if (encode(bits.header) !== HEADER) throw INVALID;
-
-			let data = bits.payload as JWT.Payload<P>;
-			if (data.exp != null && data.exp < Date.now() / 1e3) {
-				throw EXPIRED;
-			}
-
-			let check = await $.sign(data);
+			let parts = validate<P,H>(HEADER, input);
+			let check = await $.sign(parts.payload);
 			if (check !== input) throw INVALID;
-
-			return data;
+			return parts.payload;
 		}
 	};
 }
@@ -119,14 +127,8 @@ export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
-			let bits = decode(input);
 			let [hh, pp, ss] = input.split('.');
-			if (hh !== HEADER) throw INVALID;
-
-			let data = bits.payload as JWT.Payload<P>;
-			if (data.exp != null && data.exp < Date.now() / 1e3) {
-				throw EXPIRED;
-			}
+			let parts = validate<P,H>(HEADER, input);
 
 			ss = Base64.decode(ss);
 			let load = hh + '.' + pp;
@@ -145,7 +147,7 @@ export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
 			);
 
 			let bool = await wc.verify(hasher, key, load, sign);
-			if (bool) return data;
+			if (bool) return parts.payload;
 			throw INVALID;
 		}
 	};
@@ -187,14 +189,8 @@ export function ECDSA<P,H>(bits: SIZE, options: Options.ECDSA<H>): Factory<P,H> 
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
-			let bits = decode(input);
 			let [hh, pp, ss] = input.split('.');
-			if (hh !== HEADER) throw INVALID;
-
-			let data = bits.payload as JWT.Payload<P>;
-			if (data.exp != null && data.exp < Date.now() / 1e3) {
-				throw EXPIRED;
-			}
+			let parts = validate<P,H>(HEADER, input);
 
 			ss = Base64.decode(ss);
 			let load = hh + '.' + pp;
@@ -213,7 +209,7 @@ export function ECDSA<P,H>(bits: SIZE, options: Options.ECDSA<H>): Factory<P,H> 
 			);
 
 			let bool = await wc.verify(hasher, key, load, sign);
-			if (bool) return data;
+			if (bool) return parts.payload;
 			throw INVALID;
 		}
 	};
