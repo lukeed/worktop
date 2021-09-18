@@ -42,6 +42,14 @@ export function decode(input: string) {
 	};
 }
 
+export function toContent(hh: string, pp: JWT.Payload, expires?: number): string {
+	pp.iat = pp.iat || Date.now() / 1e3 | 0;
+	if (pp.exp == null && expires != null) {
+		pp.exp = pp.iat + expires;
+	}
+	return hh + '.' + encode(pp);
+}
+
 // type: template
 export function HMAC<P,H>(
 	alg: 'HS256' | 'HS384' | 'HS512',
@@ -61,14 +69,7 @@ export function HMAC<P,H>(
 
 	return $ = {
 		async sign(payload) {
-			let pp: JWT.Payload = { ...rest, ...payload };
-			pp.iat = pp.iat || Date.now() / 1e3 | 0;
-
-			if (pp.exp == null && expires != null) {
-				pp.exp = pp.iat + expires;
-			}
-
-			let out = HEADER + '.' + encode(pp);
+			let out = toContent(HEADER, { ...rest, ...payload }, expires);
 			let sign = await wc.HMAC(digest, key, out);
 			return out + '.' + toASCII(sign);
 		},
@@ -109,21 +110,13 @@ export function RSA<P,H>(
 
 	return {
 		async sign(payload) {
-			let pp: JWT.Payload = { ...rest, ...payload };
-			pp.iat = pp.iat || Date.now() / 1e3 | 0;
-
-			if (pp.exp == null && expires != null) {
-				pp.exp = pp.iat + expires;
-			}
-
-			let out = HEADER + '.' + encode(pp);
-
 			let key = await crypto.subtle.importKey(
 				'pkcs8', utils.viaPEM(privkey),
 				{ name: 'RSASSA-PKCS1-v1_5', hash: digest },
 				false, ['sign']
 			);
 
+			let out = toContent(HEADER, { ...rest, ...payload }, expires);
 			let sign = await wc.sign('RSASSA-PKCS1-v1_5', key, out);
 			return out + '.' + toASCII(sign);
 		},
@@ -181,15 +174,6 @@ export function ECDSA<P,H>(
 
 	return {
 		async sign(payload) {
-			let pp: JWT.Payload = { ...rest, ...payload };
-			pp.iat = pp.iat || Date.now() / 1e3 | 0;
-
-			if (pp.exp == null && expires != null) {
-				pp.exp = pp.iat + expires;
-			}
-
-			let out = HEADER + '.' + encode(pp);
-
 			let key = await crypto.subtle.importKey(
 				'pkcs8', utils.viaPEM(privkey),
 				{ name: 'ECDSA', namedCurve: `P-${bytes}` },
@@ -197,6 +181,7 @@ export function ECDSA<P,H>(
 			);
 
 			let sha = `SHA-${bytes}` as Algorithms.Digest;
+			let out = toContent(HEADER, { ...rest, ...payload }, expires);
 			let sign = await wc.sign({ name: 'ECDSA', hash: sha }, key, out);
 			return out + '.' + toASCII(sign);
 		},
