@@ -2,19 +2,17 @@ import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import * as jwt from './jwt';
 
-// @see internal/jwt.test.ts
-const API = suite('re-exports');
+const API = suite('export');
 
-API('INVALID', () => {
+API('exports', () => {
 	assert.instance(jwt.INVALID, Error);
-});
-
-API('EXPIRED', () => {
 	assert.instance(jwt.EXPIRED, Error);
-});
 
-API('decode', () => {
 	assert.type(jwt.decode, 'function');
+
+	assert.type(jwt.HS256, 'function');
+	assert.type(jwt.HS384, 'function');
+	assert.type(jwt.HS512, 'function');
 });
 
 API.run();
@@ -22,10 +20,6 @@ API.run();
 // ---
 
 const HS256 = suite('HS256');
-
-HS256('should be a function', () => {
-	assert.type(jwt.HS256, 'function');
-});
 
 HS256('should return a Factory object', () => {
 	let ctx = jwt.HS256({ key: '123' });
@@ -174,3 +168,73 @@ HS256('should sign a JWT input :: header claims', async () => {
 // TODO: HS384,512 tests
 
 HS256.run();
+
+// ---
+
+const HS384 = suite('HS384')
+
+HS384('should return a Factory object', () => {
+	let ctx = jwt.HS384({ key: '123' });
+
+	assert.type(ctx, 'object');
+	assert.type(ctx.sign, 'function');
+	assert.type(ctx.verify, 'function');
+});
+
+HS384('should sign a JWT input', async () => {
+	let ctx = jwt.HS384({
+		key: 'secret'
+	});
+
+	let token = await ctx.sign({ iat: 1516239022 });
+	assert.is(token, 'eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjJ9.WnlWt9KqH06xigxP92jhKyRCWQ57vWypiup9aYxRsi-vdNDGgV0acLy1NEd9UPlE');
+
+	assert.equal(jwt.decode(token), {
+		header: {
+			alg: 'HS384',
+			typ: 'JWT',
+		},
+		payload: {
+			iat: 1516239022,
+		},
+		signature: 'WnlWt9KqH06xigxP92jhKyRCWQ57vWypiup9aYxRsi-vdNDGgV0acLy1NEd9UPlE',
+	});
+});
+
+// TODO: verify
+HS384.run();
+
+// ---
+
+const HS512 = suite('HS512')
+
+HS512('should return a Factory object', () => {
+	let ctx = jwt.HS512({ key: '123' });
+
+	assert.type(ctx, 'object');
+	assert.type(ctx.sign, 'function');
+	assert.type(ctx.verify, 'function');
+});
+
+HS512('should sign a JWT input', async () => {
+	let ctx = jwt.HS512({
+		key: 'secret'
+	});
+
+	let token = await ctx.sign({ iat: 1516239022 });
+	assert.is(token, 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjJ9.jT_u5LveCncCB1Mz8irCqntlwT7RGuczMsQvxGlQymALylceOtc1OaHlojhR74CsgrLfiJtWVLplnSx_XU8MzQ');
+
+	assert.equal(jwt.decode(token), {
+		header: {
+			alg: 'HS512',
+			typ: 'JWT',
+		},
+		payload: {
+			iat: 1516239022,
+		},
+		signature: 'jT_u5LveCncCB1Mz8irCqntlwT7RGuczMsQvxGlQymALylceOtc1OaHlojhR74CsgrLfiJtWVLplnSx_XU8MzQ',
+	});
+});
+
+// TODO: verify
+HS512.run();
