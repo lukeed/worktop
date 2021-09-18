@@ -136,8 +136,16 @@ export function RSA<P,H>(
 				throw EXPIRED;
 			}
 
+			ss = Base64.decode(ss);
 			let load = hh + '.' + pp;
-			let sign = utils.encode(ss);
+
+			// TODO: Buffer.encode
+			let i=0, len=ss.length;
+			let sign = new Uint8Array(len);
+
+			for (; i < len; i++) {
+				sign[i] = ss.charCodeAt(i);
+			}
 
 			let key = await crypto.subtle.importKey(
 				'spki', utils.viaPEM(pubkey),

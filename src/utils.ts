@@ -67,7 +67,7 @@ export async function body<T>(input: Request | Response): Promise<T|void> {
 export function toObject<T>(iter: Iterable<[string, T]>): Dict<T|T[]> {
 	let key: string, val: T, tmp: T|T[], out: Dict<T|T[]> = {};
 	for ([key, val] of iter) {
-    out[key] = (tmp=out[key]) === void 0 ? val : ([] as T[]).concat(tmp, val);
+		out[key] = (tmp=out[key]) === void 0 ? val : ([] as T[]).concat(tmp, val);
 	}
 	return out;
 }
@@ -76,12 +76,11 @@ export function viaPEM(input: string): Uint8Array {
 	let content = input.replace(/^-----BEGIN .+ KEY-----/, '');
 	content = atob(content.replace(/-----END .+ KEY-----$/, ''));
 
+	// TODO: Buffer.encode
 	let i=0, len=content.length;
-  let view = new Uint8Array(len);
-  for (; i < len; i++) {
-    view[i] = content.charCodeAt(i);
-  }
-  return view;
-
-	// return encode(content);
+	let view = new Uint8Array(len);
+	for (; i < len; i++) {
+		view[i] = content.charCodeAt(i);
+	}
+	return view;
 }

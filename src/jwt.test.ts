@@ -58,6 +58,9 @@ HS256('should sign a JWT input', async () => {
 		},
 		signature: 'x-zNIj8_5JJF9BNJukHZXvc4fVnkQekXeBescZHdHSQ',
 	});
+
+	let output = await ctx.verify(token);
+	assert.ok(output);
 });
 
 HS256('should sign a JWT input :: expires', async () => {
@@ -277,6 +280,9 @@ RS256('should sign a JWT input', async () => {
 		},
 		signature: 'S5Ap_Bq-a4elbpIfmLiEER8jlkbjl8FgEyxHtgsq1ukRdHvKXt6zeR0h3zo0k4APCEky7VAyF9vaUZl7c-8iJ35Sk8z5w8hXCrf7-s7kEw6t9_ypNjZjst36JhOkrBw1SPQv3Dh9Ekjbqem5zywAhCAeynvRawk9vx6vXKFgyNQQCjRniPbAab8prk75M2zSA9DIMiDwb33ywFF-TP89vHuZhF_ekiA_M03Gw-Tgq0REx7i3NlKQw6YIfO3J3H1GNShoytD2ln45qo4FnfWXUxRxmEWpP6ZQrLHUC9EPay9ollPMQqWfB3oBAw1bIrZc0_glWpNBPl1UaQq0mRhzqg',
 	});
+
+	let output = await ctx.verify(token);
+	assert.ok(output);
 });
 
 // TODO: verify
