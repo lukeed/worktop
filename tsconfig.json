@@ -16,19 +16,8 @@
     "baseUrl": "./src",
     "checkJs": true,
     "paths": {
-      "worktop": ["./router.d.ts", "./router.ts"],
-      "worktop/cache": ["./cache.d.ts", "./cache.ts"],
-      "worktop/base64": ["./base64.d.ts", "./base64.ts"],
-      "worktop/crypto": ["./crypto.d.ts", "./crypto.ts"],
-      "worktop/response": ["./response.d.ts", "./response.ts"],
-      "worktop/durable": ["./durable.d.ts", "./durable.ts"],
-      "worktop/module": ["./module.d.ts", "./module.ts"],
-      "worktop/cookie": ["./cookie.d.ts", "./cookie.ts"],
-      "worktop/utils": ["./utils.d.ts", "./utils.ts"],
-      "worktop/cors": ["./cors.d.ts", "./cors.ts"],
-      "worktop/sw": ["./sw.d.ts", "./sw.ts"],
-      "worktop/kv": ["./kv.d.ts", "./kv.ts"],
-      "worktop/ws": ["./ws.d.ts", "./ws.ts"],
+      "worktop": ["./router.d.ts"],
+      "worktop/*": ["./*.d.ts"]
     }
   },
   "include": [
