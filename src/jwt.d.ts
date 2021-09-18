@@ -61,17 +61,17 @@ export function HS256<P=JWT.Claims, H=JWT.Claims>(options: Options.HMAC<H>): Fac
 export function HS384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
 export function HS512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
 
-// ECDSA + P-256|384|512 curve
-export function ES256<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
-export function ES384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
-export function ES512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// // RSASSA-PKCS1-v1_5 + SHA-256|384|512
+// export function RS256<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// export function RS384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// export function RS512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
 
-// RSASSA-PKCS1-v1_5 + SHA-256|384|512
-export function RS256<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
-export function RS384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
-export function RS512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// // RSASSA-PSS + SHA-256|384|512
+// export function PS256<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// export function PS384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// export function PS512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
 
-// RSASSA-PSS + SHA-256|384|512
-export function PS256<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
-export function PS384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
-export function PS512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// // ECDSA + P-256|384|512 curve
+// export function ES256<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// export function ES384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// export function ES512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
