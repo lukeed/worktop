@@ -1,5 +1,6 @@
+import * as wc from 'worktop/crypto';
+import * as utils from 'worktop/utils';
 import * as Base64 from 'worktop/base64';
-import * as crypto from 'worktop/crypto';
 
 import type { Factory, JWT, Options } from 'worktop/jwt';
 
@@ -67,7 +68,7 @@ export function HMAC<P,H>(
 			}
 
 			let out = HEADER + '.' + encode(pp);
-			let sign = await crypto.HMAC(digest, key, out);
+			let sign = await wc.HMAC(digest, key, out);
 			return out + '.' + toASCII(sign);
 		},
 		async verify(input) {
@@ -83,6 +84,70 @@ export function HMAC<P,H>(
 			if (check !== input) throw INVALID;
 
 			return data;
+		}
+	};
+}
+
+// type: template
+export function RSA<P,H>(
+	alg: 'RS256' | 'RS384' | 'RS512',
+	digest: 'SHA-256' | 'SHA-384' | 'SHA-512',
+	options: Options.RSA<H>
+): Factory<P,H> {
+	let {
+		typ, kid, header={},
+		privkey, pubkey,
+		expires, ...rest
+	} = options;
+
+	(header as JWT.Header).alg = alg;
+	(header as JWT.Header).typ = typ || 'JWT';
+	if (kid != null) (header as JWT.Header).kid = kid;
+
+	let HEADER = encode(header);
+
+	return {
+		async sign(payload) {
+			let pp: JWT.Payload = { ...rest, ...payload };
+			pp.iat = pp.iat || Date.now() / 1e3 | 0;
+
+			if (pp.exp == null && expires != null) {
+				pp.exp = pp.iat + expires;
+			}
+
+			let out = HEADER + '.' + encode(pp);
+
+			let key = await crypto.subtle.importKey(
+				'pkcs8', utils.viaPEM(privkey),
+				{ name: 'RSASSA-PKCS1-v1_5', hash: digest },
+				false, ['sign']
+			);
+
+			let sign = await wc.sign('RSASSA-PKCS1-v1_5', key, out);
+			return out + '.' + toASCII(sign);
+		},
+		async verify(input) {
+			let bits = decode(input);
+			let [hh, pp, ss] = input.split('.');
+			if (hh !== HEADER) throw INVALID;
+
+			let data = bits.payload as JWT.Payload<P>;
+			if (data.exp != null && data.exp < Date.now() / 1e3) {
+				throw EXPIRED;
+			}
+
+			let load = hh + '.' + pp;
+			let sign = utils.encode(ss);
+
+			let key = await crypto.subtle.importKey(
+				'spki', utils.viaPEM(pubkey),
+				{ name: 'RSASSA-PKCS1-v1_5', hash: digest },
+				false, ['verify']
+			);
+
+			let bool = await wc.verify('RSASSA-PKCS1-v1_5', key, load, sign);
+			if (bool) return data;
+			throw INVALID;
 		}
 	};
 }
