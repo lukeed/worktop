@@ -287,3 +287,62 @@ RS256('should sign a JWT input', async () => {
 
 // TODO: verify
 RS256.run();
+
+// ---
+
+const ES256 = suite('ES256')
+
+ES256('should return a Factory object', () => {
+	let ctx = jwt.ES256({
+		privkey: '',
+		pubkey: '',
+	});
+
+	assert.type(ctx, 'object');
+	assert.type(ctx.sign, 'function');
+	assert.type(ctx.verify, 'function');
+});
+
+ES256('should sign a JWT input', async () => {
+	// @see https://dinochiesa.github.io/jwt/
+	let ctx = jwt.ES256({
+		privkey: '-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgAv5soGvnQyF7zBf9\n5Vprvo1BHPdLV4dNMQqQran5WayhRANCAAT4crC+pezxp2vdxmIfQCAoMriZwsMz\naxK1gLLTJPqqXOXgqXok546ESdgIbLmmxvoGJxorVndO/vtA/a+2I8/s\n-----END PRIVATE KEY-----',
+		pubkey: '-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+HKwvqXs8adr3cZiH0AgKDK4mcLD\nM2sStYCy0yT6qlzl4Kl6JOeOhEnYCGy5psb6BicaK1Z3Tv77QP2vtiPP7A==\n-----END PUBLIC KEY-----',
+	});
+
+	let prefix = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjJ9.';
+
+	let token1 = await ctx.sign({ iat: 1516239022 });
+	let token2 = await ctx.sign({ iat: 1516239022 });
+	assert.is.not(token1, token2);
+
+	assert.ok(token1.startsWith(prefix));
+	assert.ok(token2.startsWith(prefix));
+
+	let output1 = jwt.decode(token1);
+	let output2 = jwt.decode(token2);
+
+	assert.equal(output1.header, output2.header);
+	assert.equal(output1.payload, output2.payload);
+
+	assert.equal(output1.header, {
+		alg: 'ES256',
+		typ: 'JWT',
+	});
+
+	assert.equal(output1.payload, {
+		iat: 1516239022,
+	});
+
+	assert.ok(token1.endsWith(output1.signature));
+	assert.ok(token2.endsWith(output2.signature));
+
+	let verify1 = await ctx.verify(token1);
+	assert.equal(verify1, output1.payload);
+
+	let verify2 = await ctx.verify(token2);
+	assert.equal(verify2, output2.payload);
+});
+
+// TODO: verify
+ES256.run();

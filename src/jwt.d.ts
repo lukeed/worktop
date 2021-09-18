@@ -53,6 +53,11 @@ export namespace Options {
 		privkey: string;
 		pubkey: string;
 	};
+
+	export type ECDSA<H=JWT.Claims> = Common<H> & {
+		privkey: string;
+		pubkey: string;
+	};
 }
 
 export function decode<P=JWT.Claims, H=JWT.Claims>(input: string): {
@@ -76,7 +81,7 @@ export function RS512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
 // export function PS384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
 // export function PS512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
 
-// // ECDSA + P-256|384|512 curve
-// export function ES256<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
-// export function ES384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
-// export function ES512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+// ECDSA + P-256|384|512 curve
+export function ES256<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+export function ES384<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;
+export function ES512<P=JWT.Claims, H=JWT.Claims>(options: any): Factory<P,H>;

@@ -3,6 +3,7 @@ import * as utils from 'worktop/utils';
 import * as Base64 from 'worktop/base64';
 
 import type { Factory, JWT, Options } from 'worktop/jwt';
+import type { Algorithms } from 'worktop/crypto';
 
 // type: externals
 export const INVALID = /*#__PURE__*/ new Error('Invalid token');
@@ -154,6 +155,80 @@ export function RSA<P,H>(
 			);
 
 			let bool = await wc.verify('RSASSA-PKCS1-v1_5', key, load, sign);
+			if (bool) return data;
+			throw INVALID;
+		}
+	};
+}
+
+// type: template
+export function ECDSA<P,H>(
+	alg: 'ES256' | 'ES384' | 'ES512',
+	bytes: '256' | '384' | '512',
+	options: Options.ECDSA<H>
+): Factory<P,H> {
+	let {
+		typ, kid, header={},
+		privkey, pubkey,
+		expires, ...rest
+	} = options;
+
+	(header as JWT.Header).alg = alg;
+	(header as JWT.Header).typ = typ || 'JWT';
+	if (kid != null) (header as JWT.Header).kid = kid;
+
+	let HEADER = encode(header);
+
+	return {
+		async sign(payload) {
+			let pp: JWT.Payload = { ...rest, ...payload };
+			pp.iat = pp.iat || Date.now() / 1e3 | 0;
+
+			if (pp.exp == null && expires != null) {
+				pp.exp = pp.iat + expires;
+			}
+
+			let out = HEADER + '.' + encode(pp);
+
+			let key = await crypto.subtle.importKey(
+				'pkcs8', utils.viaPEM(privkey),
+				{ name: 'ECDSA', namedCurve: `P-${bytes}` },
+				false, ['sign']
+			);
+
+			let sha = `SHA-${bytes}` as Algorithms.Digest;
+			let sign = await wc.sign({ name: 'ECDSA', hash: sha }, key, out);
+			return out + '.' + toASCII(sign);
+		},
+		async verify(input) {
+			let bits = decode(input);
+			let [hh, pp, ss] = input.split('.');
+			if (hh !== HEADER) throw INVALID;
+
+			let data = bits.payload as JWT.Payload<P>;
+			if (data.exp != null && data.exp < Date.now() / 1e3) {
+				throw EXPIRED;
+			}
+
+			ss = Base64.decode(ss);
+			let load = hh + '.' + pp;
+
+			// TODO: Buffer.encode
+			let i=0, len=ss.length;
+			let sign = new Uint8Array(len);
+
+			for (; i < len; i++) {
+				sign[i] = ss.charCodeAt(i);
+			}
+
+			let key = await crypto.subtle.importKey(
+				'spki', utils.viaPEM(pubkey),
+				{ name: 'ECDSA', namedCurve: `P-${bytes}` },
+				false, ['verify']
+			);
+
+			let sha = `SHA-${bytes}` as Algorithms.Digest;
+			let bool = await wc.verify({ name: 'ECDSA', hash: sha }, key, load, sign);
 			if (bool) return data;
 			throw INVALID;
 		}
