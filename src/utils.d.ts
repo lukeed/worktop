@@ -63,3 +63,9 @@ export function body<T>(input: Request | Response): Promise<T|void>;
  * @NOTE Like `Object.fromEntries`, but can collect multiple values for same key.
  */
 export function toObject<T>(iter: Iterable<[string, T]>): Dict<Arrayable<T>>;
+
+
+/**
+ * Convert a PEM key (public or private) to an ArrayBuffer.
+ */
+export function viaPEM(input: string): Uint8Array;
