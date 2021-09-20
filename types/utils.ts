@@ -5,18 +5,6 @@ declare let request: Request;
 declare let response: Response;
 
 /**
- * HEX
- */
-
-// @ts-expect-error
-HEX.push('hello', 'world');
-
-// @ts-expect-error
-HEX[10] = 'cannot do this';
-
-assert<readonly string[]>(utils.HEX);
-
-/**
  * UID
  */
 

@@ -28,6 +28,10 @@
       "import": "./cache/index.mjs",
       "require": "./cache/index.js"
     },
+    "./buffer": {
+      "import": "./buffer/index.mjs",
+      "require": "./buffer/index.js"
+    },
     "./cookie": {
       "import": "./cookie/index.mjs",
       "require": "./cookie/index.js"
@@ -68,6 +72,7 @@
   },
   "files": [
     "base64",
+    "buffer",
     "cache",
     "crypto",
     "cookie",

@@ -4,6 +4,7 @@ node_modules
 *.lock
 
 /kv
+/buffer
 /cors
 /cache
 /cookie

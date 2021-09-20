@@ -33,6 +33,7 @@ async function bundle(input, files) {
 Promise.all([
 	bundle('src/router.ts', pkg.exports['.']),
 	bundle('src/sw.ts', pkg.exports['./sw']),
+	bundle('src/buffer.ts', pkg.exports['./buffer']),
 	bundle('src/cache.ts', pkg.exports['./cache']),
 	bundle('src/cookie.ts', pkg.exports['./cookie']),
 	bundle('src/base64.ts', pkg.exports['./base64']),
