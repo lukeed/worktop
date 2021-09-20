@@ -4,7 +4,7 @@ import type { Buffer, BufferEncoding } from 'worktop/buffer';
 /**
  * Encode a "binary" string into an Uint8Array.
  * @encoding "binary"
- * @alias viaBinary
+ * @alias asBinary
  */
 export function encode(input: string): Uint8Array {
 	let i=0, len=input.length;
@@ -28,7 +28,7 @@ export function decode(buffer: ArrayBuffer): string {
 }
 
 export {
-	encode as viaBinary,
+	encode as asBinary,
 	decode as toBinary,
 };
 
@@ -51,7 +51,7 @@ export function toHEX(input: ArrayBuffer): string {
 /**
  * Construct an ArrayBuffer from a "hex" string
  */
-export function viaHEX(input: string): Uint8Array {
+export function asHEX(input: string): Uint8Array {
 	let i=0, len=input.length, out: number[] = [];
 
 	if (len & 1) {
@@ -99,7 +99,7 @@ export function from(input: string, encoding: BufferEncoding = 'utf8'): Buffer {
 	} else {
 		encoding = alias[encoding] || encoding;
 		if (encoding === 'utf8') view = asUTF8(input);
-		else if (encoding === 'hex') view = viaHEX(input);
+		else if (encoding === 'hex') view = asHEX(input);
 		else if (encoding === 'binary') view = encode(input);
 		else if (encoding === 'base64') view = encode(Base64.decode(input));
 		else if (encoding === 'utf16le') {

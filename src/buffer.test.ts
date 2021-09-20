@@ -136,17 +136,17 @@ toHEX.run();
 const viaHEX = suite('viaHEX');
 
 viaHEX('should be a function', () => {
-	assert.type(buffer.viaHEX, 'function');
+	assert.type(buffer.asHEX, 'function');
 });
 
 viaHEX('should return a `Uint8Array` instance', () => {
-	assert.instance(buffer.viaHEX(''), Uint8Array);
-	assert.instance(buffer.viaHEX('input'), Uint8Array);
+	assert.instance(buffer.asHEX(''), Uint8Array);
+	assert.instance(buffer.asHEX('input'), Uint8Array);
 });
 
 viaHEX('should decode HEX string', () => {
 	const expects = buffer.encode('hello world');
-	const output = buffer.viaHEX('68656c6c6f20776f726c64');
+	const output = buffer.asHEX('68656c6c6f20776f726c64');
 	assert.equal(output, expects);
 
 	assert.is(
@@ -156,7 +156,7 @@ viaHEX('should decode HEX string', () => {
 });
 
 viaHEX('should preserve emoji (utf8) content', () => {
-	const output = buffer.viaHEX('54686520717569636b2062726f776e20f09fa68a206a756d7073206f766572203133206c617a7920f09f90b62e');
+	const output = buffer.asHEX('54686520717569636b2062726f776e20f09fa68a206a756d7073206f766572203133206c617a7920f09f90b62e');
 
 	assert.is(
 		new TextDecoder('utf8').decode(output),
@@ -266,7 +266,7 @@ asUTF8('should return `Uint8Array` values :: raw', () => {
 
 	output = new Uint8Array([226, 130, 172]);
 	assert.equal(buffer.asUTF8('€'), output);
-	assert.not.equal(buffer.viaBinary('€'), output);
+	assert.not.equal(buffer.asBinary('€'), output);
 });
 
 asUTF8('should return `Uint8Array` values :: echo', () => {
@@ -299,7 +299,7 @@ toASCII('should be limited to the ASCII range', () => {
 	let decoder = new TextDecoder('ascii');
 	assert.is(decoder.decode(u8), 'â‚¬'); // wtf
 
-	let bin = buffer.viaBinary('€');
+	let bin = buffer.asBinary('€');
 	assert.is.not(buffer.toASCII(bin), 'b\x02,');
 });
 

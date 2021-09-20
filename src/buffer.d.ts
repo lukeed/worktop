@@ -1,7 +1,7 @@
 /**
  * Encode a "binary" string into an Uint8Array.
  * @encoding "binary"
- * @alias `viaBinary`
+ * @alias `asBinary`
  */
 export function encode(input: string): Uint8Array;
 
@@ -17,7 +17,7 @@ export function decode(buffer: ArrayBuffer): string;
  * @encoding "binary"
  * @alias `encode`
  */
-export function viaBinary(input: string): Uint8Array;
+export function asBinary(input: string): Uint8Array;
 
 /**
  * Decode an ArrayBuffer into a "binary" string.
@@ -42,7 +42,7 @@ export function toHEX(buffer: ArrayBuffer): string;
  * Convert a hexadecimal string into an `Uint8Array` instance.
  * @encoding "hex"
  */
-export function viaHEX(input: string): Uint8Array;
+export function asHEX(input: string): Uint8Array;
 
 /**
  * Reusable `TextEncoder` instance.

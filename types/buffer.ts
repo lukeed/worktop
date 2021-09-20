@@ -61,15 +61,15 @@ assert<string>(buffer.toHEX(raw));
  */
 
 // @ts-expect-error
-buffer.viaHEX(raw);
+buffer.asHEX(raw);
 
 // @ts-expect-error
-buffer.viaHEX(u8);
+buffer.asHEX(u8);
 
 // @ts-expect-error
-buffer.viaHEX([1, 2, 3]);
+buffer.asHEX([1, 2, 3]);
 
-assert<Uint8Array>(buffer.viaHEX('foo'));
+assert<Uint8Array>(buffer.asHEX('foo'));
 
 /**
  * asUTF8
