@@ -1,3 +1,6 @@
+import * as Base64 from 'worktop/base64';
+import type { Buffer, BufferEncoding } from 'worktop/buffer';
+
 /**
  * Encode a "binary" string into an Uint8Array.
  * @encoding "binary"
@@ -68,6 +71,7 @@ export const Encoder = /*#__PURE__*/ new TextEncoder;
 export const asUTF8 = (input: string) => Encoder.encode(input);
 
 const UTF8 = /*#__PURE__*/ new TextDecoder('utf-8');
+const UTF16 = /*#__PURE__*/ new TextDecoder('utf-16le');
 export const toUTF8 = (buffer: ArrayBuffer) => UTF8.decode(buffer);
 
 export function toASCII(buffer: Uint8Array): string {
@@ -76,4 +80,47 @@ export function toASCII(buffer: Uint8Array): string {
 		output += String.fromCharCode(buffer[i] & 127);
 	}
 	return output;
+}
+
+const alias: Record<string, BufferEncoding> = /*#__PURE__*/ {
+	'ascii': 'binary',
+	'latin1': 'binary',
+	'base64url': 'base64',
+	'ucs-2': 'utf16le',
+	'ucs2': 'utf16le',
+	'utf-8': 'utf8',
+};
+
+export function from(input: string, encoding: BufferEncoding = 'utf8'): Buffer {
+	let view: Uint8Array;
+
+	if (input.length < 1) {
+		view = new Uint8Array(0);
+	} else {
+		encoding = alias[encoding] || encoding;
+		if (encoding === 'utf8') view = asUTF8(input);
+		else if (encoding === 'hex') view = viaHEX(input);
+		else if (encoding === 'binary') view = encode(input);
+		else if (encoding === 'base64') view = encode(Base64.decode(input));
+		else if (encoding === 'utf16le') {
+			let i=0, u8=asUTF8(input);
+			view = new Uint8Array(u8.length*2);
+			for (; i < u8.length; i++) view[i*2] = u8[i];
+		}
+		else throw new Error(`Unknown encoding: ${encoding}`);
+	}
+
+	view.toString = function (enc: BufferEncoding = 'utf8') {
+		enc = enc.replace('-', '') as BufferEncoding;
+		if (enc === 'hex') return toHEX(view);
+		if (enc === 'utf8') return toUTF8(view);
+		if (enc === 'ascii') return toASCII(view);
+		if (enc === 'binary' || enc === 'latin1') return decode(view);
+		if (enc === 'utf16le' || enc === 'ucs2') return UTF16.decode(view);
+		if (enc === 'base64url') return Base64.base64url(decode(view));
+		if (enc === 'base64') return Base64.encode(decode(view));
+		throw new Error(`Unknown encoding: ${enc}`);
+	}
+
+	return view;
 }

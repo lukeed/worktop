@@ -1,28 +1,28 @@
 /**
  * Encode a "binary" string into an Uint8Array.
  * @encoding "binary"
- * @alias viaBinary
+ * @alias `viaBinary`
  */
 export function encode(input: string): Uint8Array;
 
 /**
  * Decode an ArrayBuffer into a "binary" string.
  * @encoding "binary"
- * @alias toBinary
+ * @alias `toBinary`
  */
 export function decode(buffer: ArrayBuffer): string;
 
 /**
  * Encode a "binary" string into an Uint8Array.
  * @encoding "binary"
- * @alias encode
+ * @alias `encode`
  */
 export function viaBinary(input: string): Uint8Array;
 
 /**
  * Decode an ArrayBuffer into a "binary" string.
  * @encoding "binary"
- * @alias decode
+ * @alias `decode`
  */
 export function toBinary(buffer: ArrayBuffer): string;
 
@@ -68,3 +68,28 @@ export function asUTF8(input: string): Uint8Array;
  * @encoding "ascii"
  */
 export function toASCII(buffer: Uint8Array): string;
+
+/**
+ * All Node.js Buffer encodings.
+ * @reference [Character encodings](https://nodejs.org/api/buffer.html#buffer_buffers_and_character_encodings)
+ */
+export type BufferEncoding = 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'base64url' | 'latin1' | 'binary' | 'hex';
+
+/**
+ * Custom `Buffer` type with dynamic `toString` encoder.
+ */
+export type Buffer = Uint8Array & {
+	/**
+	 * Decodes the `Uint8Array|Buffer` into a string with the specified character encoding.
+	 * @param {BufferEncoding} [encoding] The new character encoding to use. Default: "utf8"
+	 * @reference [`buf.toString()`](https://nodejs.org/api/buffer.html#buffer_buf_tostring_encoding_start_end)
+	 */
+	toString(encoding?: BufferEncoding): string;
+};
+
+/**
+ * Create a new `Uint8Array|Buffer` from a string with the given encoding.
+ * @param {BufferEncoding} [encoding] The `input` encoding. Default: "utf8"
+ * @reference [`Buffer.from`](https://nodejs.org/api/buffer.html#buffer_static_method_buffer_from_string_encoding)
+ */
+export function from(input: string, encoding?: BufferEncoding): Buffer;

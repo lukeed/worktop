@@ -304,3 +304,102 @@ toASCII('should be limited to the ASCII range', () => {
 });
 
 toASCII.run();
+
+// ---
+
+const from = suite<{ list: BufferEncoding[] }>('from', {
+	list: ['ascii', 'utf8', 'utf-8', 'utf16le', 'ucs2', 'ucs-2', 'base64', 'base64url', 'latin1', 'binary', 'hex']
+});
+
+from('should be a function', () => {
+	assert.type(buffer.from, 'function');
+});
+
+from('should default to "utf8" encoding', () => {
+	let foo = buffer.from('foobar');
+	let bar = buffer.from('foobar', 'utf8');
+	assert.equal(foo, bar);
+});
+
+from('should alias "utf8" and "utf-8" values', () => {
+	let foo = buffer.from('foobar', 'utf-8');
+	let bar = buffer.from('foobar', 'utf8');
+	assert.equal(foo, bar);
+});
+
+from('should parse "utf8" as UTF-8 text', () => {
+	let foo = buffer.from('foobar', 'utf-8');
+	let bar = Buffer.from('foobar', 'utf-8');
+	assert.equal(
+		new Uint8Array(foo),
+		new Uint8Array(bar),
+	);
+});
+
+from('should convert "utf8" to other encodings', ctx => {
+	let mock = buffer.from('ÀÈÌÒÙ');
+	let native = Buffer.from('ÀÈÌÒÙ');
+
+	ctx.list.forEach(str => {
+		assert.is(
+			mock.toString(str),
+			native.toString(str),
+			`utf8 => ${str}`
+		);
+	});
+});
+
+from('should convert "base64" to other encodings', ctx => {
+	let mock = buffer.from('Zm9vYmFy', 'base64');
+	let native = Buffer.from('Zm9vYmFy', 'base64');
+
+	ctx.list.forEach(str => {
+		assert.is(
+			mock.toString(str),
+			native.toString(str),
+			`base64 => ${str}`
+		);
+	});
+});
+
+from('should convert "hex" to other encodings', ctx => {
+	let mock = buffer.from('666f6f626172', 'hex');
+	let native = Buffer.from('666f6f626172', 'hex');
+
+	ctx.list.forEach(str => {
+		assert.is(
+			mock.toString(str),
+			native.toString(str),
+			`hex => ${str}`
+		);
+	});
+});
+
+from('should convert "utf16le" to other encodings', ctx => {
+	let mock = buffer.from('foobar', 'utf16le');
+	let native = Buffer.from('foobar', 'utf16le');
+
+	ctx.list.forEach(str => {
+		assert.is(
+			mock.toString(str),
+			native.toString(str),
+			`utf16le => ${str}`
+		);
+	});
+});
+
+from('should convert "binary" to other encodings', ctx => {
+	let mock = buffer.from('ÀÈÌÒÙ', 'binary');
+	let native = Buffer.from('ÀÈÌÒÙ', 'binary');
+
+	ctx.list.forEach(str => {
+		assert.ok(
+			mock.toString(str).startsWith(
+				native.toString(str)
+			),
+			`binary => ${str}`
+		);
+	});
+});
+
+from.run();
