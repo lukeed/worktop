@@ -86,6 +86,40 @@ encode.run();
 
 // ---
 
+const asBinary = suite('asBinary');
+
+asBinary('should be a function', () => {
+	assert.type(buffer.asBinary, 'function');
+});
+
+asBinary('be alias of `encode` function', () => {
+	let output = buffer.asBinary('€');
+	assert.equal(output, buffer.encode('€'));
+	assert.equal(output, new Uint8Array([172]));
+});
+
+asBinary.run();
+
+// ---
+
+const toBinary = suite('toBinary');
+
+toBinary('should be a function', () => {
+	assert.type(buffer.toBinary, 'function');
+});
+
+toBinary('be alias of `decode` function', () => {
+	let input = new Uint8Array([172]);
+	let output = buffer.toBinary(input);
+	assert.is(output, buffer.decode(input));
+	assert.is(output, Buffer.from(input).toString('binary'));
+	assert.is(output, '¬');
+});
+
+toBinary.run();
+
+// ---
+
 const HEX = suite('HEX');
 
 HEX('should be an Array', () => {
