@@ -44,9 +44,6 @@ export function randomize(length: number): Uint8Array {
 export const Encoder = /*#__PURE__*/ new TextEncoder;
 export const Decoder = /*#__PURE__*/ new TextDecoder;
 
-export const encode = (input: string) => Encoder.encode(input);
-export const decode = (input: ArrayBufferView | ArrayBuffer, stream = false) => Decoder.decode(input, { stream });
-
 export function byteLength(input?: string): number {
 	return input ? Encoder.encode(input).byteLength : 0;
 }

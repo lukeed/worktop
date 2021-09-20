@@ -83,3 +83,89 @@ viaHEX('should preserve emoji (utf8) content', () => {
 });
 
 viaHEX.run();
+
+// ---
+
+const toUTF8 = suite('toUTF8');
+
+toUTF8('should be a function', () => {
+	assert.type(buffer.toUTF8, 'function');
+});
+
+toUTF8('should return a string', () => {
+	let output = buffer.toUTF8(new Uint8Array);
+	assert.type(output, 'string');
+	assert.is(output, '');
+});
+
+toUTF8('should produce "utf8" string values :: raw', () => {
+	let input = new Uint8Array([104, 101, 108, 108, 111]);
+	assert.is(buffer.toUTF8(input), 'hello');
+
+	input = new Uint8Array([119, 111, 114, 108, 100]);
+	assert.is(buffer.toUTF8(input), 'world',);
+
+	input = new Uint8Array([]);
+	assert.is(buffer.toUTF8(input), '',);
+
+	input = new Uint8Array([32]);
+	assert.is(buffer.toUTF8(input), ' ',);
+
+	input = new Uint8Array([226, 130, 172]);
+	assert.is(buffer.toUTF8(input), '€',);
+});
+
+toUTF8('should produce "utf8" string values :: echo', () => {
+	let input = Buffer.from('ÀÈÌÒÙ');
+	let output = buffer.toUTF8(input);
+	assert.is(output, input.toString('utf8'));
+	assert.is(output, 'ÀÈÌÒÙ');
+
+	input = Buffer.from('😀');
+	output = buffer.toUTF8(input);
+	assert.is(output, input.toString('utf8'));
+	assert.is(output, '😀');
+});
+
+toUTF8.run();
+
+// ---
+
+const viaUTF8 = suite('viaUTF8');
+
+viaUTF8('should be a function', () => {
+	assert.type(buffer.viaUTF8, 'function');
+});
+
+viaUTF8('should return `Uint8Array` output', () => {
+	assert.instance(buffer.viaUTF8(''), Uint8Array);
+});
+
+viaUTF8('should return `Uint8Array` values :: raw', () => {
+	let output = new Uint8Array([104, 101, 108, 108, 111]);
+	assert.equal(buffer.viaUTF8('hello'), output);
+
+	output = new Uint8Array([119, 111, 114, 108, 100]);
+	assert.equal(buffer.viaUTF8('world'), output);
+
+	output = new Uint8Array([]);
+	assert.equal(buffer.viaUTF8(''), output);
+
+	output = new Uint8Array([32]);
+	assert.equal(buffer.viaUTF8(' '), output);
+
+	output = new Uint8Array([226, 130, 172]);
+	assert.equal(buffer.viaUTF8('€'), output);
+});
+
+viaUTF8('should return `Uint8Array` values :: echo', () => {
+	let input = 'ÀÈÌÒÙ';
+	let raw = Buffer.from(input, 'utf8');
+	assert.equal(buffer.viaUTF8(input), new Uint8Array(raw));
+
+	input = '😀';
+	raw = Buffer.from(input, 'utf8');
+	assert.equal(buffer.viaUTF8(input), new Uint8Array(raw));
+});
+
+viaUTF8.run();

@@ -43,3 +43,15 @@ export function toHEX(buffer: ArrayBuffer): string;
  * @encoding "hex"
  */
 export function viaHEX(input: string): Uint8Array;
+
+/**
+ * Decode an ArrayBuffer into an "utf8" string
+ * @encoding "utf8"
+ */
+export function toUTF8(buffer: ArrayBuffer): string;
+
+/**
+ * Encode an "utf8" string into an Uint8Array.
+ * @encoding "utf8"
+ */
+export function viaUTF8(input: string): Uint8Array;
