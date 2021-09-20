@@ -10,8 +10,8 @@ globalThis.caches = { default: {} };
 globalThis.crypto = require('crypto').webcrypto;
 
 // worktop/base64
-globalThis.btoa = (x) => Buffer.from(x).toString('base64');
-globalThis.atob = (x) => Buffer.from(x, 'base64').toString();
+globalThis.btoa = (x) => Buffer.from(x, 'binary').toString('base64');
+globalThis.atob = (x) => Buffer.from(x, 'base64').toString('binary');
 
 require('fetchy/polyfill');
 
