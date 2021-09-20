@@ -66,7 +66,7 @@ export function viaHEX(input: string): Uint8Array {
 // Note: can ONLY be "utf8" encoding
 export const Encoder = /*#__PURE__*/ new TextEncoder;
 
-const UTF8 = /*#__PURE__*/ new TextDecoder('utf8');
+const UTF8 = /*#__PURE__*/ new TextDecoder('utf-8');
 
 /**
  * Encode an "utf8" string into an Uint8Array.

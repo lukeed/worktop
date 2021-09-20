@@ -4,6 +4,88 @@ import * as buffer from './buffer';
 
 // ---
 
+const decode = suite('decode');
+
+decode('should be a function', () => {
+	assert.type(buffer.decode, 'function');
+});
+
+decode('should return a string', () => {
+	let input = new Uint8Array;
+	assert.type(buffer.decode(input), 'string');
+	assert.type(buffer.decode(input.buffer), 'string');
+});
+
+decode('should convert into "binary" string', () => {
+	let view = new TextEncoder().encode('ÀÈÌÒÙ');
+	let binary = 'Ã\x80Ã\x88Ã\x8CÃ\x92Ã\x99';
+
+	assert.is(buffer.decode(view), binary);
+	assert.is(buffer.decode(view.buffer), binary);
+
+	assert.is(Buffer.from('ÀÈÌÒÙ').toString('binary'), binary);
+	assert.is(Buffer.from('ÀÈÌÒÙ').toString('ascii'), 'C\x00C\bC\fC\x12C\x19');
+	assert.is(Buffer.from('ÀÈÌÒÙ').toString('utf8'), 'ÀÈÌÒÙ');
+
+	assert.is(new TextDecoder('utf8').decode(view), 'ÀÈÌÒÙ');
+	assert.is(new TextDecoder('ascii').decode(view), 'Ã€ÃˆÃŒÃ’Ã™');
+});
+
+decode.run();
+
+// ---
+
+const encode = suite('encode');
+
+encode('should be a function', () => {
+	assert.type(buffer.encode, 'function');
+});
+
+encode('should return `Uint8Array` output', () => {
+	assert.instance(buffer.encode(''), Uint8Array);
+});
+
+encode('should return encoded values :: binary', () => {
+	assert.equal(
+		buffer.encode('hello'),
+		new Uint8Array([104, 101, 108, 108, 111])
+	);
+
+	assert.equal(
+		buffer.encode('world'),
+		new Uint8Array([119, 111, 114, 108, 100])
+	);
+
+	assert.equal(
+		buffer.encode(''),
+		new Uint8Array([])
+	);
+
+	assert.equal(
+		buffer.encode(' '),
+		new Uint8Array([32])
+	);
+
+	assert.equal(
+		buffer.encode('€'),
+		new Uint8Array([172]),
+	);
+
+	assert.equal(
+		buffer.encode('ÀÈÌÒÙ'),
+		new Uint8Array([192, 200, 204, 210, 217])
+	);
+});
+
+encode('should return a `Uint8Array` instance', () => {
+	assert.instance(buffer.encode(''), Uint8Array);
+	assert.instance(buffer.encode('input'), Uint8Array);
+});
+
+encode.run();
+
+// ---
+
 const HEX = suite('HEX');
 
 HEX('should be an Array', () => {
