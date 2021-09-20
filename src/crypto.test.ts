@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import * as assert from 'uvu/assert';
 import { createHash, pbkdf2 } from 'crypto';
 import * as crypto from './crypto';
-import { toHEX } from './utils';
+import { toHEX } from './buffer';
 
 const digest = suite('digest');
 

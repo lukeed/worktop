@@ -1,5 +1,5 @@
 import * as crypto from 'worktop/crypto';
-import { toHEX } from 'worktop/utils';
+import { toHEX } from 'worktop/buffer';
 
 declare let i8: Int8Array;
 declare let u8: Uint8Array;
