@@ -70,6 +70,12 @@ export function asUTF8(input: string): Uint8Array;
 export function toASCII(buffer: Uint8Array): string;
 
 /**
+ * Parse a PEM key (public or private) string into an Uint8Array.
+ * @encoding "binary"
+ */
+export function asPEM(input: string): Uint8Array;
+
+/**
  * All Node.js Buffer encodings.
  * @reference [Character encodings](https://nodejs.org/api/buffer.html#buffer_buffers_and_character_encodings)
  */
