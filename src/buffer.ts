@@ -82,6 +82,11 @@ export function toASCII(buffer: Uint8Array): string {
 	return output;
 }
 
+export function asPEM(input: string): Uint8Array {
+	let content = input.replace(/^-----BEGIN .+ KEY-----/, '');
+	return encode(Base64.decode(content.replace(/-----END .+ KEY-----$/, '')));
+}
+
 const alias: Record<string, BufferEncoding> = /*#__PURE__*/ {
 	'ascii': 'binary',
 	'latin1': 'binary',

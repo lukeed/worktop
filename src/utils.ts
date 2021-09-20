@@ -71,16 +71,3 @@ export function toObject<T>(iter: Iterable<[string, T]>): Dict<T|T[]> {
 	}
 	return out;
 }
-
-export function viaPEM(input: string): Uint8Array {
-	let content = input.replace(/^-----BEGIN .+ KEY-----/, '');
-	content = atob(content.replace(/-----END .+ KEY-----$/, ''));
-
-	// TODO: Buffer.encode
-	let i=0, len=content.length;
-	let view = new Uint8Array(len);
-	for (; i < len; i++) {
-		view[i] = content.charCodeAt(i);
-	}
-	return view;
-}

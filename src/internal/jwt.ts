@@ -1,7 +1,6 @@
-import * as wc from 'worktop/crypto';
-import * as utils from 'worktop/utils';
 import * as Base64 from 'worktop/base64';
 import * as buff from 'worktop/buffer';
+import * as wc from 'worktop/crypto';
 
 import type { Factory, JWT, Options } from 'worktop/jwt';
 import type { Algorithms } from 'worktop/crypto';
@@ -120,7 +119,7 @@ export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
 	return {
 		async sign(payload) {
 			let key = await crypto.subtle.importKey(
-				'pkcs8', utils.viaPEM(privkey),
+				'pkcs8', buff.asPEM(privkey),
 				keyer, false, ['sign']
 			);
 
@@ -138,7 +137,7 @@ export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
 			);
 
 			let key = await crypto.subtle.importKey(
-				'spki', utils.viaPEM(pubkey),
+				'spki', buff.asPEM(pubkey),
 				keyer, false, ['verify']
 			);
 
@@ -167,7 +166,7 @@ export function ECDSA<P,H>(bits: SIZE, options: Options.ECDSA<H>): Factory<P,H> 
 	return {
 		async sign(payload) {
 			let key = await crypto.subtle.importKey(
-				'pkcs8', utils.viaPEM(privkey),
+				'pkcs8', buff.asPEM(privkey),
 				keyer, false, ['sign']
 			);
 
@@ -185,7 +184,7 @@ export function ECDSA<P,H>(bits: SIZE, options: Options.ECDSA<H>): Factory<P,H> 
 			);
 
 			let key = await crypto.subtle.importKey(
-				'spki', utils.viaPEM(pubkey),
+				'spki', buff.asPEM(pubkey),
 				keyer, false, ['verify']
 			);
 
