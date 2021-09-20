@@ -1,6 +1,7 @@
 import * as wc from 'worktop/crypto';
 import * as utils from 'worktop/utils';
 import * as Base64 from 'worktop/base64';
+import * as buff from 'worktop/buffer';
 
 import type { Factory, JWT, Options } from 'worktop/jwt';
 import type { Algorithms } from 'worktop/crypto';
@@ -17,11 +18,8 @@ export function encode(input: object) {
 }
 
 // type: helper
-export function toASCII(buff: ArrayBuffer): string {
-	return Base64.base64url(
-		// @ts-ignore (native) ArrayLike<number[]> vs number[]
-		String.fromCharCode.apply(null, new Uint8Array(buff))
-	);
+export function toASCII(input: ArrayBuffer): string {
+	return Base64.base64url(buff.toBinary(input));
 }
 
 // type: external
@@ -134,16 +132,10 @@ export function RSA<P,H>(bits: SIZE, options: Options.RSA<H>): Factory<P,H> {
 			let [hh, pp, ss] = input.split('.');
 			let parts = validate<P,H>(header, input);
 
-			ss = Base64.decode(ss);
 			let load = hh + '.' + pp;
-
-			// TODO: Buffer.encode
-			let i=0, len=ss.length;
-			let sign = new Uint8Array(len);
-
-			for (; i < len; i++) {
-				sign[i] = ss.charCodeAt(i);
-			}
+			let sign = buff.asBinary(
+				Base64.decode(ss)
+			);
 
 			let key = await crypto.subtle.importKey(
 				'spki', utils.viaPEM(pubkey),
@@ -187,16 +179,10 @@ export function ECDSA<P,H>(bits: SIZE, options: Options.ECDSA<H>): Factory<P,H> 
 			let [hh, pp, ss] = input.split('.');
 			let parts = validate<P,H>(header, input);
 
-			ss = Base64.decode(ss);
 			let load = hh + '.' + pp;
-
-			// TODO: Buffer.encode
-			let i=0, len=ss.length;
-			let sign = new Uint8Array(len);
-
-			for (; i < len; i++) {
-				sign[i] = ss.charCodeAt(i);
-			}
+			let sign = buff.asBinary(
+				Base64.decode(ss)
+			);
 
 			let key = await crypto.subtle.importKey(
 				'spki', utils.viaPEM(pubkey),
