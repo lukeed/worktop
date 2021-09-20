@@ -25,3 +25,21 @@ export function viaBinary(input: string): Uint8Array;
  * @alias decode
  */
 export function toBinary(buffer: ArrayBuffer): string;
+
+/**
+ * All 256 hexadecimal pairs
+ * @NOTE Maximum index is `255`
+ */
+export const HEX: readonly string[];
+
+/**
+ * Decode an ArrayBuffer into a hexadecimal string.
+ * @encoding "hex"
+ */
+export function toHEX(buffer: ArrayBuffer): string;
+
+/**
+ * Convert a hexadecimal string into an `Uint8Array` instance.
+ * @encoding "hex"
+ */
+export function viaHEX(input: string): Uint8Array;
