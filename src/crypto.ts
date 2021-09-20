@@ -1,5 +1,4 @@
-import { encode } from 'worktop/utils';
-import { toHEX } from 'worktop/buffer';
+import { encode, toHEX } from 'worktop/buffer';
 import type { Algorithms, TypedArray } from 'worktop/crypto';
 
 export function digest(algo: Algorithms.Digest, message: string): Promise<string> {
