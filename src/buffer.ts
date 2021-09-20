@@ -1,6 +1,7 @@
 /**
- * String to ArrayBuffer
+ * Encode a "binary" string into an Uint8Array.
  * @encoding "binary"
+ * @alias viaBinary
  */
 export function encode(input: string): Uint8Array {
 	let i=0, len=input.length;
@@ -14,13 +15,19 @@ export function encode(input: string): Uint8Array {
 }
 
 /**
- * ArrayBuffer to string
+ * Convert an ArrayBuffer to a "binary" string
  * @encoding "binary"
+ * @alias toBinary
  */
 export function decode(buffer: ArrayBuffer): string {
 	// @ts-ignore (native) ArrayLike<number[]> vs number[]
 	return String.fromCharCode.apply(null, new Uint8Array(buffer));
 }
+
+export {
+	encode as viaBinary,
+	decode as toBinary,
+};
 
 /**
  * All 256 hexadecimal pairs (max index = 255)
