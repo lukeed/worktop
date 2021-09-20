@@ -62,3 +62,9 @@ export function toUTF8(buffer: ArrayBuffer): string;
  * @encoding "utf8"
  */
 export function asUTF8(input: string): Uint8Array;
+
+/**
+ * Convert an Uint8Array into an "ascii" string
+ * @encoding "ascii"
+ */
+export function toASCII(buffer: Uint8Array): string;

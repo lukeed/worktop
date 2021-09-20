@@ -280,3 +280,27 @@ asUTF8('should return `Uint8Array` values :: echo', () => {
 });
 
 asUTF8.run();
+
+// ---
+
+const toASCII = suite('toASCII');
+
+toASCII('should be a function', () => {
+	assert.type(buffer.toASCII, 'function');
+});
+
+toASCII('should be limited to the ASCII range', () => {
+	let u8 = buffer.asUTF8('€');
+	assert.equal(u8, new Uint8Array([226, 130, 172]));
+
+	assert.is(buffer.toUTF8(u8), '€');
+	assert.is(buffer.toASCII(u8), 'b\x02,');
+
+	let decoder = new TextDecoder('ascii');
+	assert.is(decoder.decode(u8), 'â‚¬'); // wtf
+
+	let bin = buffer.viaBinary('€');
+	assert.is.not(buffer.toASCII(bin), 'b\x02,');
+});
+
+toASCII.run();

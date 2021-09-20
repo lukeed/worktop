@@ -98,3 +98,18 @@ buffer.toUTF8([1, 2, 3]);
 
 assert<string>(buffer.toUTF8(u8));
 assert<string>(buffer.toUTF8(raw));
+
+/**
+ * toASCII
+ */
+
+// @ts-expect-error
+buffer.toASCII('foobar');
+
+// @ts-expect-error
+buffer.toASCII([1, 2, 3]);
+
+// @ts-expect-error - u8 only
+assert<string>(buffer.toASCII(raw));
+
+assert<string>(buffer.toASCII(u8));

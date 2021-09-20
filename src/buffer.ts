@@ -69,3 +69,11 @@ export const asUTF8 = (input: string) => Encoder.encode(input);
 
 const UTF8 = /*#__PURE__*/ new TextDecoder('utf-8');
 export const toUTF8 = (buffer: ArrayBuffer) => UTF8.decode(buffer);
+
+export function toASCII(buffer: Uint8Array): string {
+	let i=0, output='';
+	for (; i < buffer.length; i++) {
+		output += String.fromCharCode(buffer[i] & 127);
+	}
+	return output;
+}
