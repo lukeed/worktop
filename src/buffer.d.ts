@@ -45,6 +45,12 @@ export function toHEX(buffer: ArrayBuffer): string;
 export function viaHEX(input: string): Uint8Array;
 
 /**
+ * Reusable `TextEncoder` instance.
+ * @encoding "utf8"
+ */
+export const Encoder: TextEncoder;
+
+/**
  * Decode an ArrayBuffer into an "utf8" string
  * @encoding "utf8"
  */

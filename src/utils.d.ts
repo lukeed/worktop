@@ -11,7 +11,6 @@ declare global {
 	}
 }
 
-
 /**
  * Generate a unique string of `len` length.
  * @NOTE Relies on `crypto` to produce cryptographically secure (CSPRNG) values.
@@ -43,19 +42,6 @@ export type ULID = { 0: string; length: 26 } & string;
  * @NOTE Throws a `QuotaExceededError` error if `length` exceeds 65,536 bytes.
  */
 export function randomize(length: number): Uint8Array;
-
-
-/**
- * Reusable `TextEncoder` instance.
- */
-export const Encoder: TextEncoder;
-
-
-/**
- * Reusable `TextDecoder` instance.
- * @NOTE Initialized with UTF-8 encoding.
- */
-export const Decoder: TextDecoder;
 
 
 /**

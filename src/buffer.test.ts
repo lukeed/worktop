@@ -86,6 +86,34 @@ viaHEX.run();
 
 // ---
 
+const Encoder = suite('Encoder');
+
+Encoder('should be a `TextEncoder` instance', () => {
+	assert.instance(buffer.Encoder, TextEncoder);
+});
+
+Encoder('should have the `encode` method', () => {
+	assert.type(buffer.Encoder.encode, 'function');
+});
+
+Encoder('should produce `Uint8Array` values', () => {
+	assert.instance(buffer.Encoder.encode(''), Uint8Array);
+});
+
+Encoder('should produce `Uint8Array` with UTF-8 encoded text', () => {
+	let output = buffer.Encoder.encode('ÀÈÌÒÙ');
+	assert.not.equal(output, buffer.encode('ÀÈÌÒÙ'));
+	assert.equal(output, new Uint8Array([195, 128, 195, 136, 195, 140, 195, 146, 195, 153]));
+
+	output = buffer.Encoder.encode('€');
+	assert.not.equal(output, buffer.encode('€'));
+	assert.equal(output, new Uint8Array([226, 130, 172]));
+});
+
+Encoder.run();
+
+// ---
+
 const toUTF8 = suite('toUTF8');
 
 toUTF8('should be a function', () => {
@@ -103,16 +131,16 @@ toUTF8('should produce "utf8" string values :: raw', () => {
 	assert.is(buffer.toUTF8(input), 'hello');
 
 	input = new Uint8Array([119, 111, 114, 108, 100]);
-	assert.is(buffer.toUTF8(input), 'world',);
+	assert.is(buffer.toUTF8(input), 'world');
 
 	input = new Uint8Array([]);
-	assert.is(buffer.toUTF8(input), '',);
+	assert.is(buffer.toUTF8(input), '');
 
 	input = new Uint8Array([32]);
-	assert.is(buffer.toUTF8(input), ' ',);
+	assert.is(buffer.toUTF8(input), ' ');
 
 	input = new Uint8Array([226, 130, 172]);
-	assert.is(buffer.toUTF8(input), '€',);
+	assert.is(buffer.toUTF8(input), '€');
 });
 
 toUTF8('should produce "utf8" string values :: echo', () => {

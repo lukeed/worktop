@@ -1,3 +1,4 @@
+import { Encoder } from 'worktop/buffer';
 import type { Dict } from 'worktop/utils';
 
 // @see https://github.com/lukeed/uuid
@@ -40,9 +41,6 @@ export function ulid(): string {
 export function randomize(length: number): Uint8Array {
 	return crypto.getRandomValues(new Uint8Array(length));
 }
-
-export const Encoder = /*#__PURE__*/ new TextEncoder;
-export const Decoder = /*#__PURE__*/ new TextDecoder;
 
 export function byteLength(input?: string): number {
 	return input ? Encoder.encode(input).byteLength : 0;
