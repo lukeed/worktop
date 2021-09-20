@@ -57,7 +57,8 @@ export const Encoder: TextEncoder;
 export function toUTF8(buffer: ArrayBuffer): string;
 
 /**
- * Encode an "utf8" string into an Uint8Array.
+ * Parse a string as a `Uint8Array` containing UTF-8 encoded text.
+ * @alias new TextEncoder().encode(input);
  * @encoding "utf8"
  */
-export function viaUTF8(input: string): Uint8Array;
+export function asUTF8(input: string): Uint8Array;

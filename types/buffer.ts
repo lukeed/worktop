@@ -72,19 +72,19 @@ buffer.viaHEX([1, 2, 3]);
 assert<Uint8Array>(buffer.viaHEX('foo'));
 
 /**
- * viaUTF8
+ * asUTF8
  */
 
 // @ts-expect-error
-buffer.viaUTF8(raw);
+buffer.asUTF8(raw);
 
 // @ts-expect-error
-buffer.viaUTF8(u8);
+buffer.asUTF8(u8);
 
 // @ts-expect-error
-buffer.viaUTF8([1, 2, 3]);
+buffer.asUTF8([1, 2, 3]);
 
-assert<Uint8Array>(buffer.viaUTF8('foo'));
+assert<Uint8Array>(buffer.asUTF8('foo'));
 
 /**
  * toUTF8

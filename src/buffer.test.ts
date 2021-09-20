@@ -241,41 +241,42 @@ toUTF8.run();
 
 // ---
 
-const viaUTF8 = suite('viaUTF8');
+const asUTF8 = suite('asUTF8');
 
-viaUTF8('should be a function', () => {
-	assert.type(buffer.viaUTF8, 'function');
+asUTF8('should be a function', () => {
+	assert.type(buffer.asUTF8, 'function');
 });
 
-viaUTF8('should return `Uint8Array` output', () => {
-	assert.instance(buffer.viaUTF8(''), Uint8Array);
+asUTF8('should return `Uint8Array` output', () => {
+	assert.instance(buffer.asUTF8(''), Uint8Array);
 });
 
-viaUTF8('should return `Uint8Array` values :: raw', () => {
+asUTF8('should return `Uint8Array` values :: raw', () => {
 	let output = new Uint8Array([104, 101, 108, 108, 111]);
-	assert.equal(buffer.viaUTF8('hello'), output);
+	assert.equal(buffer.asUTF8('hello'), output);
 
 	output = new Uint8Array([119, 111, 114, 108, 100]);
-	assert.equal(buffer.viaUTF8('world'), output);
+	assert.equal(buffer.asUTF8('world'), output);
 
 	output = new Uint8Array([]);
-	assert.equal(buffer.viaUTF8(''), output);
+	assert.equal(buffer.asUTF8(''), output);
 
 	output = new Uint8Array([32]);
-	assert.equal(buffer.viaUTF8(' '), output);
+	assert.equal(buffer.asUTF8(' '), output);
 
 	output = new Uint8Array([226, 130, 172]);
-	assert.equal(buffer.viaUTF8('€'), output);
+	assert.equal(buffer.asUTF8('€'), output);
+	assert.not.equal(buffer.viaBinary('€'), output);
 });
 
-viaUTF8('should return `Uint8Array` values :: echo', () => {
+asUTF8('should return `Uint8Array` values :: echo', () => {
 	let input = 'ÀÈÌÒÙ';
 	let raw = Buffer.from(input, 'utf8');
-	assert.equal(buffer.viaUTF8(input), new Uint8Array(raw));
+	assert.equal(buffer.asUTF8(input), new Uint8Array(raw));
 
 	input = '😀';
 	raw = Buffer.from(input, 'utf8');
-	assert.equal(buffer.viaUTF8(input), new Uint8Array(raw));
+	assert.equal(buffer.asUTF8(input), new Uint8Array(raw));
 });
 
-viaUTF8.run();
+asUTF8.run();
