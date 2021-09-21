@@ -71,7 +71,6 @@ export const Encoder = /*#__PURE__*/ new TextEncoder;
 export const asUTF8 = (input: string) => Encoder.encode(input);
 
 const UTF8 = /*#__PURE__*/ new TextDecoder('utf-8');
-const UTF16 = /*#__PURE__*/ new TextDecoder('utf-16le');
 export const toUTF8 = (buffer: ArrayBuffer) => UTF8.decode(buffer);
 
 export function toASCII(buffer: Uint8Array): string {
@@ -121,7 +120,11 @@ export function from(input: string, encoding: BufferEncoding = 'utf8'): Buffer {
 		if (enc === 'utf8') return toUTF8(view);
 		if (enc === 'ascii') return toASCII(view);
 		if (enc === 'binary' || enc === 'latin1') return decode(view);
-		if (enc === 'utf16le' || enc === 'ucs2') return UTF16.decode(view);
+		if (enc === 'utf16le' || enc === 'ucs2') {
+			// TODO: hoist after CF supports it.
+			// Currently this throws error when invoked.
+			return new TextDecoder('utf-16le').decode(view);
+		}
 		if (enc === 'base64url') return Base64.base64url(decode(view));
 		if (enc === 'base64') return Base64.encode(decode(view));
 		throw new Error(`Unknown encoding: ${enc}`);

@@ -78,6 +78,7 @@ export function asPEM(input: string): Uint8Array;
 /**
  * All Node.js Buffer encodings.
  * @reference [Character encodings](https://nodejs.org/api/buffer.html#buffer_buffers_and_character_encodings)
+ * @NOTE Cloudflare Workers does NOT support: "utf16le", "ucs2", "ucs-2"
  */
 export type BufferEncoding = 'ascii' | 'utf8' | 'utf-8' | 'utf16le' | 'ucs2' | 'ucs-2' | 'base64' | 'base64url' | 'latin1' | 'binary' | 'hex';
 
