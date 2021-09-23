@@ -53,21 +53,23 @@ fs.existsSync(entry) || bail(`Missing file: ${entry}`);
 // TODO: construct `output` based on combinations
 let outfile = 'build/index.mjs';
 
-// TODO: track time -> diff
 // TODO: validate --format and/or --platform combination
 
-require('.').build({
+let { build } = require('.');
+let start = Date.now();
+
+build({
 	input: entry,
 	output: outfile,
 	minify: !!flags.minify,
 	target: 'es2021',
 	format: 'esm',
 }).then(async result => {
-	let output = path.join(cwd, outfile);
-	let outdir = path.dirname(output);
+	let ms = (Date.now() - start).toLocaleString();
+	let output=path.join(cwd, outfile), outdir=path.dirname(output);
 	fs.existsSync(outdir) || await fs.promises.mkdir(outdir, { recursive: true });
 	await fs.promises.writeFile(output, result.code);
-	console.log('~> built "%s" ~!', outfile);
+	console.log('~> built "%s" in %dms', outfile, ms);
 }).catch(err => {
 	bail(err.stack || err.message);
 });
