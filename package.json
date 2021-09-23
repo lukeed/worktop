@@ -7,6 +7,9 @@
   "types": "index.d.ts",
   "main": "index.js",
   "license": "MIT",
+  "bin": {
+    "worktop": "bin.js"
+  },
   "author": {
     "name": "Luke Edwards",
     "email": "luke.edwards05@gmail.com",
@@ -15,7 +18,8 @@
   "files": [
     "index.d.ts",
     "index.mjs",
-    "index.js"
+    "index.js",
+    "bin.js"
   ],
   "engines": {
     "node": ">=12"
@@ -25,7 +29,8 @@
     "types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
-    "@swc/core": "^1.2.89"
+    "@swc/core": "^1.2.89",
+    "mri": "^1.2.0"
   },
   "devDependencies": {
     "@types/node": "16.9.6",

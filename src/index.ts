@@ -26,6 +26,7 @@ export async function build(options: Options): Promise<Output> {
 		}
 	};
 
+	// TODO: cwd -> workingDir?
 	let opts: BundleOptions = {
 		entry: options.input,
 		target: options.platform || 'browser',

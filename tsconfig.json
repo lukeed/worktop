@@ -14,9 +14,11 @@
     "noImplicitAny": true,
     "alwaysStrict": true,
     "checkJs": true,
+    "noEmit": true,
   },
   "include": [
-    "src/**/*"
+    "bin.js",
+    "src"
   ],
   "exclude": [
     "node_modules"
