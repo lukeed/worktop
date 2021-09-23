@@ -3,12 +3,20 @@
   "version": "0.0.0",
   "repository": "lukeed/worktop",
   "description": "wip",
+  "module": "index.mjs",
+  "types": "index.d.ts",
+  "main": "index.js",
   "license": "MIT",
   "author": {
     "name": "Luke Edwards",
     "email": "luke.edwards05@gmail.com",
     "url": "https://lukeed.com"
   },
+  "files": [
+    "index.d.ts",
+    "index.mjs",
+    "index.js"
+  ],
   "engines": {
     "node": ">=12"
   },
