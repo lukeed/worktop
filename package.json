@@ -21,7 +21,7 @@
     "node": ">=12"
   },
   "scripts": {
-    "build": "node bin",
+    "build": "node bin/build",
     "types": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
