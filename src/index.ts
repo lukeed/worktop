@@ -3,8 +3,9 @@ import type { BundleOptions } from '@swc/core/spack';
 import type { Output, Options } from '../';
 
 export async function build(options: Options): Promise<Output> {
-	let { output, sourcemap, minify=true } = options;
+	let { output, sourcemap, minify, target='es2021' } = options;
 	let format = options.format === 'cjs' ? 'commonjs' : 'es6';
+	let isESM = format === 'es6';
 
 	let config: swc.Options = {
 		minify: minify,
@@ -18,10 +19,18 @@ export async function build(options: Options): Promise<Output> {
 		sourceMaps: sourcemap ? 'inline' : false,
 		jsc: {
 			loose: true,
-			target: options.target || 'es2021',
+			target: target,
 			parser: {
 				syntax: 'typescript',
 				...options.parser,
+			},
+			// @ts-ignore
+			minify: {
+				compress: true,
+				sourceMap: !!sourcemap,
+				ecma: +target.slice(2),
+				module: isESM,
+				mangle: true,
 			}
 		}
 	};
@@ -33,10 +42,7 @@ export async function build(options: Options): Promise<Output> {
 		externalModules: ([] as string[]).concat(options.external || []),
 		mode: 'production',
 		options: config,
-		module: {
-			// ignored
-			type: format,
-		},
+		module: config.module!,
 		output: {
 			name: 'ignore',
 			path: output,
@@ -47,7 +53,5 @@ export async function build(options: Options): Promise<Output> {
 		for (let k in r) return r[k];
 	});
 
-	return format !== 'es6'
-		? swc.transform(result!.code, config)
-		: result!;
+	return isESM ? result! : swc.transform(result!.code, config);
 }

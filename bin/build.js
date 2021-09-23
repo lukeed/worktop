@@ -21,6 +21,13 @@ async function bundle(path, isESM) {
 			target: 'es2021',
 			parser: {
 				syntax: 'typescript'
+			},
+			minify: {
+				compress: true,
+				sourceMap: true,
+				module: isESM,
+				mangle: true,
+				ecma: 2021
 			}
 		},
 	};
