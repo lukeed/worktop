@@ -46,22 +46,28 @@ if (cmd && cmd.toLowerCase() !== 'build') {
 const fs = require('fs');
 const path = require('path');
 
-const cwd = path.resolve(flags.cwd);
-
-entry = path.join(cwd, entry);
+let cwd = path.resolve(flags.cwd);
+entry = path.join(flags.cwd, entry);
 fs.existsSync(entry) || bail(`Missing file: ${entry}`);
 
-// TODO: validate --format and/or --platform combination
 // TODO: construct `output` based on combinations
+let outfile = 'build/index.mjs';
+
+// TODO: track time -> diff
+// TODO: validate --format and/or --platform combination
 
 require('.').build({
 	input: entry,
-	output: 'build/index.mjs',
+	output: outfile,
 	minify: !!flags.minify,
 	target: 'es2021',
 	format: 'esm',
-}).then(result => {
-	console.log(result);
+}).then(async result => {
+	let output = path.join(cwd, outfile);
+	let outdir = path.dirname(output);
+	fs.existsSync(outdir) || await fs.promises.mkdir(outdir, { recursive: true });
+	await fs.promises.writeFile(output, result.code);
+	console.log('~> built "%s" ~!', outfile);
 }).catch(err => {
 	bail(err.stack || err.message);
 });
