@@ -1,20 +1,8 @@
 import * as swc from '@swc/core';
 import type { BundleOptions } from '@swc/core/spack';
-import type { JscTarget, ParserConfig } from '@swc/core';
+import type { Output, Options } from '../';
 
-export interface Options {
-	input: string;
-	output: string;
-	minify?: boolean;
-	target?: JscTarget;
-	sourcemap?: boolean;
-	platform?: 'node' | 'browser';
-	format?: 'esm' | 'cjs';
-	parser?: ParserConfig;
-	external?: string[];
-}
-
-export async function build(options: Options): Promise<swc.Output> {
+export async function build(options: Options): Promise<Output> {
 	let { output, sourcemap, minify=true } = options;
 	let format = options.format === 'cjs' ? 'commonjs' : 'es6';
 

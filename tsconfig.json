@@ -13,8 +13,7 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "alwaysStrict": true,
-    "baseUrl": "./src",
-    "checkJs": true
+    "checkJs": true,
   },
   "include": [
     "src/**/*"
