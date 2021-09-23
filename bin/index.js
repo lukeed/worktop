@@ -1,26 +1,15 @@
 const swc = require('@swc/core');
-const { writeFileSync } = require('fs');
+const { builtinModules } = require('node:module');
+const { writeFileSync } = require('node:fs');
 const pkg = require('../package.json');
 
 async function bundle(path, isESM) {
 	let start = Date.now();
 	let format = isESM ? 'es6' : 'commonjs';
-	let bun = await swc.bundle({
-		target: 'node',
-		mode: 'production',
-		entry: 'src/index.ts',
-		output: { path },
-	});
 
-	let k, code;
-	for (k in bun) {
-		code = bun[k].code;
-		break;
-	}
-
-	let output = await swc.transform(code, {
+	/** @type {swc.Options} */
+	let config = {
 		minify: true,
-		swcrc: true,
 		module: {
 			strict: true,
 			noInterop: true,
@@ -33,8 +22,33 @@ async function bundle(path, isESM) {
 			parser: {
 				syntax: 'typescript'
 			}
-		}
+		},
+	};
+
+	let bun = await swc.bundle({
+		target: 'node',
+		output: { path },
+		mode: 'production',
+		entry: 'src/index.ts',
+		options: config,
+		module: {
+			// ignored
+			type: format,
+		},
+		externalModules: [
+			...builtinModules,
+			...Object.keys(pkg.dependencies),
+		],
 	});
+
+	let k, result;
+	for (k in bun) {
+		result = bun[k];
+		break;
+	}
+
+	// Needs another pass for module format change
+	let output = isESM ? result : await swc.transform(result.code, config);
 
 	let ms = Date.now() - start;
 	writeFileSync(path, output.code);
