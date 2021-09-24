@@ -21,6 +21,7 @@ const flags = require('mri')(argv, {
 
 let [cmd, entry='index.ts'] = flags._;
 
+/** @param {string} msg */
 function bail(msg, code = 1) {
 	console.error(msg);
 	process.exit(code);
