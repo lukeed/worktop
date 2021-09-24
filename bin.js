@@ -3,16 +3,16 @@ const argv = process.argv.slice(2);
 const flags = require('mri')(argv, {
 	alias: {
 		C: 'cwd',
+		h: 'help',
 		f: 'format',
 		l: 'loglevel',
 		a: 'analyze',
 		m: 'minify',
-		h: 'help',
 	},
 	default: {
 		C: '.',
-		a: false,
 		h: false,
+		a: false,
 		f: 'module',
 		l: 'info',
 		m: false,
@@ -35,6 +35,7 @@ function help() {
 	msg += '\n    -f, --format      Worker/Script output format (default "module")';
 	msg += '\n    -l, --loglevel    Logging display level (default "info")';
 	msg += '\n    -a, --analyze     Render bundle output analysis';
+	msg += '\n    -m, --minify      Minify built output file(s)';
 	msg += '\n    -h, --help        Displays this message\n';
 	msg += '\n  Examples';
 	msg += '\n    $ worktop build';
