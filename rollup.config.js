@@ -27,10 +27,10 @@ module.exports = defineConfig({
 		name: 'esbuild',
 		async transform(code, id) {
 			let result = await transform(code, {
+				minify: true,
 				format: 'esm',
 				sourcefile: id,
 				target: 'es2020',
-				minify: false,
 				loader: 'ts',
 			});
 
