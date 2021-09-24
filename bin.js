@@ -56,10 +56,11 @@ let { existsSync } = require('fs');
 
 entry = resolve(flags.cwd, entry);
 existsSync(entry) || bail(`Missing file: ${entry}`);
+let output = resolve(flags.cwd, 'build/index.mjs');
 
 require('.').build({
 	input: entry,
-	output: 'build/index.mjs',
+	output: output,
 	loglevel: flags.loglevel,
 	analyze: flags.analyze,
 	minify: flags.minify,
