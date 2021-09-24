@@ -58,5 +58,6 @@ require('.').build({
 	minify: flags.minify,
 	cwd: flags.cwd,
 }).catch(err => {
-	bail(err.stack || err.message);
+	if (err.errors) process.exitCode = 1;
+	else bail(err.stack || err.message);
 });
