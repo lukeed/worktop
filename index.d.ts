@@ -26,4 +26,5 @@ export interface Options {
 	modify?(config: BuildOptions): void;
 }
 
+export function define(options: Options): Options;
 export function build(options: Options): Promise<void>;

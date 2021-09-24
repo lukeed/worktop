@@ -63,3 +63,7 @@ export async function build(options: Options): Promise<void> {
 		);
 	}
 }
+
+export function define(config: Options): Options {
+	return config;
+}
