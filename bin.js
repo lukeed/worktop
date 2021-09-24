@@ -4,13 +4,17 @@ const flags = require('mri')(argv, {
 	alias: {
 		C: 'cwd',
 		f: 'format',
+		l: 'loglevel',
+		a: 'analyze',
 		m: 'minify',
 		h: 'help',
 	},
 	default: {
 		C: '.',
+		a: false,
 		h: false,
 		f: 'module',
+		l: 'info',
 		m: false,
 	}
 });
@@ -27,8 +31,10 @@ function help() {
 	msg += '\n  Usage';
 	msg += '\n    $ worktop build [input] [options]\n';
 	msg += '\n  Options';
-	msg += '\n    -f, --format   Worker/Script output format (default "module")';
-	msg += '\n    -h, --help     Displays this message\n';
+	msg += '\n    -f, --format      Worker/Script output format (default "module")';
+	msg += '\n    -l, --loglevel    Logging display level (default "info")';
+	msg += '\n    -a, --analyze     Render bundle output analysis';
+	msg += '\n    -h, --help        Displays this message\n';
 	msg += '\n  Examples';
 	msg += '\n    $ worktop build';
 	msg += '\n    $ worktop build --format sw';
@@ -43,33 +49,18 @@ if (cmd && cmd.toLowerCase() !== 'build') {
 	bail(`Invalid command: ${cmd}\nPlease run \`worktop --help\` for more information.`);
 }
 
-const fs = require('fs');
-const path = require('path');
+let { resolve } = require('path');
+let { existsSync } = require('fs');
 
-let cwd = path.resolve(flags.cwd);
-entry = path.join(flags.cwd, entry);
-fs.existsSync(entry) || bail(`Missing file: ${entry}`);
+entry = resolve(flags.cwd, entry);
+existsSync(entry) || bail(`Missing file: ${entry}`);
 
-// TODO: construct `output` based on combinations
-let outfile = 'build/index.mjs';
-
-// TODO: validate --format and/or --platform combination
-
-let { build } = require('.');
-let start = Date.now();
-
-build({
+require('.').build({
 	input: entry,
-	output: outfile,
-	minify: !!flags.minify,
-	target: 'es2021',
-	format: 'esm',
-}).then(async result => {
-	let ms = (Date.now() - start).toLocaleString();
-	let output=path.join(cwd, outfile), outdir=path.dirname(output);
-	fs.existsSync(outdir) || await fs.promises.mkdir(outdir, { recursive: true });
-	await fs.promises.writeFile(output, result.code);
-	console.log('~> built "%s" in %dms', outfile, ms);
+	output: 'build/index.mjs',
+	loglevel: flags.loglevel,
+	analyze: flags.analyze,
+	minify: flags.minify,
 }).catch(err => {
 	bail(err.stack || err.message);
 });

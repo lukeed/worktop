@@ -1,17 +1,27 @@
-import type { Output, JscTarget, ParserConfig } from '@swc/core';
+import type { BuildOptions, LogLevel } from 'esbuild';
 
-export type { Output };
+export type Platform = 'node' | 'browser' | 'cloudflare';
 
 export interface Options {
 	input: string;
 	output: string;
-	minify?: boolean;
-	target?: JscTarget;
-	sourcemap?: boolean;
-	platform?: 'node' | 'browser';
+	/** @default "cloudflare" */
+	platform?: Platform;
+	/** @default "esnext" */
+	target?: string | string[];
+	/** @default "esm" */
 	format?: 'esm' | 'cjs';
-	parser?: ParserConfig;
+	/** @default false */
+	sourcemap?: boolean;
 	external?: string[];
+	/** @default false */
+	minify?: boolean;
+	/** @default false */
+	analyze?: boolean;
+	/** @default "info" */
+	loglevel?: LogLevel;
+	overrides?: BuildOptions;
+	modify?(config: BuildOptions): void;
 }
 
-export function build(options: Options): Promise<Output>;
+export function build(options: Options): Promise<void>;
