@@ -19,8 +19,6 @@ const flags = require('mri')(argv, {
 	}
 });
 
-let [cmd, entry='index.ts'] = flags._;
-
 /** @param {string} msg */
 function bail(msg, code = 1) {
 	console.error(msg);
@@ -47,23 +45,18 @@ function help() {
 }
 
 if (flags.help) help();
+let [cmd, entry] = flags._;
 if (cmd && cmd.toLowerCase() !== 'build') {
 	bail(`Invalid command: ${cmd}\nPlease run \`worktop --help\` for more information.`);
 }
 
-let { resolve } = require('path');
-let { existsSync } = require('fs');
-
-entry = resolve(flags.cwd, entry);
-existsSync(entry) || bail(`Missing file: ${entry}`);
-let output = resolve(flags.cwd, 'build/index.mjs');
-
 require('.').build({
-	input: entry,
-	output: output,
+	input: entry || 'index.ts',
+	output: 'build/index.mjs',
 	loglevel: flags.loglevel,
 	analyze: flags.analyze,
 	minify: flags.minify,
+	cwd: flags.cwd,
 }).catch(err => {
 	bail(err.stack || err.message);
 });

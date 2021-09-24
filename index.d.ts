@@ -18,6 +18,8 @@ export interface Options {
 	minify?: boolean;
 	/** @default false */
 	analyze?: boolean;
+	/** @default "." */
+	cwd?: string;
 	/** @default "info" */
 	loglevel?: LogLevel;
 	overrides?: BuildOptions;

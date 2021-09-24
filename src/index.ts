@@ -1,3 +1,5 @@
+import { resolve } from 'path';
+
 import type { BuildOptions } from 'esbuild';
 import type { Options } from '../';
 
@@ -19,6 +21,7 @@ export async function build(options: Options): Promise<void> {
 		format: options.format || 'esm',
 		target: options.target || 'esnext',
 		sourcemap: sourcemap ? 'inline' : false,
+		absWorkingDir: resolve(options.cwd || '.'),
 		resolveExtensions: ['.tsx', '.ts', '.jsx', '.mjs', '.js', '.json', '.htm', '.html'],
 		external: ([] as string[]).concat(external),
 		logLevel: options.loglevel || 'info',
