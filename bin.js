@@ -4,6 +4,7 @@ const flags = require('mri')(argv, {
 	alias: {
 		C: 'cwd',
 		h: 'help',
+		c: 'config',
 		f: 'format',
 		l: 'loglevel',
 		a: 'analyze',
@@ -14,6 +15,7 @@ const flags = require('mri')(argv, {
 		h: false,
 		a: false,
 		f: 'module',
+		c: 'worktop.config.js',
 		l: 'info',
 		m: false,
 	}
@@ -30,6 +32,8 @@ function help() {
 	msg += '\n  Usage';
 	msg += '\n    $ worktop build [input] [options]\n';
 	msg += '\n  Options';
+	msg += '\n    -C, --cwd         Current working directory (default ".")';
+	msg += '\n    -c, --config      Path to config file (default "worktop.config.js")';
 	msg += '\n    -f, --format      Worker/Script output format (default "module")';
 	msg += '\n    -l, --loglevel    Logging display level (default "info")';
 	msg += '\n    -a, --analyze     Render bundle output analysis';
@@ -51,6 +55,7 @@ if (cmd && cmd.toLowerCase() !== 'build') {
 }
 
 require('.').build({
+	config: flags.config,
 	input: entry || 'index.ts',
 	output: 'build/index.mjs',
 	loglevel: flags.loglevel,

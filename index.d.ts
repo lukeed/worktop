@@ -5,6 +5,7 @@ export type Platform = 'node' | 'browser' | 'cloudflare';
 export interface Options {
 	input: string;
 	output: string;
+	config?: string;
 	/** @default "cloudflare" */
 	platform?: Platform;
 	/** @default "esnext" */
