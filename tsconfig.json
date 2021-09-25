@@ -3,7 +3,6 @@
     "strict": true,
     "allowJs": true,
     "target": "esnext",
-    "module": "esnext",
     "strictBindCallApply": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext", "dom.iterable", "webworker"],
@@ -13,16 +12,15 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "alwaysStrict": true,
-    "baseUrl": "./src",
+    "module": "esnext",
     "checkJs": true,
     "paths": {
-      "worktop": ["./router.d.ts"],
-      "worktop/*": ["./*.d.ts"]
+      "worktop": ["./packages/worktop/src/router.d.ts"],
+      "worktop/*": ["./packages/worktop/src/*.d.ts"]
     }
   },
   "include": [
-    "src/**/*",
-    "types/**/*",
+    "packages/**/*",
     "examples/workers/**/*"
   ],
   "exclude": [

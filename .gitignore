@@ -3,21 +3,8 @@ node_modules
 *-lock.*
 *.lock
 
-/kv
-/buffer
-/cors
-/cache
-/cookie
-/crypto
-/base64
-/request
-/response
-/durable
-/module
-/router
-/utils
-/jwt
-/sw
-/ws
+/packages/worktop/**
+!/packages/worktop/src
+!/packages/worktop/types
 
 /examples/build
