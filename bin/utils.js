@@ -1,3 +1,4 @@
+// @ts-check
 // @see https://github.com/lukeed/bundt/blob/master/index.js
 const { white, cyan, dim } = require('kleur');
 const rimports = require('rewrite-imports');
@@ -10,6 +11,27 @@ const UNITS = ['B ', 'kB', 'MB', 'GB'];
 const lpad = (str, max) => _.repeat(max - str.length) + str;
 const rpad = (str, max) => str + _.repeat(max - str.length);
 const th = dim().bold().italic().underline;
+
+/**
+ * @typedef FileData
+ * @property {string} file
+ * @property {string} size
+ * @property {string} gzip
+ */
+
+/**
+ * @param {string} file
+ * @param {Uint8Array} buffer
+ * @returns {FileData}
+ */
+exports.inspect = function (file, buffer) {
+	let gz = gzipSync(buffer).byteLength;
+	return {
+		file: file,
+		gzip: size(gz),
+		size: size(buffer.byteLength),
+	};
+}
 
 function size(val=0) {
 	if (val < 1e3) return `${val} ${UNITS[0]}`;
@@ -24,45 +46,31 @@ function size(val=0) {
 	return out + ' ' + UNITS[exp];
 }
 
-/** @type {string[]} */
-const FILELIST = [];
-
 /**
- * @param {string} file
- * @returns {string}
+ * @param {string} modname
+ * @param {string} pkgdir
+ * @param {FileData[]} files
+ * @returns {void}
  */
-exports.save = function (file) {
-	file = normalize(file);
-	return FILELIST.push(file) && file;
-}
+exports.table = function (modname, pkgdir, files) {
+	let f=modname.length, s=8, g=6;
+	let G1 = _+_, G2 = G1+G1, out='';
 
-/** @returns {void} */
-exports.table = function () {
-	let f=8, s=8, g=6;
-	let out='', data, tmp;
-	let G1 = _+_, G2 = G1+G1;
+	files.sort((a, b) => a.file.localeCompare(b.file)).forEach(obj => {
+		obj.file = normalize(
+			obj.file.replace(pkgdir, '')
+		);
 
-	let arr = FILELIST.sort().map(fname => {
-		data = readFileSync(fname);
-
-		tmp = {
-			file: fname,
-			size: size(data.byteLength),
-			gzip: size(gzipSync(data).byteLength)
-		};
-
-		f = Math.max(f, tmp.file.length);
-		s = Math.max(s, tmp.size.length);
-		g = Math.max(g, tmp.gzip.length);
-
-		return tmp;
+		f = Math.max(f, obj.file.length);
+		s = Math.max(s, obj.size.length);
+		g = Math.max(g, obj.gzip.length);
 	});
 
 	f += 2; // underline extension
 
-	out += G1 + th(rpad('Filename', f)) + G2 + th(lpad('Filesize', s)) + G1 + dim().bold().italic(lpad('(gzip)', g));
+	out += G1 + th(rpad(modname, f)) + G2 + th(lpad('Filesize', s)) + G1 + dim().bold().italic(lpad('(gzip)', g));
 
-	arr.forEach((obj, idx) => {
+	files.forEach((obj, idx) => {
 		if (idx && idx % 3 === 0) out += '\n';
 		out += ('\n' + G1 + white(rpad(obj.file, f)) + G2 + cyan(lpad(obj.size, s)) + G1 + dim().italic(lpad(obj.gzip, g)));
 	});
@@ -71,13 +79,12 @@ exports.table = function () {
 }
 
 /**
- * @param {string} input The ESM input file
+ * @param {string} content The ESM input file
  * @see https://github.com/lukeed/bundt/blob/master/index.js#L131
+ * @returns {string}
  */
-exports.rewrite = function (input) {
+exports.rewrite = function (content) {
 	let footer = '';
-	let content = readFileSync(input, 'utf8');
-
 	return rimports(content)
 		.replace(/(^|\s|;)export default/, '$1module.exports =')
 		.replace(/(^|\s|;)export (const|(?:async )?function|class|let|var) (.+?)(?=(\(|\s|\=))/gi, (_, x, type, name) => {

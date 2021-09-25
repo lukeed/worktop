@@ -1,49 +1,129 @@
-const { parse, format } = require('path');
-const { copyFileSync, existsSync, writeFileSync } = require('fs');
-const { rewrite, save, table } = require('./format');
-const pkg = require('../package.json');
-const esbuild = require('./esbuild');
+// @ts-check
+const fs = require('node:fs');
+const { build } = require('esbuild');
+const { join, dirname } = require('node:path');
+const { builtinModules } = require('node:module');
+const utils = require('./utils');
 
-const externals = ['worktop', ...Object.keys(pkg.dependencies)];
+const packages = join(__dirname, '../packages');
+const overrides = {
+	worktop: {
+		'router.ts': '.'
+	}
+};
 
-/**
- * @param {string} input
- * @param {Record<'import'|'require', string>} files
- */
-async function bundle(input, files) {
-	await esbuild.build(input, save(files.import), externals);
+/** @param {string} message */
+function bail(message) {
+	console.error(message);
+	process.exit(1);
+}
 
-	writeFileSync(
-		save(files.require),
-		rewrite(files.import)
+/** @param {string} modname */
+async function bundle(modname) {
+	let pkgdir = join(packages, modname);
+	let pkg = require(join(pkgdir, 'package.json'));
+	let files = await fs.promises.readdir(
+		join(pkgdir, 'src')
 	);
 
-	let dts = input.replace(/\.[mc]?[tj]s$/, '.d.ts');
-	if (!existsSync(dts)) return console.warn('Missing "%s" file!', dts),process.exitCode=1;
+	let externals = [
+		pkg.name, ...builtinModules,
+		...Object.keys(pkg.dependencies||{}),
+		...Object.keys(pkg.peerDependencies||{}),
+	];
 
-	let info = parse(input);
-	info.base = 'index.d.ts';
-	info.dir = info.name;
-	copyFileSync(dts, save(format(info)));
+	if (pkg.exports == null) {
+		return bail(`Missing "exports" in module: ${modname}`);
+	}
+
+	let outputs = [];
+	let encoder = new TextEncoder;
+
+	/**
+	 * @param {string} file
+	 * @param {Uint8Array|string} content
+	 */
+	async function write(file, content) {
+		await fs.promises.writeFile(file, content);
+		if (typeof content === 'string') content = encoder.encode(content);
+		outputs.push(utils.inspect(file, content));
+	}
+
+	let i=0, isTS=/\.ts$/, tasks=[];
+	let overs = overrides[modname] || {};
+
+	for (files.sort(); i < files.length; i++) {
+		let file = files[i];
+		if (!isTS.test(file)) continue;
+		if (file == 'node_modules') continue;
+		if (/\.(test|d)\.ts$/.test(file)) continue;
+
+		let dts = file.replace(isTS, '.d.ts');
+		files.includes(dts) || bail(`Missing "${dts}" file!`);
+		let key = overs[file] || ('./' + file.replace(isTS, ''));
+
+		let entry = pkg.exports[key];
+		if (!entry) return bail(`Missing "exports" entry: ${key}`);
+		if (!entry.import) return bail(`Missing "import" condition: ${key}`);
+		if (!entry.require) return bail(`Missing "require" condition: ${key}`);
+
+		tasks.push(async function () {
+			let input = join(pkgdir, 'src', file);
+			let output = join(pkgdir, entry.import);
+
+			// build ts -> esm
+			let esm = await build({
+				bundle: true,
+				format: 'esm',
+				sourcemap: false,
+				entryPoints: [input],
+				external: externals,
+				outfile: output,
+				target: 'es2019',
+				treeShaking: true,
+				logLevel: 'warning',
+				minifyIdentifiers: true,
+				minifySyntax: true,
+				charset: 'utf8',
+				write: false,
+			}).then(bundle => {
+				return bundle.outputFiles[0];
+			});
+
+			let outdir = dirname(esm.path);
+
+			// purge existing directory
+			if (fs.existsSync(outdir)) {
+				await fs.promises.rm(outdir, {
+					recursive: true,
+					force: true,
+				});
+			}
+
+			// create dir (safe writes)
+			await fs.promises.mkdir(outdir);
+			await write(esm.path, esm.contents);
+
+			// convert esm -> cjs
+			output = join(pkgdir, entry.require);
+			await write(output, utils.rewrite(esm.text));
+
+			// foo.d.ts -> foo/index.d.ts
+			input = join(pkgdir, 'src', dts);
+			await write(
+				join(outdir, 'index.d.ts'),
+				await fs.promises.readFile(input)
+			);
+		}());
+	}
+
+	await Promise.all(tasks);
+	utils.table(modname, pkgdir, outputs);
 }
 
 /**
  * init
  */
 Promise.all([
-	bundle('src/router.ts', pkg.exports['.']),
-	bundle('src/sw.ts', pkg.exports['./sw']),
-	bundle('src/jwt.ts', pkg.exports['./jwt']),
-	bundle('src/buffer.ts', pkg.exports['./buffer']),
-	bundle('src/cache.ts', pkg.exports['./cache']),
-	bundle('src/cookie.ts', pkg.exports['./cookie']),
-	bundle('src/base64.ts', pkg.exports['./base64']),
-	bundle('src/response.ts', pkg.exports['./response']),
-	bundle('src/durable.ts', pkg.exports['./durable']),
-	bundle('src/module.ts', pkg.exports['./module']),
-	bundle('src/crypto.ts', pkg.exports['./crypto']),
-	bundle('src/utils.ts', pkg.exports['./utils']),
-	bundle('src/cors.ts', pkg.exports['./cors']),
-	bundle('src/kv.ts', pkg.exports['./kv']),
-	bundle('src/ws.ts', pkg.exports['./ws']),
-]).then(table);
+	bundle('worktop')
+]);
