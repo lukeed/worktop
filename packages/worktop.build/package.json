@@ -1,0 +1,47 @@
+{
+  "version": "0.0.3",
+  "name": "worktop.build",
+  "repository": "lukeed/worktop",
+  "description": "wip",
+  "module": "index.mjs",
+  "types": "index.d.ts",
+  "main": "index.js",
+  "license": "MIT",
+  "bin": {
+    "worktop": "bin.js"
+  },
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.d.ts",
+    "index.mjs",
+    "index.js",
+    "bin.js"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "types": "tsc --noEmit --skipLibCheck"
+  },
+  "dependencies": {
+    "esbuild": "^0.13.2",
+    "mri": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "16.9.6",
+    "rollup": "2.57.0",
+    "typescript": "4.4.2"
+  }
+}
