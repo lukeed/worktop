@@ -20,7 +20,8 @@
     }
   },
   "include": [
-    "packages/**/*",
+    "packages/worktop/src",
+    "packages/worktop/types",
     "examples/workers/**/*"
   ],
   "exclude": [
