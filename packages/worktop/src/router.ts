@@ -63,7 +63,7 @@ function find(tree: Tree, method: Method, pathname: string): Route|void {
 }
 
 export function Router(): RR<Context> {
-	let $: RR<Context>, tree: Tree = {}, mounts: Mounts = {};
+	let $: RR<Context>, mounts: Mounts, tree: Tree = {};
 
 	return $ = {
 		add(method: Method, route: RegExp | string, handler: HC) {
@@ -87,6 +87,7 @@ export function Router(): RR<Context> {
 		},
 
 		mount(prefix, router) {
+			mounts = mounts || {};
 			if (!prefix.endsWith('/')) prefix += '/';
 			if (!prefix.startsWith('/')) prefix = '/' + prefix;
 			mounts[prefix] = router.run;
@@ -112,7 +113,7 @@ export function Router(): RR<Context> {
 				if (res && res instanceof Response) return res;
 				let tmp, path = context.url.pathname;
 
-				for (tmp in mounts) {
+				if (mounts) for (tmp in mounts) {
 					if (path.startsWith(tmp)) {
 						context.url.pathname = path.substring(tmp.length);
 						return mounts[tmp](new Request(context.url.href, req), context);
