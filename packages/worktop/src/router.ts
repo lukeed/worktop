@@ -114,7 +114,7 @@ export function Router(): RR<Context> {
 				if (mounts) for (tmp in mounts) {
 					if (x.startsWith(tmp)) {
 						context.url.pathname = path.substring(tmp.length) || '/';
-						return mounts[tmp](new Request(context.url.href, req), context);
+						return res = await mounts[tmp](new Request(context.url.href, req), context);
 					}
 				}
 
