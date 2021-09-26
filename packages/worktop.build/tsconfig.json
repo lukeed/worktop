@@ -1,7 +1,0 @@
-{
-  "extends": "../../",
-  "include": [
-    "bin.js",
-    "src"
-  ]
-}
