@@ -88,8 +88,6 @@ export function Router(): RR<Context> {
 
 		mount(prefix, router) {
 			mounts = mounts || {};
-			if (!prefix.endsWith('/')) prefix += '/';
-			if (!prefix.startsWith('/')) prefix = '/' + prefix;
 			mounts[prefix] = router.run;
 		},
 

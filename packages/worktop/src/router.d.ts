@@ -89,7 +89,7 @@ export type Initializer<C extends Context> = (
 ) => Promise<Response>;
 
 export declare class Router<C extends Context = Context> {
-	mount(prefix: string, router: Router<C>): void;
+	mount(prefix: `/${string}/`, router: Router<C>): void;
 	add<T extends RegExp>(method: Method, route: T, handler: Handler<C, Params>): void;
 	add<T extends string>(method: Method, route: T, handler: Handler<C, Strict<RouteParams<T>>>): void;
 	onerror(req: Request, context: C & { status?: number; error?: Error }): Promisable<Response>;

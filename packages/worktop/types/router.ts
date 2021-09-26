@@ -257,4 +257,11 @@ API.prepare = (req, res) => 123;
 // @ts-expect-error
 API.mount(/foo/, API);
 
+// @ts-expect-error
+API.mount('foo/', API);
+
+// @ts-expect-error
+API.mount('/foo', API);
+
 API.mount('/foo/', API);
+API.mount('/foo/bar/', API);
