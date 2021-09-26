@@ -18,8 +18,11 @@ function bail(message) {
 	process.exit(1);
 }
 
-/** @param {string} modname */
-async function bundle(modname) {
+/**
+ * @param {string} modname
+ * @param {boolean} isMulti
+ */
+async function bundle(modname, isMulti = true) {
 	let pkgdir = join(packages, modname);
 	let pkg = require(join(pkgdir, 'package.json'));
 	let files = await fs.promises.readdir(
@@ -58,9 +61,14 @@ async function bundle(modname) {
 		if (file == 'node_modules') continue;
 		if (/\.(test|d)\.ts$/.test(file)) continue;
 
-		let dts = file.replace(isTS, '.d.ts');
-		files.includes(dts) || bail(`Missing "${dts}" file!`);
-		let key = overs[file] || ('./' + file.replace(isTS, ''));
+		if (isMulti) {
+			var dts = file.replace(isTS, '.d.ts');
+			files.includes(dts) || bail(`Missing "${dts}" file!`);
+		}
+
+		let key = overs[file];
+		if (!key && file === 'index.ts') key = '.';
+		else if (!key) key = './' + file.replace(isTS, '');
 
 		let entry = pkg.exports[key];
 		if (!entry) return bail(`Missing "exports" entry: ${key}`);
@@ -93,7 +101,7 @@ async function bundle(modname) {
 			let outdir = dirname(esm.path);
 
 			// purge existing directory
-			if (fs.existsSync(outdir)) {
+			if (isMulti && fs.existsSync(outdir)) {
 				await fs.promises.rm(outdir, {
 					recursive: true,
 					force: true,
@@ -101,19 +109,21 @@ async function bundle(modname) {
 			}
 
 			// create dir (safe writes)
-			await fs.promises.mkdir(outdir);
+			if (isMulti) await fs.promises.mkdir(outdir);
 			await write(esm.path, esm.contents);
 
 			// convert esm -> cjs
 			output = join(pkgdir, entry.require);
 			await write(output, utils.rewrite(esm.text));
 
-			// foo.d.ts -> foo/index.d.ts
-			input = join(pkgdir, 'src', dts);
-			await write(
-				join(outdir, 'index.d.ts'),
-				await fs.promises.readFile(input)
-			);
+			if (isMulti) {
+				// foo.d.ts -> foo/index.d.ts
+				input = join(pkgdir, 'src', dts);
+				await write(
+					join(outdir, 'index.d.ts'),
+					await fs.promises.readFile(input)
+				);
+			}
 		}());
 	}
 
@@ -125,5 +135,6 @@ async function bundle(modname) {
  * init
  */
 Promise.all([
-	bundle('worktop')
+	bundle('worktop', true),
+	bundle('worktop.build', false),
 ]);
