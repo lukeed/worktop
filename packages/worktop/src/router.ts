@@ -109,11 +109,11 @@ export function Router(): RR<Context> {
 
 				var res = $.prepare && await $.prepare(req, context as PC);
 				if (res && res instanceof Response) return res;
-				let tmp, path = context.url.pathname;
 
+				let tmp, path = context.url.pathname, x = path + '/';
 				if (mounts) for (tmp in mounts) {
-					if (path.startsWith(tmp)) {
-						context.url.pathname = path.substring(tmp.length);
+					if (x.startsWith(tmp)) {
+						context.url.pathname = path.substring(tmp.length) || '/';
 						return mounts[tmp](new Request(context.url.href, req), context);
 					}
 				}
