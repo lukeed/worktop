@@ -56,13 +56,13 @@ async function bundle(modname, isMulti = true) {
 	let overs = overrides[modname] || {};
 
 	for (files.sort(); i < files.length; i++) {
-		let file = files[i];
+		let dts, file = files[i];
 		if (!isTS.test(file)) continue;
 		if (file == 'node_modules') continue;
 		if (/\.(test|d)\.ts$/.test(file)) continue;
 
 		if (isMulti) {
-			var dts = file.replace(isTS, '.d.ts');
+			dts = file.replace(isTS, '.d.ts');
 			files.includes(dts) || bail(`Missing "${dts}" file!`);
 		}
 
