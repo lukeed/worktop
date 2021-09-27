@@ -1,8 +1,9 @@
 import { parse } from 'regexparam';
 import { finalize, STATUS_CODES } from 'worktop/response';
 
-import type { Handler, Deferral, Router as RR } from 'worktop';
+import type { Handler, Deferral } from 'worktop';
 import type { Method, Params, Context } from 'worktop';
+import type { Initializer, Router as RR } from 'worktop';
 import type { Dict } from 'worktop/utils';
 
 type HC = Handler;
@@ -33,6 +34,7 @@ interface Branch {
 
 type Tree = Partial<Record<Method, Branch>>;
 type Route = { params: Params; handler: HC };
+type Mounts = Dict<Initializer<Context>>;
 
 function find(tree: Tree, method: Method, pathname: string): Route|void {
 	let params: Params = {};
@@ -61,7 +63,7 @@ function find(tree: Tree, method: Method, pathname: string): Route|void {
 }
 
 export function Router(): RR<Context> {
-	let $: RR<Context>, tree: Tree = {};
+	let $: RR<Context>, mounts: Mounts, tree: Tree = {};
 
 	return $ = {
 		add(method: Method, route: RegExp | string, handler: HC) {
@@ -84,6 +86,11 @@ export function Router(): RR<Context> {
 			}
 		},
 
+		mount(prefix, router) {
+			mounts = mounts || {};
+			mounts[prefix] = router.run;
+		},
+
 		onerror(req, context) {
 			let { error, status=500 } = context;
 			let body = error && error.message || STATUS_CODES[status];
@@ -103,7 +110,15 @@ export function Router(): RR<Context> {
 				var res = $.prepare && await $.prepare(req, context as PC);
 				if (res && res instanceof Response) return res;
 
-				let tmp = find(tree, req.method as Method, context.url.pathname);
+				let tmp, path = context.url.pathname, x = path+'/';
+				if (mounts && path.length > 1) for (tmp in mounts) {
+					if (x.startsWith(tmp)) {
+						context.url.pathname = path.substring(tmp.length) || '/';
+						return res = await mounts[tmp](new Request(context.url.href, req), context);
+					}
+				}
+
+				tmp = find(tree, req.method as Method, path);
 				if (!tmp) return (context as EC).status=404, res=await $.onerror(req, context as Context);
 
 				context.params = tmp.params;
