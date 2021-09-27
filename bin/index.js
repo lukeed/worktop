@@ -61,8 +61,9 @@ async function bundle(modname, isMulti = true) {
 		if (file == 'node_modules') continue;
 		if (/\.(test|d)\.ts$/.test(file)) continue;
 
+		let dts;
 		if (isMulti) {
-			var dts = file.replace(isTS, '.d.ts');
+			dts = file.replace(isTS, '.d.ts');
 			files.includes(dts) || bail(`Missing "${dts}" file!`);
 		}
 
