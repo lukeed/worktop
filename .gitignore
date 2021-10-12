@@ -3,9 +3,9 @@ node_modules
 *-lock.*
 *.lock
 
-/packages/worktop/**
-!/packages/worktop/src
-!/packages/worktop/types
+/packages/worktop/*/
+!/packages/worktop/src/
+!/packages/worktop/types/
 
 /packages/worktop.build/index.js
 /packages/worktop.build/index.mjs
