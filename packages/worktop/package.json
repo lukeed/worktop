@@ -1,0 +1,109 @@
+{
+  "name": "worktop",
+  "version": "0.8.0-next.5",
+  "repository": "lukeed/worktop",
+  "description": "The next generation web framework for Cloudflare Workers",
+  "types": "router/index.d.ts",
+  "main": "router/index.mjs",
+  "license": "MIT",
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com"
+  },
+  "exports": {
+    ".": {
+      "import": "./router/index.mjs",
+      "require": "./router/index.js"
+    },
+    "./kv": {
+      "import": "./kv/index.mjs",
+      "require": "./kv/index.js"
+    },
+    "./cors": {
+      "import": "./cors/index.mjs",
+      "require": "./cors/index.js"
+    },
+    "./jwt": {
+      "import": "./jwt/index.mjs",
+      "require": "./jwt/index.js"
+    },
+    "./cache": {
+      "import": "./cache/index.mjs",
+      "require": "./cache/index.js"
+    },
+    "./buffer": {
+      "import": "./buffer/index.mjs",
+      "require": "./buffer/index.js"
+    },
+    "./cookie": {
+      "import": "./cookie/index.mjs",
+      "require": "./cookie/index.js"
+    },
+    "./crypto": {
+      "import": "./crypto/index.mjs",
+      "require": "./crypto/index.js"
+    },
+    "./durable": {
+      "import": "./durable/index.mjs",
+      "require": "./durable/index.js"
+    },
+    "./response": {
+      "import": "./response/index.mjs",
+      "require": "./response/index.js"
+    },
+    "./module": {
+      "import": "./module/index.mjs",
+      "require": "./module/index.js"
+    },
+    "./base64": {
+      "import": "./base64/index.mjs",
+      "require": "./base64/index.js"
+    },
+    "./utils": {
+      "import": "./utils/index.mjs",
+      "require": "./utils/index.js"
+    },
+    "./sw": {
+      "import": "./sw/index.mjs",
+      "require": "./sw/index.js"
+    },
+    "./ws": {
+      "import": "./ws/index.mjs",
+      "require": "./ws/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "cors",
+    "base64",
+    "buffer",
+    "cache",
+    "crypto",
+    "cookie",
+    "response",
+    "durable",
+    "module",
+    "router",
+    "utils",
+    "jwt",
+    "kv",
+    "sw",
+    "ws"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {
+    "regexparam": "^2.0.0"
+  },
+  "keywords": [
+    "serviceworker",
+    "cloudflare",
+    "framework",
+    "workers",
+    "worker",
+    "http",
+    "api"
+  ]
+}
