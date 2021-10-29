@@ -13,12 +13,30 @@ export const EXPIRED = /*#__PURE__*/ new Error('Expired token');
 
 // type: helper
 export function encode(input: object) {
-	return Base64.base64url(JSON.stringify(input));
+	return Base64.base64url(
+		buff.toBinary(
+			buff.asUTF8(
+				JSON.stringify(input)
+			)
+		)
+	);
 }
 
 // type: helper
 export function toASCII(input: ArrayBuffer): string {
-	return Base64.base64url(buff.toBinary(input));
+	return Base64.base64url(
+		buff.toBinary(input)
+	);
+}
+
+// type: helper
+// Convert base64 string into JSON w/ UTF8 values
+function toJSON<T>(input: string): T {
+	return JSON.parse(
+		buff.toUTF8(
+			buff.asBinary(input)
+		)
+	);
 }
 
 // type: external
@@ -32,8 +50,9 @@ export function decode<P,H>(input: string): {
 
 	try {
 		let payload = Base64.decode(segs[1]);
-		var hh = JSON.parse(Base64.decode(segs[0]));
-		var pp = hh.typ === 'JWT' ? JSON.parse(payload) : payload;
+		var hh = toJSON<JWT.Header<H>>(Base64.decode(segs[0]));
+		// var pp = hh.typ === 'JWT' ? toJSON<JWT.Payload<P>>(payload) : payload;
+		var pp = toJSON<JWT.Payload<P>>(payload);
 	} catch (e) {
 		throw INVALID;
 	}
