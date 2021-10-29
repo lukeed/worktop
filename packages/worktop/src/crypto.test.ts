@@ -1,9 +1,11 @@
 import { suite } from 'uvu';
 import { promisify } from 'util';
 import * as assert from 'uvu/assert';
-import { createHash, pbkdf2 } from 'crypto';
+import { createHash, createHmac, pbkdf2 } from 'crypto';
 import * as crypto from './crypto';
 import { toHEX } from './buffer';
+
+import type { Algorithms } from './crypto.d';
 
 const digest = suite('digest');
 
@@ -20,144 +22,100 @@ digest.run();
 
 // ---
 
-const SHA1 = suite('SHA1');
+const SHA1 = suite('SHA1', {
+	async compare(input: string) {
+		assert.is(
+			await crypto.SHA1(input),
+			createHash('sha1').update(input).digest('hex'),
+			`~> "${input}"`
+		);
+	}
+});
 
 SHA1('should be a function', () => {
 	assert.type(crypto.SHA1, 'function');
 });
 
-SHA1('should return correct values as hexstrings', async () => {
-	assert.is(
-		await crypto.SHA1(''),
-		createHash('sha1').update('').digest('hex'),
-		'~> da39a3ee5e6b4b0d3255bfef95601890afd80709'
-	);
-
-	assert.is(
-		await crypto.SHA1('hello'),
-		createHash('sha1').update('hello').digest('hex'),
-		'~> aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d'
-	);
-
-	assert.is(
-		await crypto.SHA1('hello1'),
-		createHash('sha1').update('hello1').digest('hex'),
-		'~> 88fdd585121a4ccb3d1540527aee53a77c77abb8'
-	);
-
-	assert.is(
-		await crypto.SHA1('hello world'),
-		createHash('sha1').update('hello world').digest('hex'),
-		'~> 2aae6c35c94fcfb415dbe95f408b9ce91ee846ed'
-	);
+SHA1('should return correct values as hexstrings', async ctx => {
+	await ctx.compare('');
+	await ctx.compare('hello');
+	await ctx.compare('hello123');
+	await ctx.compare('"foo … bar"');
 });
 
 SHA1.run();
 
 // ---
 
-const SHA256 = suite('SHA256');
+const SHA256 = suite('SHA256', {
+	async compare(input: string) {
+		assert.is(
+			await crypto.SHA256(input),
+			createHash('sha256').update(input).digest('hex'),
+			`~> "${input}"`
+		);
+	}
+});
 
 SHA256('should be a function', () => {
 	assert.type(crypto.SHA256, 'function');
 });
 
-SHA256('should return correct values as hexstrings', async () => {
-	assert.is(
-		await crypto.SHA256(''),
-		createHash('sha256').update('').digest('hex'),
-		'~> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
-	);
-
-	assert.is(
-		await crypto.SHA256('hello'),
-		createHash('sha256').update('hello').digest('hex'),
-		'~> 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824'
-	);
-
-	assert.is(
-		await crypto.SHA256('hello1'),
-		createHash('sha256').update('hello1').digest('hex'),
-		'~> 91e9240f415223982edc345532630710e94a7f52cd5f48f5ee1afc555078f0ab'
-	);
-
-	assert.is(
-		await crypto.SHA256('hello world'),
-		createHash('sha256').update('hello world').digest('hex'),
-		'~> b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
-	);
+SHA256('should return correct values as hexstrings', async ctx => {
+	await ctx.compare('');
+	await ctx.compare('hello');
+	await ctx.compare('hello123');
+	await ctx.compare('"foo … bar"');
 });
 
 SHA256.run();
 
 // ---
 
-const SHA384 = suite('SHA384');
+const SHA384 = suite('SHA384', {
+	async compare(input: string) {
+		assert.is(
+			await crypto.SHA384(input),
+			createHash('sha384').update(input).digest('hex'),
+			`~> "${input}"`
+		);
+	}
+});
 
 SHA384('should be a function', () => {
 	assert.type(crypto.SHA384, 'function');
 });
 
-SHA384('should return correct values as hexstrings', async () => {
-	assert.is(
-		await crypto.SHA384(''),
-		createHash('sha384').update('').digest('hex'),
-		'~> 38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b'
-	);
-
-	assert.is(
-		await crypto.SHA384('hello'),
-		createHash('sha384').update('hello').digest('hex'),
-		'~> 59e1748777448c69de6b800d7a33bbfb9ff1b463e44354c3553bcdb9c666fa90125a3c79f90397bdf5f6a13de828684f'
-	);
-
-	assert.is(
-		await crypto.SHA384('hello1'),
-		createHash('sha384').update('hello1').digest('hex'),
-		'~> 7a79ada28c7218353974345bfc7c2c463577219dc4ecc155341e770ce235634c7f5224bf586e51fe6d890cfe41e1c59a'
-	);
-
-	assert.is(
-		await crypto.SHA384('hello world'),
-		createHash('sha384').update('hello world').digest('hex'),
-		'~> fdbd8e75a67f29f701a4e040385e2e23986303ea10239211af907fcbb83578b3e417cb71ce646efd0819dd8c088de1bd'
-	);
+SHA384('should return correct values as hexstrings', async ctx => {
+	await ctx.compare('');
+	await ctx.compare('hello');
+	await ctx.compare('hello123');
+	await ctx.compare('"foo … bar"');
 });
 
 SHA384.run();
 
 // ---
 
-const SHA512 = suite('SHA512');
+const SHA512 = suite('SHA512', {
+	async compare(input: string) {
+		assert.is(
+			await crypto.SHA512(input),
+			createHash('sha512').update(input).digest('hex'),
+			`~> "${input}"`
+		);
+	}
+});
 
 SHA512('should be a function', () => {
 	assert.type(crypto.SHA512, 'function');
 });
 
-SHA512('should return correct values as hexstrings', async () => {
-	assert.is(
-		await crypto.SHA512(''),
-		createHash('sha512').update('').digest('hex'),
-		'~> cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e'
-	);
-
-	assert.is(
-		await crypto.SHA512('hello'),
-		createHash('sha512').update('hello').digest('hex'),
-		'~> 9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043'
-	);
-
-	assert.is(
-		await crypto.SHA512('hello1'),
-		createHash('sha512').update('hello1').digest('hex'),
-		'~> 1dabfeadb6451e4903649fe6efec8ecda6b40e5ba99f73dfb5510956df496ecb1ebb625b9376bbcef223b354481633e9b977872aef979478e6451975e714c31f'
-	);
-
-	assert.is(
-		await crypto.SHA512('hello world'),
-		createHash('sha512').update('hello world').digest('hex'),
-		'~> 309ecc489c12d6eb4cc40f50c902f2b4d0ed77ee511a7c7a9bcd3ca86d4cd86f989dd35bc5ff499670da34255b45b0cfd830e81f605dcf7dc5542e93ae9cd76f'
-	);
+SHA512('should return correct values as hexstrings', async ctx => {
+	await ctx.compare('');
+	await ctx.compare('hello');
+	await ctx.compare('hello123');
+	await ctx.compare('"foo … bar"');
 });
 
 SHA512.run();
@@ -248,27 +206,34 @@ timingSafeEqual.run();
 // ---
 
 const PBKDF2 = suite('PBKDF2', {
-	native: promisify(pbkdf2)
+	async compare(payload: string, salt: string) {
+		// @see https://nodejs.org/api/crypto.html#crypto_crypto_pbkdf2_password_salt_iterations_keylen_digest_callback
+		let nodejs = await promisify(pbkdf2)(payload, salt, 100e3, 64, 'sha512');
+		let web = toHEX(await crypto.PBKDF2('SHA-512', payload, salt, 100e3, 64));
+		assert.is(web, nodejs.toString('hex'), `~> "${ payload }"`);
+	}
 });
 
 PBKDF2('should be a function', () => {
 	assert.type(crypto.PBKDF2, 'function');
 });
 
-// @see https://nodejs.org/api/crypto.html#crypto_crypto_pbkdf2_password_salt_iterations_keylen_digest_callback
 PBKDF2('should produce expected output', async ctx => {
-	assert.is(
-		await crypto.PBKDF2('SHA-512', 'secret', 'salt', 100e3, 64).then(toHEX),
-		(await ctx.native('secret', 'salt', 100e3, 64, 'sha512')).toString('hex'),
-		'~> 3745e482c6e0ade35da10139e797157f4a5da669dad7d5da88ef87e47471cc47ed941c7ad618e827304f083f8707f12b7cfdd5f489b782f10cc269e3c08d59ae'
-	)
+	await ctx.compare('secret123', 'salt');
+	await ctx.compare('foo … bar', 'salt123');
 });
 
 PBKDF2.run();
 
 // ---
 
-const HMAC = suite('HMAC');
+const HMAC = suite('HMAC', {
+	async compare(algo: Algorithms.Digest, payload: string, secret: string) {
+		let native = createHmac(algo.replace('-', '').toLowerCase(), secret).update(payload).digest('hex');
+		let output = await crypto.HMAC(algo, secret, payload).then(toHEX);
+		assert.is(output, native, `~> "${payload}"`);
+	}
+});
 
 HMAC('should be a function', () => {
 	assert.type(crypto.HMAC, 'function');
@@ -282,42 +247,36 @@ HMAC('should return ArrayBuffer', async () => {
 	assert.instance(output, ArrayBuffer);
 });
 
-HMAC('should produce expected output :: SHA-1', async () => {
-	let foo = await crypto.HMAC('SHA-1', 'hello', 'world').then(toHEX);
-	assert.is(foo, '8a3a84bcd0d0065e97f175d370447c7d02e00973');
+HMAC('should produce expected output :: SHA-1', async ctx => {
+	await ctx.compare('SHA-1', 'hello', 'world');
+	await ctx.compare('SHA-1', 'world', 'world');
 
-	let bar = await crypto.HMAC('SHA-1', 'world', 'hello').then(toHEX);
-	assert.is(bar, '5a0c67d922de0ca53e306250e6858c1f6d2c4943');
+	await ctx.compare('SHA-1', 'foo … bar', 'password');
+	await ctx.compare('SHA-1', '😂', 'password');
 });
 
-HMAC('should produce expected output :: SHA-256', async () => {
-	let foo = await crypto.HMAC('SHA-256', 'hello', 'world').then(toHEX);
-	assert.is(foo, 'f1ac9702eb5faf23ca291a4dc46deddeee2a78ccdaf0a412bed7714cfffb1cc4');
-	assert.is(foo, await crypto.HMAC256('hello', 'world').then(toHEX));
+HMAC('should produce expected output :: SHA-256', async ctx => {
+	await ctx.compare('SHA-256', 'hello', 'world');
+	await ctx.compare('SHA-256', 'world', 'world');
 
-	let bar = await crypto.HMAC('SHA-256', 'world', 'hello').then(toHEX);
-	assert.is(bar, '3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b');
-	assert.is(bar, await crypto.HMAC256('world', 'hello').then(toHEX));
+	await ctx.compare('SHA-256', 'foo … bar', 'password');
+	await ctx.compare('SHA-256', '😂', 'password');
 });
 
-HMAC('should produce expected output :: SHA-384', async () => {
-	let foo = await crypto.HMAC('SHA-384', 'hello', 'world').then(toHEX);
-	assert.is(foo, '80d036d9974e6f71ceabe493ee897d00235edcc4c72e046ddfc8bf68e86a477d63b9f7d26ad5b990aae6ac17db57ddcf');
-	assert.is(foo, await crypto.HMAC384('hello', 'world').then(toHEX));
+HMAC('should produce expected output :: SHA-384', async ctx => {
+	await ctx.compare('SHA-384', 'hello', 'world');
+	await ctx.compare('SHA-384', 'world', 'world');
 
-	let bar = await crypto.HMAC('SHA-384', 'world', 'hello').then(toHEX);
-	assert.is(bar, '2dc82db49e763d4f589d6b79c788a66ca27a708e8fba0014c36519f4c48e9cb5651d8c86ea6ca0c760219ac3bc009cf8');
-	assert.is(bar, await crypto.HMAC384('world', 'hello').then(toHEX));
+	await ctx.compare('SHA-384', 'foo … bar', 'password');
+	await ctx.compare('SHA-384', '😂', 'password');
 });
 
-HMAC('should produce expected output :: SHA-512', async () => {
-	let foo = await crypto.HMAC('SHA-512', 'hello', 'world').then(toHEX);
-	assert.is(foo, '6668ed2f7d016c5f12d7808fc4f2d1dc4851622d7f15616de947a823b3ee67d761b953f09560da301f832902020dd1c64f496df37eb7ac4fd2feeeb67d77ba9b');
-	assert.is(foo, await crypto.HMAC512('hello', 'world').then(toHEX));
+HMAC('should produce expected output :: SHA-512', async ctx => {
+	await ctx.compare('SHA-512', 'hello', 'world');
+	await ctx.compare('SHA-512', 'world', 'world');
 
-	let bar = await crypto.HMAC('SHA-512', 'world', 'hello').then(toHEX);
-	assert.is(bar, '2b83319d3e78544e4430c4f5621968fee8b6ffa1254678b2c6fb98f7f79ff16afee2da909a7bb741488ca3bacbbf6cec8fd226c5a52eef805ea65a352e2ece8e');
-	assert.is(bar, await crypto.HMAC512('world', 'hello').then(toHEX));
+	await ctx.compare('SHA-512', 'foo … bar', 'password');
+	await ctx.compare('SHA-512', '😂', 'password');
 });
 
 HMAC.run();
