@@ -15,13 +15,13 @@
     "types": "tsc --noEmit --skipLibCheck"
   },
   "devDependencies": {
-    "@types/node": "16.9.6",
+    "@types/node": "16.11.6",
     "esbuild": "0.13.2",
     "fetchy": "next",
     "is-uuid": "1.0.2",
     "kleur": "4.1.4",
     "rewrite-imports": "2.0.3",
-    "typescript": "4.4.2",
-    "uvu": "0.5.1"
+    "typescript": "4.4.4",
+    "uvu": "0.5.2"
   }
 }
