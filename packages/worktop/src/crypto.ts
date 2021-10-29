@@ -1,8 +1,8 @@
-import { encode, toHEX } from 'worktop/buffer';
+import { asUTF8, toHEX } from 'worktop/buffer';
 import type { Algorithms, TypedArray } from 'worktop/crypto';
 
 export function digest(algo: Algorithms.Digest, message: string): Promise<string> {
-	return crypto.subtle.digest(algo, encode(message)).then(toHEX);
+	return crypto.subtle.digest(algo, asUTF8(message)).then(toHEX);
 }
 
 export const MD5    = /*#__PURE__*/ digest.bind(0, 'MD5');
@@ -12,7 +12,7 @@ export const SHA384 = /*#__PURE__*/ digest.bind(0, 'SHA-384');
 export const SHA512 = /*#__PURE__*/ digest.bind(0, 'SHA-512');
 
 export function keyload(algo: Algorithms.Keying, secret: string, scopes: KeyUsage[]): Promise<CryptoKey> {
-	return crypto.subtle.importKey('raw', encode(secret), algo, false, scopes);
+	return crypto.subtle.importKey('raw', asUTF8(secret), algo, false, scopes);
 }
 
 export function keygen(algo: Algorithms.Keying, scopes: KeyUsage[], extractable = false): Promise<CryptoKey|CryptoKeyPair> {
@@ -20,11 +20,11 @@ export function keygen(algo: Algorithms.Keying, scopes: KeyUsage[], extractable 
 }
 
 export function sign(algo: Algorithms.Signing, key: CryptoKey, payload: string): Promise<ArrayBuffer> {
-	return crypto.subtle.sign(algo, key, encode(payload));
+	return crypto.subtle.sign(algo, key, asUTF8(payload));
 }
 
 export function verify(algo: Algorithms.Signing, key: CryptoKey, payload: string, signature: ArrayBuffer): Promise<boolean> {
-	return crypto.subtle.verify(algo, key, signature, encode(payload));
+	return crypto.subtle.verify(algo, key, signature, asUTF8(payload));
 }
 
 export function timingSafeEqual<T extends TypedArray>(a: T, b: T): boolean {
@@ -42,7 +42,7 @@ export async function PBKDF2(digest: Algorithms.Digest, password: string, salt: 
 
 	const algo: Pbkdf2Params = {
 		name: 'PBKDF2',
-		salt: encode(salt),
+		salt: asUTF8(salt),
 		iterations: iters,
 		hash: digest,
 	};
