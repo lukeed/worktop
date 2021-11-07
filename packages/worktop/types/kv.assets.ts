@@ -1,10 +1,8 @@
 import * as assets from 'worktop/kv.assets';
-import type { Context } from 'worktop';
 import type { KV } from 'worktop/kv';
 
 declare let request: Request;
 declare let binding: KV.Namespace;
-declare let context: Context;
 
 assert<Function>(assets.serve);
 
