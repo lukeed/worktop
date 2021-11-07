@@ -86,6 +86,7 @@
     "crypto",
     "cookie",
     "response",
+    "kv.assets",
     "durable",
     "module",
     "router",
