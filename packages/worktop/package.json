@@ -20,6 +20,10 @@
       "import": "./kv/index.mjs",
       "require": "./kv/index.js"
     },
+    "./kv.assets": {
+      "import": "./kv.assets/index.mjs",
+      "require": "./kv.assets/index.js"
+    },
     "./cors": {
       "import": "./cors/index.mjs",
       "require": "./cors/index.js"
@@ -95,6 +99,7 @@
     "node": ">=12"
   },
   "dependencies": {
+    "mrmime": "^1.0.0",
     "regexparam": "^2.0.0"
   },
   "keywords": [
