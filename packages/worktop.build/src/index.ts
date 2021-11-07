@@ -54,6 +54,7 @@ export async function build(options: Options): Promise<void> {
 		mainFields: fields,
 		conditions: conds,
 		charset: 'utf8',
+		plugins: [],
 		loader: {
 			'.htm': 'text',
 			'.html': 'text',
