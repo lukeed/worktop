@@ -1,19 +1,17 @@
 import { lookup, mimes } from 'mrmime';
-import type { Context } from 'worktop';
 import type { KV } from 'worktop/kv';
 
 export { mimes };
 
 // TODO: last-modified / etag headers
 // TODO: compare if-modified-since / if-none-match headers
-export async function serve(ns: KV.Namespace, req: Request | `/${string}`, context: Context): Promise<Response | void> {
+export async function serve(ns: KV.Namespace, req: Request | `/${string}`): Promise<Response | void> {
 	let isPath = typeof req === 'string';
 	let isHEAD = !isPath && (req as Request).method === 'HEAD';
 	let isGET = isPath || isHEAD || (req as Request).method === 'GET';
 	if (!isGET) return;
 
-	// TODO: maybe skip context here
-	let path = isPath ? (req as string) : context.url.pathname;
+	let path = isPath ? (req as string) : new URL((req as Request).url).pathname;
 	if (!isPath && path.endsWith('/')) path += 'index.html';
 
 	let item = await ns.get(path, 'arrayBuffer');

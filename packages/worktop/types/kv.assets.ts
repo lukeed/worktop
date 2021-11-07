@@ -15,22 +15,19 @@ assets.serve();
 assets.serve(request);
 
 // @ts-expect-error
-assets.serve(binding, request);
-
-// @ts-expect-error
 assets.serve(binding, request, request);
 
 // @ts-expect-error
-assets.serve(binding, 'foobar', context);
+assets.serve(binding, 'foobar');
 
-assets.serve(binding, request, context);
-assets.serve(binding, '/foo/bar', context);
-assets.serve(binding, '/foobar', context);
+assets.serve(binding, request);
+assets.serve(binding, '/foo/bar');
+assets.serve(binding, '/foobar');
 
 assert<Promise<Response|void>>(
-	assets.serve(binding, request, context)
+	assets.serve(binding, request)
 );
 
 assert<Response|void>(
-	await assets.serve(binding, request, context)
+	await assets.serve(binding, request)
 );
