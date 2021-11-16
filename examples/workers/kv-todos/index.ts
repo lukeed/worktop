@@ -1,8 +1,9 @@
 import { Router } from 'worktop';
 import * as Cache from 'worktop/cache';
 import * as Todos from './routes';
+import { Bindings } from './model';
 
-const API = new Router();
+const API = new Router<Bindings>();
 
 /**
  * NOTE: Demo expects hard-coded ":username" value.

@@ -47,9 +47,15 @@ import { Router } from 'worktop';
 import * as Cache from 'worktop/cache';
 import { uid as toUID } from 'worktop/utils';
 import { read, write } from 'worktop/kv';
+import { send } from 'worktop/response'
 import type { KV } from 'worktop/kv';
+import type { Context } from 'worktop';
 
-declare var DATA: KV.Namespace;
+interface Bindings extends Context {
+  bindings: {
+    DATA: KV.Namespace
+  }
+}
 
 interface Message {
   id: string;
@@ -58,38 +64,40 @@ interface Message {
 }
 
 // Initialize
-const API = new Router();
+const API = new Router<Bindings>();
 
 
-API.add('GET', '/messages/:id', async (req, res) => {
+API.add('GET', '/messages/:id', async (req, context) => {
   // Pre-parsed `req.params` object
-  const key = `messages::${req.params.id}`;
+  const key = `messages::${context.params.id}`;
 
   // Assumes JSON (can override)
-  const message = await read<Message>(DATA, key);
+  const message = await read<Message>(context.bindings.DATA, key);
 
   // Alter response headers directly
-  res.setHeader('Cache-Control', 'public, max-age=60');
+  // res.setHeader('Cache-Control', 'public, max-age=60');
 
   // Smart `res.send()` helper
   // ~> automatically stringifies JSON objects
   // ~> auto-sets `Content-Type` & `Content-Length` headers
-  res.send(200, message);
+  send(200, message, {
+    'Cache-Control': 'public, max-age=60'
+  });
 });
 
 
-API.add('POST', '/messages', async (req, res) => {
+API.add('POST', '/messages', async (req, context) => {
   try {
     // Smart `req.body` helper
     // ~> parses JSON header as JSON
     // ~> parses form-like header as FormData, ...etc
     var input = await req.body<Message>();
   } catch (err) {
-    return res.send(400, 'Error parsing request body');
+    return send(400, 'Error parsing request body');
   }
 
   if (!input || !input.text.trim()) {
-    return res.send(422, { text: 'required' });
+    return send(422, { text: 'required' });
   }
 
   const value: Message = {
@@ -100,12 +108,12 @@ API.add('POST', '/messages', async (req, res) => {
 
   // Assumes JSON (can override)
   const key = `messages::${value.id}`;
-  const success = await write<Message>(DATA, key, value);
+  const success = await write<Message>(context.bindings.DATA, key, value);
   //    ^ boolean
 
   // Alias for `event.waitUntil`
   // ~> queues background task (does NOT delay response)
-  req.extend(
+  context.waitUntil(
     fetch('https://.../logs', {
       method: 'POST',
       headers: { 'content-type': 'application/json '},
@@ -113,20 +121,20 @@ API.add('POST', '/messages', async (req, res) => {
     })
   );
 
-  if (success) res.send(201, value);
-  else res.send(500, 'Error creating record');
+  if (success) send(201, value);
+  else send(500, 'Error creating record');
 });
 
 
-API.add('GET', '/alive', (req, res) => {
-  res.end('OK'); // Node.js-like `res.end`
+API.add('GET', '/alive', (req, context) => {
+  send(200, 'OK'); // Node.js-like `res.end`
 });
 
 
 // Attach "fetch" event handler
 // ~> use `Cache` for request-matching, when permitted
 // ~> store Response in `Cache`, when permitted
-Cache.listen(API.run);
+export default Cache.listen(API.run);
 ```
 
 ## API

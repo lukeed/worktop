@@ -2,8 +2,13 @@ import * as DB from 'worktop/kv';
 import { ulid } from 'worktop/utils';
 import type { ULID } from 'worktop/utils';
 import type { KV } from 'worktop/kv';
+import type { Context } from 'worktop';
 
-declare const TODOS: KV.Namespace;
+export interface Bindings extends Context {
+  bindings: {
+    TODOS: KV.Namespace
+  }
+}
 
 export interface Todo {
 	uid: ULID;
@@ -13,15 +18,15 @@ export interface Todo {
 	updated_at: number|null;
 }
 
-const toPrefix = (username: string) => `user::${username}::todos::`;
-const toKeyname = (username: string, uid: string) => toPrefix(username) + uid;
+const toPrefix = (username: string): string => `user::${username}::todos::`;
+const toKeyname = (username: string, uid: string): string => toPrefix(username) + uid;
 
 /**
  * Get a list of Todo IDs for <username>
  */
-export async function list(username: string, options: { limit?: number; page?: number } = {}): Promise<string[]> {
+export async function list(KV: KV.Namespace, username: string, options: { limit?: number; page?: number } = {}): Promise<string[]> {
 	const prefix = toPrefix(username);
-	const keys = await DB.paginate<string[]>(TODOS, { ...options, prefix });
+	const keys = await DB.paginate<string[]>(KV, { ...options, prefix });
 	//    ^keys are the full KV key names
 	// Remove the `prefix::` from each of them
 	return keys.map(x => x.substring(prefix.length));
@@ -30,17 +35,17 @@ export async function list(username: string, options: { limit?: number; page?: n
 /**
  * Force-write a `Todo` record
  */
-export function save(username: string, item: Todo) {
+export function save(KV: KV.Namespace, username: string, item: Todo): Promise<boolean> {
 	const key = toKeyname(username, item.uid);
-	return DB.write(TODOS, key, item);
+	return DB.write(KV, key, item);
 }
 
 /**
  * Find a `Todo` record by its <username>::<uid> pair
  */
-export function find(username: string, uid: string) {
+export function find(KV: KV.Namespace, username: string, uid: string): Promise<object | null> {
 	const key = toKeyname(username, uid);
-	return DB.read<Todo>(TODOS, key, 'json');
+	return DB.read<Todo>(KV, key, 'json');
 }
 
 /**
@@ -49,12 +54,12 @@ export function find(username: string, uid: string) {
  * - Carefully picks value-keys for the record data
  * - Synchronizes owner's ID list for `GET /todos` route
  */
-export async function insert(username: string, item: Partial<Todo>) {
+export async function insert(KV: KV.Namespace, username: string, item: Partial<Todo>): Promise<void | object> {
 	try {
 		// Generate new UID
 		const nextID = await DB.until(
 			() => ulid(), // 8 character string
-			(x) => find(username, x), // check if unique for user
+			(x) => find(KV, username, x), // check if unique for user
 		);
 
 		const values: Todo = {
@@ -66,7 +71,7 @@ export async function insert(username: string, item: Partial<Todo>) {
 		};
 
 		// exit early if could not save new `Todo` record
-		if (!await save(username, values)) return;
+		if (!await save(KV, username, values)) return;
 
 		// return the new item
 		return values;
@@ -80,7 +85,7 @@ export async function insert(username: string, item: Partial<Todo>) {
  * - Carefully picks value-keys to be saved
  * - Ensures `updated_at` is touched
  */
-export async function update(username: string, item: Todo) {
+export async function update(KV: KV.Namespace, username: string, item: Todo): Promise<object | void> {
 	// Pick values explictly
 	const values = {
 		uid: item.uid,
@@ -90,7 +95,7 @@ export async function update(username: string, item: Todo) {
 		updated_at: Date.now()
 	};
 
-	const success = await save(username, values);
+	const success = await save(KV, username, values);
 	if (success) return values;
 }
 
@@ -98,7 +103,7 @@ export async function update(username: string, item: Todo) {
  * Remove an existing `Todo` record
  * - Synchronizes owner's ID list for `GET /todos` route
  */
-export function destroy(username: string, uid: string) {
+export function destroy(KV: KV.Namespace, username: string, uid: string): Promise<boolean> {
 	const key = toKeyname(username, uid);
-	return DB.remove(TODOS, key);
+	return DB.remove(KV, key);
 }
