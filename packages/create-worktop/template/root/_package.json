@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "worktop build"
+  },
+  "dependencies": {
+    "worktop": "next"
+  },
+  "devDependencies": {
+    "worktop.build": "latest"
+  }
+}

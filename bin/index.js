@@ -149,5 +149,6 @@ async function bundle(modname, isMulti = true) {
  */
 Promise.all([
 	bundle('worktop', true),
+	bundle('create-worktop', false),
 	bundle('worktop.build', false),
 ]);
