@@ -3,8 +3,11 @@ const argv = require('mri')(process.argv.slice(2), {
 	alias: {
 		C: 'cwd',
 		f: 'force',
+		t: 'typescript',
+		// m: 'monorepo',
 		v: 'version',
 		h: 'help',
+		c: 'cfw',
 	},
 	default: {
 		C: '.',
@@ -26,10 +29,13 @@ if (argv.help) {
 	output += '\n    npm init worktop <name> [options]';
 	output += '\n';
 	output += '\n  Options';
-	output += '\n    -C, --cwd        Directory to resolve from';
-	output += '\n    -f, --force      Force directory overwrite';
-	output += '\n    -v, --version    Displays current version';
-	output += '\n    -h, --help       Displays this message';
+	output += '\n    -C, --cwd          Directory to resolve from';
+	output += '\n    -f, --force        Force directory overwrite';
+	output += '\n    -t, --typescript   Force directory overwrite';
+	// output += '\n    -m, --monorepo     Force directory overwrite';
+	output += '\n    -c, --cfw          Force directory overwrite';
+	output += '\n    -v, --version      Displays current version';
+	output += '\n    -h, --help         Displays this message';
 	output += '\n';
 	output += '\n  Examples';
 	output += '\n    $ npm init worktop my-worker';

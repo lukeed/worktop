@@ -4,6 +4,7 @@ import * as path from 'path';
 interface Argv {
 	cwd: string;
 	force?: boolean;
+	typescript?: boolean;
 }
 
 async function mkdir(dir: string) {
@@ -36,7 +37,7 @@ async function copy(src: string, dest: string) {
 export async function setup(dir: string, argv: Argv) {
 	argv.cwd = path.resolve(argv.cwd || '.');
 
-	let source = path.join(__dirname, 'template', 'root');
+	let source = path.join(__dirname, 'template');
 	let target = path.join(argv.cwd, dir);
 
 	if (fs.existsSync(target) && !argv.force) {
@@ -48,7 +49,8 @@ export async function setup(dir: string, argv: Argv) {
 
 	await mkdir(target);
 
-	await list(source, function (abs, rel, isDir) {
+	let root = path.join(source, 'root');
+	await list(root, function (abs, rel, isDir) {
 		let next = path.join(target, rel);
 		return isDir ? mkdir(next) : copy(abs, next);
 	});
@@ -56,5 +58,27 @@ export async function setup(dir: string, argv: Argv) {
 	await fs.promises.rename(
 		path.join(target, '.package.json'),
 		path.join(target, 'package.json'),
+	);
+
+	let file = path.join(target, 'package.json');
+	let pkg = require(file);
+
+	let input = argv.typescript ? 'index.ts' : 'index.js';
+
+	await fs.promises.mkdir(
+		path.join(target, 'src')
+	);
+
+	await fs.promises.copyFile(
+		path.join(source, input),
+		path.join(target, 'src', input),
+	);
+
+	// TODO: --cfw hook
+	pkg.devDependencies['worktop.build'] = 'latest';
+	pkg.scripts['build'] = `worktop build src/${input}`;
+
+	await fs.promises.writeFile(
+		file, JSON.stringify(pkg, null, 2)
 	);
 }
