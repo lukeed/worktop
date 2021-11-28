@@ -1,5 +1,5 @@
 import type { Bindings } from 'worktop';
-import type { Dict } from 'worktop/utils';
+import type { Dict, Promisable } from 'worktop/utils';
 import type { WebSocket } from 'worktop/ws';
 
 export namespace Durable {
@@ -27,7 +27,7 @@ export namespace Durable {
 		id: ObjectID;
 		storage: Storage;
 		waitUntil(f: any): void;
-		blockConcurrencyWhile(f: any): Promise<void>;
+		blockConcurrencyWhile<T>(f: () => Promisable<T>): Promise<T>;
 	}
 
 	export namespace Storage {

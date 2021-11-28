@@ -7,7 +7,7 @@ export abstract class Actor {
 	DEBUG: boolean;
 
 	constructor(state: Durable.State, bindings: Bindings) {
-		if (this.setup) state.blockConcurrencyWhile(this.setup(state, bindings));
+		if (this.setup) state.blockConcurrencyWhile(() => this.setup!(state, bindings));
 		this.DEBUG = false;
 	}
 
