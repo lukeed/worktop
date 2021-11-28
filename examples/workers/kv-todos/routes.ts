@@ -3,7 +3,7 @@ import * as utils from 'worktop/utils';
 import * as Model from './model';
 
 import type { Todo } from './model';
-import type { Handler } from 'worktop';
+import type { Handler } from './types';
 
 /**
  * GET /users/:username/todos

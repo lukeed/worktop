@@ -1,14 +1,8 @@
 import * as DB from 'worktop/kv';
 import { ulid } from 'worktop/utils';
+
 import type { ULID } from 'worktop/utils';
 import type { KV } from 'worktop/kv';
-import type { Context } from 'worktop';
-
-export interface Bindings extends Context {
-  bindings: {
-    TODOS: KV.Namespace
-  }
-}
 
 export interface Todo {
 	uid: ULID;
@@ -18,15 +12,15 @@ export interface Todo {
 	updated_at: number|null;
 }
 
-const toPrefix = (username: string): string => `user::${username}::todos::`;
-const toKeyname = (username: string, uid: string): string => toPrefix(username) + uid;
+const toPrefix = (username: string) => `user::${username}::todos::`;
+const toKeyname = (username: string, uid: string) => toPrefix(username) + uid;
 
 /**
  * Get a list of Todo IDs for <username>
  */
-export async function list(KV: KV.Namespace, username: string, options: { limit?: number; page?: number } = {}): Promise<string[]> {
+export async function list(TODOS: KV.Namespace, username: string, options: { limit?: number; page?: number } = {}): Promise<string[]> {
 	const prefix = toPrefix(username);
-	const keys = await DB.paginate<string[]>(KV, { ...options, prefix });
+	const keys = await DB.paginate<string[]>(TODOS, { ...options, prefix });
 	//    ^keys are the full KV key names
 	// Remove the `prefix::` from each of them
 	return keys.map(x => x.substring(prefix.length));
@@ -35,17 +29,17 @@ export async function list(KV: KV.Namespace, username: string, options: { limit?
 /**
  * Force-write a `Todo` record
  */
-export function save(KV: KV.Namespace, username: string, item: Todo): Promise<boolean> {
+export function save(TODOS: KV.Namespace, username: string, item: Todo): Promise<boolean> {
 	const key = toKeyname(username, item.uid);
-	return DB.write(KV, key, item);
+	return DB.write(TODOS, key, item);
 }
 
 /**
  * Find a `Todo` record by its <username>::<uid> pair
  */
-export function find(KV: KV.Namespace, username: string, uid: string): Promise<object | null> {
+export function find(TODOS: KV.Namespace, username: string, uid: string): Promise<object | null> {
 	const key = toKeyname(username, uid);
-	return DB.read<Todo>(KV, key, 'json');
+	return DB.read<Todo>(TODOS, key, 'json');
 }
 
 /**
@@ -54,12 +48,12 @@ export function find(KV: KV.Namespace, username: string, uid: string): Promise<o
  * - Carefully picks value-keys for the record data
  * - Synchronizes owner's ID list for `GET /todos` route
  */
-export async function insert(KV: KV.Namespace, username: string, item: Partial<Todo>): Promise<void | object> {
+export async function insert(TODOS: KV.Namespace, username: string, item: Partial<Todo>): Promise<Todo|void> {
 	try {
 		// Generate new UID
 		const nextID = await DB.until(
 			() => ulid(), // 8 character string
-			(x) => find(KV, username, x), // check if unique for user
+			(x) => find(TODOS, username, x), // check if unique for user
 		);
 
 		const values: Todo = {
@@ -71,7 +65,7 @@ export async function insert(KV: KV.Namespace, username: string, item: Partial<T
 		};
 
 		// exit early if could not save new `Todo` record
-		if (!await save(KV, username, values)) return;
+		if (!await save(TODOS, username, values)) return;
 
 		// return the new item
 		return values;
@@ -85,9 +79,9 @@ export async function insert(KV: KV.Namespace, username: string, item: Partial<T
  * - Carefully picks value-keys to be saved
  * - Ensures `updated_at` is touched
  */
-export async function update(KV: KV.Namespace, username: string, item: Todo): Promise<object | void> {
+export async function update(TODOS: KV.Namespace, username: string, item: Todo): Promise<Todo|void> {
 	// Pick values explictly
-	const values = {
+	const values: Todo = {
 		uid: item.uid,
 		title: item.title.trim(),
 		complete: !!item.complete,
@@ -95,7 +89,7 @@ export async function update(KV: KV.Namespace, username: string, item: Todo): Pr
 		updated_at: Date.now()
 	};
 
-	const success = await save(KV, username, values);
+	const success = await save(TODOS, username, values);
 	if (success) return values;
 }
 
@@ -103,7 +97,7 @@ export async function update(KV: KV.Namespace, username: string, item: Todo): Pr
  * Remove an existing `Todo` record
  * - Synchronizes owner's ID list for `GET /todos` route
  */
-export function destroy(KV: KV.Namespace, username: string, uid: string): Promise<boolean> {
+export function destroy(TODOS: KV.Namespace, username: string, uid: string): Promise<boolean> {
 	const key = toKeyname(username, uid);
-	return DB.remove(KV, key);
+	return DB.remove(TODOS, key);
 }
