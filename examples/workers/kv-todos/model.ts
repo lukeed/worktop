@@ -37,7 +37,7 @@ export function save(TODOS: KV.Namespace, username: string, item: Todo): Promise
 /**
  * Find a `Todo` record by its <username>::<uid> pair
  */
-export function find(TODOS: KV.Namespace, username: string, uid: string): Promise<object | null> {
+export function find(TODOS: KV.Namespace, username: string, uid: string): Promise<Todo|null> {
 	const key = toKeyname(username, uid);
 	return DB.read<Todo>(TODOS, key, 'json');
 }
