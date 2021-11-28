@@ -2,7 +2,9 @@ import { Router } from 'worktop';
 import * as Cache from 'worktop/cache';
 import * as Todos from './routes';
 
-const API = new Router();
+import type { Context } from './types';
+
+const API = new Router<Context>();
 
 /**
  * NOTE: Demo expects hard-coded ":username" value.
