@@ -44,10 +44,11 @@ $ npm install --save worktop
 
 ```ts
 import { Router } from 'worktop';
-import * as Cache from 'worktop/cache';
-import { uid as toUID } from 'worktop/utils';
+import * as utils from 'worktop/utils';
 import { read, write } from 'worktop/kv';
-import { send } from 'worktop/response'
+import { send } from 'worktop/response';
+import * as Cache from 'worktop/cache';
+
 import type { KV } from 'worktop/kv';
 import type { Context } from 'worktop';
 
@@ -68,19 +69,16 @@ const API = new Router<Bindings>();
 
 
 API.add('GET', '/messages/:id', async (req, context) => {
-  // Pre-parsed `req.params` object
+  // Pre-parsed `context.params` object
   const key = `messages::${context.params.id}`;
 
   // Assumes JSON (can override)
   const message = await read<Message>(context.bindings.DATA, key);
 
-  // Alter response headers directly
-  // res.setHeader('Cache-Control', 'public, max-age=60');
-
-  // Smart `res.send()` helper
+  // Smart `send` helper
   // ~> automatically stringifies JSON objects
   // ~> auto-sets `Content-Type` & `Content-Length` headers
-  send(200, message, {
+  return send(200, message, {
     'Cache-Control': 'public, max-age=60'
   });
 });
@@ -88,10 +86,10 @@ API.add('GET', '/messages/:id', async (req, context) => {
 
 API.add('POST', '/messages', async (req, context) => {
   try {
-    // Smart `req.body` helper
+    // Smart `utils.body` helper
     // ~> parses JSON header as JSON
     // ~> parses form-like header as FormData, ...etc
-    var input = await req.body<Message>();
+    var input = await utils.body<Message>(req);
   } catch (err) {
     return send(400, 'Error parsing request body');
   }
@@ -101,7 +99,7 @@ API.add('POST', '/messages', async (req, context) => {
   }
 
   const value: Message = {
-    id: toUID(16),
+    id: utils.uid(16),
     text: input.text.trim(),
     // ...
   };
@@ -121,20 +119,15 @@ API.add('POST', '/messages', async (req, context) => {
     })
   );
 
-  if (success) send(201, value);
-  else send(500, 'Error creating record');
-});
-
-
-API.add('GET', '/alive', (req, context) => {
-  send(200, 'OK'); // Node.js-like `res.end`
+  if (success) return send(201, value);
+  return send(500, 'Error creating record');
 });
 
 
 // Attach "fetch" event handler
 // ~> use `Cache` for request-matching, when permitted
 // ~> store Response in `Cache`, when permitted
-export default Cache.listen(API.run);
+export default Cache.reply(API.run);
 ```
 
 ## API
