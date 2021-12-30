@@ -15,7 +15,7 @@ export function finalize(res: Response, isHEAD?: boolean): Response;
  * Auto-serialize `data` to a `Response` object.
  * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
  */
-export function send(status: number, data?: any, headers?: HeadersObject): Response;
+export function reply(status: number, data?: any, headers?: HeadersObject): Response;
 
 export declare class ServerResponse {
 	readonly headers: Headers;
