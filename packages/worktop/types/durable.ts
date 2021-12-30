@@ -119,6 +119,23 @@ export class Counter4 extends Actor {
 	}
 }
 
+// https://github.com/lukeed/worktop/issues/120
+export class Issue extends Actor {
+	API = new Router;
+	receive = this.API.run;
+
+	constructor(public state: Durable.State, public bindings: Bindings) {
+    super(state, bindings)
+    this.setupRouter()
+  }
+
+
+  setupRouter() {
+    this.API.add('GET', '/', () => {
+      return new Response;
+    })
+  }
+}
 
 /**
  * NATIVE

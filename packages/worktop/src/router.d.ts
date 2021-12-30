@@ -83,7 +83,7 @@ export type RouteParams<T extends string> =
 
 export type Initializer<C extends Context> = (
 	request: Request,
-	context: Partial<C> & Module.Context & {
+	context?: Partial<C> & Module.Context & {
 		bindings?: Bindings;
 	}
 ) => Promise<Response>;

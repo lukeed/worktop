@@ -102,7 +102,7 @@ export function Router(): RR<Context> {
 				var defer: Deferral | void;
 				var queue: Deferral[] = [];
 
-				context = context || {};
+				context = context || {} as Context;
 				context.url = new URL(req.url);
 				context.defer = f => { queue.push(f) };
 				context.bindings = context.bindings || {};
