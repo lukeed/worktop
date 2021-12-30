@@ -86,6 +86,11 @@ isCacheable('status code :: 206', () => {
 	assert.is(Cache.isCacheable(res), false);
 });
 
+isCacheable('status code :: 101', () => {
+	const res = new Response(null, { status: 101 });
+	assert.is(Cache.isCacheable(res), false);
+});
+
 isCacheable('cache-control :: public', () => {
 	const res = new Response();
 	res.headers.set('cache-control', 'public,max-age=0');

@@ -27,8 +27,10 @@ export function save(req: Request | string, res: Response, context: Module.Conte
 	return res;
 }
 
+// TODO: Check if other codes (eg 500) actually work in CF cache
+// @see https://datatracker.ietf.org/doc/html/rfc7231#section-6.1
 export function isCacheable(res: Response): boolean {
-	if (res.status === 206) return false;
+	if (res.status === 101 || res.status === 206) return false;
 
 	const vary = res.headers.get('Vary') || '';
 	if (!!~vary.indexOf('*')) return false;
