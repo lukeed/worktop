@@ -23,21 +23,20 @@ export function headers(res: Response, options?: Partial<Config>): Config {
 
 type Options = Omit<Config, 'origin'> & { origin?: boolean | string | RegExp };
 export function preflight(options: Options = {}): Handler {
-	let origin = (options.origin = options.origin || '*');
-	let isStatic = typeof origin === 'string';
-
 	return function (req, context) {
+		// false -> "*"
+		let origin = options.origin || '*';
 		let tmp: string | null;
 
-		if (!isStatic) {
+		if (typeof origin !== 'string') {
+			// true|RegExp -> reflects
 			tmp = req.headers.get('Origin') || '';
-			// false -> "*"; true -> reflects; rgx -> reflect?
-			options.origin = origin === true && tmp || origin instanceof RegExp && origin.test(tmp) && tmp || 'false';
+			origin = origin === true && tmp || (origin instanceof RegExp && origin.test(tmp) && tmp) || 'false';
 		}
 
 		if (req.method === 'OPTIONS') {
 			let res = new Response(null, { status: 204 });
-			let c = headers(res, options as Config);
+			let c = headers(res, { ...options, origin });
 
 			if (c.headers!.length) {
 				res.headers.set('Access-Control-Allow-Headers', c.headers!);
@@ -54,6 +53,7 @@ export function preflight(options: Options = {}): Handler {
 		}
 
 		context.defer(res => {
+			options.origin = origin as string;
 			headers(res, options as Config);
 		});
 	};
