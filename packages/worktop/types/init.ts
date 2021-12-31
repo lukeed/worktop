@@ -49,19 +49,19 @@ Cache.listen(API.run);
  * init: Module Worker
  */
 
-modules.reply(API.run);
+modules.start(API.run);
 assert<Module.Worker>(
-	modules.reply(API.run)
+	modules.start(API.run)
 );
 
-modules.reply(CUSTOM.run);
+modules.start(CUSTOM.run);
 assert<Module.Worker>(
-	modules.reply(CUSTOM.run)
+	modules.start(CUSTOM.run)
 );
 
-modules.reply(CUSTOM.run);
+modules.start(CUSTOM.run);
 assert<Module.Worker<MyBindings>>(
-	modules.reply<MyContext, MyBindings>(CUSTOM.run)
+	modules.start<MyContext, MyBindings>(CUSTOM.run)
 );
 
 modules.define({
@@ -126,7 +126,7 @@ addEventListener('fetch', event => {
 	)
 });
 
-const worker1 = modules.reply(API.run);
+const worker1 = modules.start(API.run);
 const worker2 = Cache.reply(API.run);
 
 addEventListener('fetch', event => {

@@ -56,4 +56,4 @@ API.add('DELETE', '/', (req, context) => {
 });
 
 // Module Worker
-export default mod.reply(API.run);
+export default mod.start(API.run);
