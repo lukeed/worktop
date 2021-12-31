@@ -12,6 +12,7 @@ declare global {
 	};
 
 	interface ResponseInit {
+		/** @note Cloudflare only */
 		webSocket?: WebSocket;
 	}
 }

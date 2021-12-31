@@ -10,6 +10,10 @@ declare global {
 		cf: IncomingCloudflareProperties;
 	}
 
+	interface ResponseInit {
+		webSocket?: WebSocket;
+	}
+
 	interface FetchEvent {
 		passThroughOnException(): void;
 	}
