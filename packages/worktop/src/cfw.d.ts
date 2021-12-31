@@ -216,4 +216,6 @@ export function define<
 export function start<
 	C extends Context = Context,
 	B extends Bindings = Bindings,
->(run: Initializer<C>): Module.Worker<B>;
+>(run: Initializer<C>): {
+	fetch: FetchHandler<B>;
+}

@@ -16,4 +16,4 @@ API.add('PUT', '/users/:username/todos/:uid', Todos.update);
 API.add('DELETE', '/users/:username/todos/:uid', Todos.destroy);
 
 // Module Worker
-export default Cache.reply(API.run);
+export default Cache.start(API.run);

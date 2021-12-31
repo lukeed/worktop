@@ -25,4 +25,4 @@ API.add('GET', '/', (req, context) => {
 	});
 });
 
-export default Cache.reply(API.run);
+export default Cache.start(API.run);

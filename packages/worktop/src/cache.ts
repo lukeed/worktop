@@ -1,5 +1,4 @@
 import type { Context, Initializer } from 'worktop';
-import type { ResponseHandler } from 'worktop/cache';
 import type { Module, Bindings } from 'worktop/cfw';
 
 export const Cache: Cache = /*#__PURE__*/ (caches as any).default;
@@ -42,7 +41,7 @@ export function isCacheable(res: Response): boolean {
 }
 
 // Generate a Module Worker definition from an `Initializer` type.
-export function reply<
+export function start<
 	C extends Context = Context,
 	B extends Bindings = Bindings,
 >(run: Initializer<C>): Module.Worker<B> {
@@ -56,17 +55,4 @@ export function reply<
 			return save(req, res, ctx);
 		}
 	}
-}
-
-// initializer: Service Worker
-export function listen(handler: ResponseHandler): void {
-	addEventListener('fetch', event => {
-		event.respondWith(
-			lookup(event.request).then(prev => {
-				return prev || handler(event).then(res => {
-					return save(event.request, res, event);
-				});
-			})
-		);
-	});
 }
