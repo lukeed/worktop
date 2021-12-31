@@ -35,15 +35,12 @@ assert<void>(
  */
 
 assert<Module.Worker>(
-	Cache.reply(API.run)
+	Cache.start(API.run)
 );
 
 assert<Module.Worker>(
-	Cache.reply(CUSTOM.run)
+	Cache.start(CUSTOM.run)
 );
-
-// @ts-expect-error
-Cache.listen(API.run);
 
 /**
  * init: Module Worker
@@ -127,14 +124,14 @@ addEventListener('fetch', event => {
 });
 
 const worker1 = cfw.start(API.run);
-const worker2 = Cache.reply(API.run);
+const worker2 = Cache.start(API.run);
 
 addEventListener('fetch', event => {
 	let req = event.request;
 	let bindings: Bindings = {};
 	event.respondWith((async function () {
-		let res = await worker1.fetch!(req, bindings, event);
-		return res || worker2.fetch!(req, bindings, event);
+		let res = await worker1.fetch(req, bindings, event);
+		return res || worker2.fetch(req, bindings, event);
 	})());
 });
 

@@ -106,4 +106,4 @@ API.add('POST', '/accounts', async (req, context) => {
 });
 
 // Initialize: Module Worker
-export default Cache.reply(API.run);
+export default Cache.start(API.run);

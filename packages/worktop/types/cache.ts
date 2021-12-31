@@ -72,16 +72,19 @@ Cache.isCacheable(request);
  */
 
 assert<Module.Worker>(
-	Cache.reply(API.run)
+	Cache.start(API.run)
 );
 
 /**
- * LISTEN
+ * Service Worker
  */
 
-assert<void>(
-	Cache.listen(event => {
-		assert<FetchEvent>(event);
-		return Promise.resolve(response);
-	})
-);
+addEventListener('fetch', event => {
+	event.respondWith(
+		Cache.lookup(event.request).then(prev => {
+			return prev || Promise.resolve(response).then(res => {
+				return Cache.save(event.request, res, event);
+			});
+		})
+	);
+});

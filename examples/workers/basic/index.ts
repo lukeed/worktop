@@ -1,6 +1,6 @@
 import { Router } from 'worktop';
-import { reply } from 'worktop/response';
 import * as Cache from 'worktop/cache';
+import { reply } from 'worktop/response';
 
 const API = new Router();
 
@@ -17,6 +17,13 @@ API.add('GET', '/', (req, context) => {
 	});
 });
 
-Cache.listen(event => {
-	return API.run(event.request, event)
+// NOTE: manual because SW is not assumed
+addEventListener('fetch', event => {
+	event.respondWith(
+		Cache.lookup(event.request).then(prev => {
+			return prev || API.run(event.request, event).then(res => {
+				return Cache.save(event.request, res, event);
+			});
+		})
+	);
 });

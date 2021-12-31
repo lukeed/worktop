@@ -127,7 +127,7 @@ API.add('POST', '/messages', async (req, context) => {
 // Attach "fetch" event handler
 // ~> use `Cache` for request-matching, when permitted
 // ~> store Response in `Cache`, when permitted
-export default Cache.reply(API.run);
+export default Cache.start(API.run);
 ```
 
 ## API
