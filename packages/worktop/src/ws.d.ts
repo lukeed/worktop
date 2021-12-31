@@ -1,32 +1,16 @@
+import type { WebSocket } from 'worktop/cfw';
 import type { Context, Params } from 'worktop';
 import type { Dict, Strict, Promisable } from 'worktop/utils';
 
 declare global {
-	const WebSocketPair: {
-		new(): {
-			/** the `client` socket */
-			0: WebSocket,
-			/** the `server` socket */
-			1: WebSocket,
-		};
-	};
-
 	interface ResponseInit {
 		/** @note Cloudflare only */
 		webSocket?: WebSocket;
 	}
 }
 
-export interface WebSocket {
-	accept(): void;
-	send(message: number | string): void;
-	close(code?: number, reason?: string): void;
-	addEventListener(type: 'error', listener: (this: WebSocket, ev: Event) => any): void;
-	addEventListener(type: 'close', listener: (this: WebSocket, ev: CloseEvent) => any): void;
-	addEventListener(type: 'message', listener: (this: WebSocket, ev: MessageEvent<string>) => any): void;
-}
-
-type State = Dict<any>;
+export type { WebSocket };
+export type State = Dict<any>;
 
 export interface Socket<S extends State = State> {
 	send: WebSocket['send'];
