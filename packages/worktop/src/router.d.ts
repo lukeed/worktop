@@ -18,23 +18,6 @@ export type Params = Dict<string>;
  */
 export type Method = 'ACL' | 'BIND' | 'CHECKOUT' | 'CONNECT' | 'COPY' | 'DELETE' | 'GET' | 'HEAD' | 'LINK' | 'LOCK' | 'M-SEARCH' | 'MERGE' | 'MKACTIVITY' | 'MKCALENDAR' | 'MKCOL' | 'MOVE' | 'NOTIFY' | 'OPTIONS' | 'PATCH' | 'POST' | 'PRI' | 'PROPFIND' | 'PROPPATCH' | 'PURGE' | 'PUT' | 'REBIND' | 'REPORT' | 'SEARCH' | 'SOURCE' | 'SUBSCRIBE' | 'TRACE' | 'UNBIND' | 'UNLINK' | 'UNLOCK' | 'UNSUBSCRIBE';
 
-export interface CronEvent {
-	type: 'scheduled';
-	/**
-	 * The CRON trigger
-	 * @example "23 59 LW * *"
-	 */
-	cron: string;
-	/**
-	 * Milliseconds since UNIX epoch.
-	 * @example new Date(evt.scheduledTime)
-	 */
-	scheduledTime: number;
-	/**
-	 * Method wrapper for event's action handler.
-	 */
-	waitUntil(f: Promisable<any>): void;
-}
 
 
 // TODO: move to utils?
