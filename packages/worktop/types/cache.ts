@@ -1,6 +1,7 @@
+import { compose } from 'worktop';
 import * as Cache from 'worktop/cache';
 import type { Module } from 'worktop/cfw';
-import type { Router } from 'worktop';
+import type { Router, Handler } from 'worktop';
 
 declare const event: FetchEvent;
 declare const request: Request;
@@ -68,11 +69,27 @@ Cache.isCacheable(123);
 Cache.isCacheable(request);
 
 /**
- * REPLY
+ * sync
  */
 
-assert<Module.Worker>(
-	Cache.start(API.run)
+assert<Handler>(
+	Cache.sync()
+);
+
+
+/**
+ * ROUTER
+ */
+
+// @ts-expect-error
+API.prepare = Cache.sync;
+API.prepare = Cache.sync();
+
+API.prepare = compose(
+	Cache.sync(),
+	async (req, res) => {
+		return new Response
+	}
 );
 
 /**
