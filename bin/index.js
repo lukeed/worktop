@@ -71,7 +71,20 @@ async function bundle(modname, isMulti = true) {
 		else if (!key) key = './' + file.replace(isTS, '');
 
 		let entry = pkg.exports[key];
-		if (!entry) return bail(`Missing "exports" entry: ${key}`);
+
+		if (!entry) {
+			if (typeof pkg.exports === 'string') {
+				let isCJS = /\.c?js$/.test(pkg.exports);
+				entry = { [isCJS ? 'require' : 'import']: pkg.exports };
+			} else if (pkg.exports.require || pkg.exports.import) {
+				entry = pkg.exports;
+			} else {
+				return bail(`Missing "exports" entry: ${key}`);
+			}
+
+			entry.import = entry.import || './fake.mjs';
+		}
+
 		if (!entry.import) return bail(`Missing "import" condition: ${key}`);
 		if (!entry.require) return bail(`Missing "require" condition: ${key}`);
 
@@ -110,7 +123,7 @@ async function bundle(modname, isMulti = true) {
 
 			// create dir (safe writes)
 			if (isMulti) await fs.promises.mkdir(outdir);
-			await write(esm.path, esm.contents);
+			esm.path.endsWith('fake.mjs') || await write(esm.path, esm.contents);
 
 			// convert esm -> cjs
 			output = join(pkgdir, entry.require);
@@ -136,5 +149,6 @@ async function bundle(modname, isMulti = true) {
  */
 Promise.all([
 	bundle('worktop', true),
+	bundle('create-worktop', false),
 	bundle('worktop.build', false),
 ]);

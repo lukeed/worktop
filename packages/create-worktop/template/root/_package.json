@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "<inject>"
+  },
+  "dependencies": {
+    "worktop": "next"
+  },
+  "devDependencies": {
+  }
+}

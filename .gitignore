@@ -7,7 +7,7 @@ node_modules
 !/packages/worktop/src/
 !/packages/worktop/types/
 
-/packages/worktop.build/index.js
-/packages/worktop.build/index.mjs
+/packages/*/index.js
+/packages/*/index.mjs
 
 /examples/build

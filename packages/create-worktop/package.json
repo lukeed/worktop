@@ -1,0 +1,26 @@
+{
+  "version": "0.0.4",
+  "name": "create-worktop",
+  "repository": "lukeed/worktop",
+  "description": "wip",
+  "license": "MIT",
+  "bin": "bin.js",
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "https://lukeed.com"
+  },
+  "exports": "./index.js",
+  "files": [
+    "bin.js",
+    "index.js",
+    "template"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {
+    "kleur": "^4.0.0",
+    "mri": "^1.2.0"
+  }
+}
