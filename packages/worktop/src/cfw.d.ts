@@ -211,7 +211,7 @@ export function define<
 
 /**
  * Generate a Module Worker definition from a Module `Initializer` function.
- * @example export default mod.start(API.run);
+ * @example export default cfw.start(API.run);
  */
 export function start<
 	C extends Context = Context,
@@ -219,3 +219,13 @@ export function start<
 >(run: Initializer<C>): {
 	fetch: FetchHandler<B>;
 }
+
+/**
+ * Attach the `Initializer` function as a "fetch" event listener.
+ * @note This is the same as `start` from `worktop/sw` but auto-loads
+ * the type definitions for the Cloudflare runtime environment.
+ * @example cfw.listen(API.run);
+ */
+export function listen<
+	C extends Context = Context
+>(run: Initializer<C>): void;

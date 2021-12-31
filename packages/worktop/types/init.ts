@@ -30,6 +30,10 @@ assert<void>(
 	sw.start(CUSTOM.run)
 );
 
+assert<void>(
+	cfw.listen(CUSTOM.run)
+);
+
 /**
  * init: Cache
  */
@@ -109,6 +113,8 @@ cfw.define<MyBindings>({
 /**
  * Event: fetch
  */
+
+cfw.listen(API.run);
 
 // @ts-expect-error
 addEventListener('fetch', API.run);
