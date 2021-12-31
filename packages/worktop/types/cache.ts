@@ -1,5 +1,5 @@
 import * as Cache from 'worktop/cache';
-import type { Module } from 'worktop/module';
+import type { Module } from 'worktop/cfw';
 import type { Router } from 'worktop';
 
 declare const event: FetchEvent;

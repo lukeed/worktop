@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import type { KV } from 'worktop/kv';
-import type { Module } from 'worktop/module';
+import type { Module } from 'worktop/cfw';
 import type { Durable } from 'worktop/durable';
 import type { Promisable, Strict, Dict } from 'worktop/utils';
 

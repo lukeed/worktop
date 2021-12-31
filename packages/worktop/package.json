@@ -40,6 +40,10 @@
       "import": "./buffer/index.mjs",
       "require": "./buffer/index.js"
     },
+    "./cfw": {
+      "import": "./cfw/index.mjs",
+      "require": "./cfw/index.js"
+    },
     "./cookie": {
       "import": "./cookie/index.mjs",
       "require": "./cookie/index.js"
@@ -55,10 +59,6 @@
     "./response": {
       "import": "./response/index.mjs",
       "require": "./response/index.js"
-    },
-    "./module": {
-      "import": "./module/index.mjs",
-      "require": "./module/index.js"
     },
     "./base64": {
       "import": "./base64/index.mjs",
@@ -79,6 +79,7 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "cfw",
     "cors",
     "base64",
     "buffer",
@@ -88,7 +89,6 @@
     "response",
     "kv.assets",
     "durable",
-    "module",
     "router",
     "utils",
     "jwt",
