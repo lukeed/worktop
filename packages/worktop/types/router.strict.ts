@@ -45,7 +45,7 @@ API.add('GET', '/:foo/:bar?', async (req, context) => {
 /**
  * init: service worker
  */
-sw.reply(API.run);
+sw.start(API.run);
 
 /**
  * init: module worker
