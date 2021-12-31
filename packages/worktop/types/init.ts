@@ -1,10 +1,10 @@
-import * as modules from 'worktop/module';
 import * as Cache from 'worktop/cache';
+import * as cfw from 'worktop/cfw';
 import * as sw from 'worktop/sw';
 
-import type { Module } from 'worktop/module';
-import type { Bindings, Context, Router, CronEvent } from 'worktop';
 import type { Strict } from 'worktop/utils';
+import type { Bindings, Context, Router, CronEvent } from 'worktop';
+import type { Module } from 'worktop/cfw';
 
 declare const API: Router;
 declare const CUSTOM: Router<MyContext>;
@@ -49,22 +49,22 @@ Cache.listen(API.run);
  * init: Module Worker
  */
 
-modules.start(API.run);
+cfw.start(API.run);
 assert<Module.Worker>(
-	modules.start(API.run)
+	cfw.start(API.run)
 );
 
-modules.start(CUSTOM.run);
+cfw.start(CUSTOM.run);
 assert<Module.Worker>(
-	modules.start(CUSTOM.run)
+	cfw.start(CUSTOM.run)
 );
 
-modules.start(CUSTOM.run);
+cfw.start(CUSTOM.run);
 assert<Module.Worker<MyBindings>>(
-	modules.start<MyContext, MyBindings>(CUSTOM.run)
+	cfw.start<MyContext, MyBindings>(CUSTOM.run)
 );
 
-modules.define({
+cfw.define({
 	fetch(req, bindings, ctx) {
 		assert<Module.Context>(ctx);
 
@@ -89,7 +89,7 @@ modules.define({
 	}
 });
 
-modules.define<MyBindings>({
+cfw.define<MyBindings>({
 	fetch(req, bindings, ctx) {
 		assert<Module.Context>(ctx);
 
@@ -126,7 +126,7 @@ addEventListener('fetch', event => {
 	)
 });
 
-const worker1 = modules.start(API.run);
+const worker1 = cfw.start(API.run);
 const worker2 = Cache.reply(API.run);
 
 addEventListener('fetch', event => {

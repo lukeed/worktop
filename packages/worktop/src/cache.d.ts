@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
+import type { Module } from 'worktop/cfw';
 import type { Bindings, Context } from 'worktop';
-import type { Module } from 'worktop/module';
 import type { Initializer } from 'worktop';
 
 export const Cache: Cache;

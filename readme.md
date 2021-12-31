@@ -162,12 +162,12 @@ The `worktop/durable` submodule includes native types for [Durable Objects](http
 
 > **Note:** Durable Objects can only be used with the Module Worker format. You must integrate the `Router` with the `worktop/modules` submodule.
 
-### Module: `worktop/modules`
+### Module: `worktop/cfw`
 
-> [View `worktop/modules` API documentation](/src/modules.d.ts)
-<!-- > [View `worktop/modules` API documentation](/docs/module.modules.md) -->
+> [View `worktop/cfw` API documentation](/src/cfw.d.ts)
+<!-- > [View `worktop/cfw` API documentation](/docs/module.cfw.md) -->
 
-The `worktop/modules` submodule includes two utilities related to the Module Workers format. Most notably, it exports a `listen` method to conform existing `Router` applications from Service Worker to Module Worker format.
+The `worktop/cfw` submodule includes two utilities related to Cloudflare's Module Worker format. Most notably, it includes TypeScript annotations specific to Cloudflare's environment.
 
 ### Module: `worktop/request`
 
