@@ -50,4 +50,4 @@ sw.start(API.run);
 /**
  * init: module worker
  */
-export default modules.reply(API.run);
+export default modules.start(API.run);
