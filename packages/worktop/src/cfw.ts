@@ -1,6 +1,6 @@
 import type { Strict } from 'worktop/utils';
-import type { Bindings, Context, Initializer } from 'worktop';
-import type { Module } from 'worktop/cfw';
+import type { Context, Initializer } from 'worktop';
+import type { Module, Bindings } from 'worktop/cfw';
 
 // Tiny helper for TypeScript definition
 export function define<B extends Bindings = Bindings>(worker: Module.Worker<B>): Module.Worker<B> {
