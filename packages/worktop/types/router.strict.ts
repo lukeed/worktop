@@ -1,4 +1,5 @@
-import { Router } from 'worktop';
+import * as Cache from 'worktop/cache';
+import { Router, compose } from 'worktop';
 import * as modules from 'worktop/cfw';
 import * as sw from 'worktop/sw';
 
@@ -19,9 +20,12 @@ interface Custom extends Context {
 
 const API = new Router<Custom>();
 
-API.prepare = function (req, context) {
-	context.start = Date.now();
-};
+API.prepare = compose(
+	Cache.sync(),
+	function (req, context) {
+		context.start = Date.now();
+	},
+);
 
 API.add('GET', '/:foo/:bar?', async (req, context) => {
 	assert<Custom>(context);

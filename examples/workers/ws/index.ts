@@ -1,5 +1,5 @@
 import { Router } from 'worktop';
-import * as sworker from 'worktop/sw';
+import { start } from 'worktop/sw';
 import * as ws from 'worktop/ws';
 
 const API = new Router;
@@ -199,6 +199,5 @@ API.add('GET', '/', (req, context) => {
 	});
 });
 
-// Format: Service Worker
-// Wraps w/ addEventListener('fetch', ...)
-sworker.start(API.run);
+// Service Worker
+start(API.run);

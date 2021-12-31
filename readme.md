@@ -48,6 +48,7 @@ import * as utils from 'worktop/utils';
 import { read, write } from 'worktop/kv';
 import { reply } from 'worktop/response';
 import * as Cache from 'worktop/cache';
+import { start } from 'worktop/cfw';
 
 import type { KV } from 'worktop/kv';
 import type { Context } from 'worktop';
@@ -64,9 +65,13 @@ interface Message {
   // ...
 }
 
-// Initialize
+// Create new Router instance
 const API = new Router<Bindings>();
 
+// Any `prepare` logic runs 1st for every request, before routing
+// ~> use `Cache` for request-matching, when permitted
+// ~> store Response in `Cache`, when permitted
+API.prepare = Cache.sync();
 
 API.add('GET', '/messages/:id', async (req, context) => {
   // Pre-parsed `context.params` object
@@ -124,10 +129,8 @@ API.add('POST', '/messages', async (req, context) => {
 });
 
 
-// Attach "fetch" event handler
-// ~> use `Cache` for request-matching, when permitted
-// ~> store Response in `Cache`, when permitted
-export default Cache.start(API.run);
+// Init: Module Worker
+export default start(API.run);
 ```
 
 ## API

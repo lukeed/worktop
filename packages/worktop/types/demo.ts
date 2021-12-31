@@ -5,6 +5,7 @@ import { read, write } from 'worktop/kv';
 import { Router, compose } from 'worktop';
 import { reply } from 'worktop/response';
 import * as utils from 'worktop/utils';
+import { start } from 'worktop/cfw';
 
 import type { Context } from 'worktop';
 import type { ULID } from 'worktop/utils';
@@ -41,6 +42,9 @@ API.prepare = compose(
 			res.headers.set('x-response-time', ms);
 		});
 	},
+
+	// Attach `Cache` lookup -> save
+	Cache.sync(),
 
 	// Attach global CORS config
 	CORS.preflight({
@@ -106,4 +110,4 @@ API.add('POST', '/accounts', async (req, context) => {
 });
 
 // Initialize: Module Worker
-export default Cache.start(API.run);
+export default start(API.run);

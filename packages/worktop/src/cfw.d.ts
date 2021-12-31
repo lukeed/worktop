@@ -15,6 +15,10 @@ declare global {
 		};
 	};
 
+	interface CacheStorage {
+		default: Cache;
+	}
+
 	interface Request {
 		cf: IncomingCloudflareProperties;
 	}

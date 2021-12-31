@@ -1,6 +1,8 @@
 import { Router } from 'worktop';
 import * as Cache from 'worktop/cache';
 import { reply } from 'worktop/response';
+import { start } from 'worktop/cfw';
+
 import type { Context } from 'worktop';
 
 interface Custom extends Context {
@@ -10,6 +12,8 @@ interface Custom extends Context {
 }
 
 const API = new Router<Custom>();
+
+API.prepare = Cache.sync();
 
 API.add('GET', '/greet/:name?', (req, context) => {
 	let name = context.params.name || context.bindings.FALLBACK;
@@ -25,4 +29,5 @@ API.add('GET', '/', (req, context) => {
 	});
 });
 
-export default Cache.start(API.run);
+// Module Worker
+export default start(API.run);

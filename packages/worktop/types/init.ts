@@ -3,8 +3,8 @@ import * as cfw from 'worktop/cfw';
 import * as sw from 'worktop/sw';
 
 import type { Strict } from 'worktop/utils';
-import type { Bindings, CronEvent, Module } from 'worktop/cfw';
 import type { Context, Router } from 'worktop';
+import type { Bindings, CronEvent, Module } from 'worktop/cfw';
 
 declare const API: Router;
 declare const CUSTOM: Router<MyContext>;
@@ -32,18 +32,6 @@ assert<void>(
 
 assert<void>(
 	cfw.listen(CUSTOM.run)
-);
-
-/**
- * init: Cache
- */
-
-assert<Module.Worker>(
-	Cache.start(API.run)
-);
-
-assert<Module.Worker>(
-	Cache.start(CUSTOM.run)
 );
 
 /**
@@ -129,15 +117,14 @@ addEventListener('fetch', event => {
 	)
 });
 
-const worker1 = cfw.start(API.run);
-const worker2 = Cache.start(API.run);
+const worker = cfw.start(API.run);
 
 addEventListener('fetch', event => {
 	let req = event.request;
 	let bindings: Bindings = {};
 	event.respondWith((async function () {
-		let res = await worker1.fetch(req, bindings, event);
-		return res || worker2.fetch(req, bindings, event);
+		let res = await worker.fetch(req, bindings, event);
+		return res || fetch(req);
 	})());
 });
 

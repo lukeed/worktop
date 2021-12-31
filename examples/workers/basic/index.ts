@@ -1,8 +1,11 @@
 import { Router } from 'worktop';
 import * as Cache from 'worktop/cache';
 import { reply } from 'worktop/response';
+import { listen } from 'worktop/cfw';
 
 const API = new Router();
+
+API.prepare = Cache.sync();
 
 API.add('GET', '/greet/:name', (req, context) => {
 	return new Response(`Hello, ${context.params.name}!`);
@@ -17,13 +20,5 @@ API.add('GET', '/', (req, context) => {
 	});
 });
 
-// NOTE: manual because SW is not assumed
-addEventListener('fetch', event => {
-	event.respondWith(
-		Cache.lookup(event.request).then(prev => {
-			return prev || API.run(event.request, event).then(res => {
-				return Cache.save(event.request, res, event);
-			});
-		})
-	);
-});
+// Service Worker
+listen(API.run);

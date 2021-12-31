@@ -1,7 +1,7 @@
-import type { Context, Initializer } from 'worktop';
+import type { Context, Handler, Initializer } from 'worktop';
 import type { Module, Bindings } from 'worktop/cfw';
 
-export const Cache: Cache = /*#__PURE__*/ (caches as any).default;
+export const Cache = /*#__PURE__*/ caches.default;
 
 export async function lookup(req: Request | string) {
 	let isHEAD = typeof req !== 'string' && req.method === 'HEAD';
@@ -40,19 +40,16 @@ export function isCacheable(res: Response): boolean {
 	return true;
 }
 
-// Generate a Module Worker definition from an `Initializer` type.
-export function start<
-	C extends Context = Context,
-	B extends Bindings = Bindings,
->(run: Initializer<C>): Module.Worker<B> {
-	return {
-		async fetch(req, env, ctx) {
-			let res = await lookup(req);
-			if (res) return res;
+// TODO: Add `cache?` param throughout?
+// ~> would make cache target configurable
+// ~> and `caches.default` is Cloudflare-only
+export function sync(): Handler {
+	return async function (req, context) {
+		let r = await lookup(req);
+		if (r) return r;
 
-			(ctx as C).bindings = env;
-			res = await run(req, ctx as C);
-			return save(req, res, ctx);
-		}
-	}
+		context.defer(res => {
+			save(req, res, context);
+		});
+	};
 }
