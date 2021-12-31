@@ -4,10 +4,6 @@ import type { Promisable } from 'worktop/utils';
 declare global {
 	function addEventListener(type: 'fetch', handler: FetchHandler): void;
 	function addEventListener(type: 'scheduled', handler: CronHandler): void;
-
-	interface FetchEvent {
-		passThroughOnException(): void;
-	}
 }
 
 export type CronHandler = (event: CronEvent) => Promisable<void>;

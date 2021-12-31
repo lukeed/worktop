@@ -8,6 +8,10 @@ declare global {
 	interface Request {
 		cf: IncomingCloudflareProperties;
 	}
+
+	interface FetchEvent {
+		passThroughOnException(): void;
+	}
 }
 
 export type FetchHandler<B extends Bindings = Bindings> = (
