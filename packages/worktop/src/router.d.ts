@@ -1,8 +1,6 @@
 /// <reference lib="webworker" />
 
-import type { KV } from 'worktop/kv';
 import type { Module } from 'worktop/cfw';
-import type { Durable } from 'worktop/durable';
 import type { Promisable, Strict, Dict } from 'worktop/utils';
 
 declare global {
@@ -38,9 +36,6 @@ export interface CronEvent {
 	waitUntil(f: Promisable<any>): void;
 }
 
-export interface Bindings {
-	[name: string]: string | CryptoKey | KV.Namespace | Durable.Namespace;
-}
 
 // TODO: move to utils?
 type Merge<C extends Context, P> = Omit<C, 'params'> & { params: P };
@@ -50,7 +45,6 @@ export type Deferral = (res: Response) => Promisable<void>;
 export interface Context extends Module.Context {
 	url: URL;
 	params: Params;
-	bindings?: Bindings;
 	defer(f: Deferral): void;
 }
 
@@ -79,9 +73,7 @@ export type RouteParams<T extends string> =
 
 export type Initializer<C extends Context> = (
 	request: Request,
-	context?: Partial<C> & Module.Context & {
-		bindings?: Bindings;
-	}
+	context?: Partial<C> & Module.Context
 ) => Promise<Response>;
 
 export declare class Router<C extends Context = Context> {

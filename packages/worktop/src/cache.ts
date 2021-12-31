@@ -1,6 +1,6 @@
-import type { Bindings, Context, Initializer } from 'worktop';
+import type { Context, Initializer } from 'worktop';
 import type { ResponseHandler } from 'worktop/cache';
-import type { Module } from 'worktop/cfw';
+import type { Module, Bindings } from 'worktop/cfw';
 
 export const Cache: Cache = /*#__PURE__*/ (caches as any).default;
 

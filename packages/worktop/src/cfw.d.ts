@@ -1,8 +1,9 @@
 /// <reference lib="webworker" />
 
-// TODO: cronevent should be inside "cfw" module
-import type { Bindings, Context, CronEvent, Initializer } from 'worktop';
+import type { Context, CronEvent, Initializer } from 'worktop';
 import type { Promisable, Strict } from 'worktop/utils';
+import type { Durable } from 'worktop/durable';
+import type { KV } from 'worktop/kv';
 
 declare global {
 	interface Request {
@@ -14,16 +15,27 @@ declare global {
 	}
 }
 
+export interface Bindings {
+	[name: string]: string | CryptoKey | KV.Namespace | Durable.Namespace;
+}
+
 export type FetchHandler<B extends Bindings = Bindings> = (
 	request: Request,
 	bindings: Strict<B>,
-	context: Required<Module.Context>
+	context: {
+		bindings?: Bindings;
+		waitUntil(f: any): void;
+		passThroughOnException(): void;
+	}
 ) => Promisable<Response>;
 
 export type CronHandler<B extends Bindings = Bindings> = (
 	event: Omit<CronEvent, 'waitUntil'>,
 	bindings: Strict<B>,
-	context: Pick<Module.Context, 'waitUntil'>
+	context: {
+		bindings?: Bindings;
+		waitUntil(f: any): void;
+	}
 ) => Promisable<void>;
 
 /**
@@ -139,6 +151,7 @@ export namespace Module {
 	}
 
 	export interface Context {
+		bindings?: Bindings;
 		waitUntil(f: any): void;
 		passThroughOnException?(): void;
 	}

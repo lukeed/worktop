@@ -3,9 +3,9 @@ import { Actor } from 'worktop/durable';
 import * as cookies from 'worktop/cookie';
 import * as utils from 'worktop/utils';
 
+import type { Bindings } from 'worktop/cfw';
 import type { Durable } from 'worktop/durable';
 import type { WebSocket } from 'worktop/ws';
-import type { Bindings } from 'worktop';
 import type { KV } from 'worktop/kv';
 
 interface CustomBindings extends Bindings {
