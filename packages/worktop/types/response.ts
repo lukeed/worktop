@@ -1,4 +1,4 @@
-import { ServerResponse, STATUS_CODES } from 'worktop/response';
+import { reply, ServerResponse, STATUS_CODES } from 'worktop/response';
 
 // @ts-expect-error
 ServerResponse();
@@ -53,6 +53,19 @@ assert<void>(response.send(200, undefined));
 assert<void>(response.send(200, null, { foo: 'bar' }));
 assert<void>(response.send(200, new FormData));
 assert<void>(response.send(200));
+
+/**
+ * REPLY
+ */
+
+assert<Response>(reply(200));
+assert<Response>(reply(200, 'OK'));
+assert<Response>(reply(200, 'OK', {
+	'x-foo': 123,
+	'x-bar': [1, 2, 3],
+	'x-baz': ['hello', 'world'],
+	'x-bat': 'hello',
+}));
 
 
 /**

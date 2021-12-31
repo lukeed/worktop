@@ -9,7 +9,7 @@ const API = new Router();
 // Example – KV, Durable Object, or third-party
 let counter = 0;
 
-function send(status: number, count: number) {
+function reply(status: number, count: number) {
 	let value = String(count);
 	let headers = { 'x-count': value };
 	return new Response(value, { status, headers });
@@ -30,12 +30,12 @@ API.prepare = CORS.preflight({
 });
 
 API.add('GET', '/', (req, context) => {
-	return send(200, counter);
+	return reply(200, counter);
 });
 
 API.add('POST', '/', (req, context) => {
 	counter += 1;
-	return send(200, counter);
+	return reply(200, counter);
 });
 
 API.add('PUT', '/', async (req, context) => {
@@ -47,12 +47,12 @@ API.add('PUT', '/', async (req, context) => {
 	}
 
 	counter = next;
-	return send(200, counter);
+	return reply(200, counter);
 });
 
 API.add('DELETE', '/', (req, context) => {
 	counter -= 1;
-	return send(200, counter);
+	return reply(200, counter);
 });
 
 // Module Worker

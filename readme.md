@@ -46,7 +46,7 @@ $ npm install --save worktop
 import { Router } from 'worktop';
 import * as utils from 'worktop/utils';
 import { read, write } from 'worktop/kv';
-import { send } from 'worktop/response';
+import { reply } from 'worktop/response';
 import * as Cache from 'worktop/cache';
 
 import type { KV } from 'worktop/kv';
@@ -78,7 +78,7 @@ API.add('GET', '/messages/:id', async (req, context) => {
   // Smart `send` helper
   // ~> automatically stringifies JSON objects
   // ~> auto-sets `Content-Type` & `Content-Length` headers
-  return send(200, message, {
+  return reply(200, message, {
     'Cache-Control': 'public, max-age=60'
   });
 });
@@ -91,11 +91,11 @@ API.add('POST', '/messages', async (req, context) => {
     // ~> parses form-like header as FormData, ...etc
     var input = await utils.body<Message>(req);
   } catch (err) {
-    return send(400, 'Error parsing request body');
+    return reply(400, 'Error parsing request body');
   }
 
   if (!input || !input.text.trim()) {
-    return send(422, { text: 'required' });
+    return reply(422, { text: 'required' });
   }
 
   const value: Message = {
@@ -119,8 +119,8 @@ API.add('POST', '/messages', async (req, context) => {
     })
   );
 
-  if (success) return send(201, value);
-  return send(500, 'Error creating record');
+  if (success) return reply(201, value);
+  return reply(500, 'Error creating record');
 });
 
 

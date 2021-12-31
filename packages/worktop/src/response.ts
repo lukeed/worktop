@@ -38,7 +38,7 @@ export const STATUS_CODES: Record<string|number, string> = {
  * Auto-serialize `data` to a `Response` object.
  * @see https://github.com/lukeed/polka/blob/next/packages/send/index.js
  */
-export function send(status: number, data?: any, headers?: HeadersObject): Response {
+export function reply(status: number, data?: any, headers?: HeadersObject): Response {
 	let obj: HeadersObject = {};
 	for (let key in headers) {
 		obj[key.toLowerCase()] = headers[key];
@@ -112,7 +112,7 @@ export function ServerResponse(this: Writable<SR>): SR {
 	}
 
 	$.send = (code, data, headers) => {
-		let k, v, res = send(code, data, {
+		let k, v, res = reply(code, data, {
 			[CLENGTH]: $.getHeader(CLENGTH)!,
 			[CTYPE]: $.getHeader(CTYPE)!,
 			...headers,

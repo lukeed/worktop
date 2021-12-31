@@ -1,4 +1,4 @@
-import { send } from 'worktop/response';
+import { reply } from 'worktop/response';
 import * as utils from 'worktop/utils';
 import * as Model from './model';
 
@@ -16,7 +16,7 @@ export const list: Handler = async function (req, context) {
 
 	const { username } = context.params;
 	const data = await Model.list(context.bindings.TODOS, username, { limit, page });
-	return send(200, { data }, { 'cache-control': 'private,max-age=30' });
+	return reply(200, { data }, { 'cache-control': 'private,max-age=30' });
 }
 
 /**
@@ -29,12 +29,12 @@ export const create: Handler = async function (req, context) {
 	// NOTE: assumes JSON or FormData
 	const input = await utils.body<Todo>(req);
 	const title = input && (input.title || '').trim();
-	if (!input || !title) return send(422, { title: 'required' });
+	if (!input || !title) return reply(422, { title: 'required' });
 
 	const result = await Model.insert(context.bindings.TODOS, username, { ...input, title });
 
-	if (result) return send(201, result);
-	return send(500, 'Error creating item');
+	if (result) return reply(201, result);
+	return reply(500, 'Error creating item');
 }
 
 /**
@@ -44,8 +44,8 @@ export const show: Handler = async function (req, context) {
 	const { username, uid } = context.params;
 	const item = await Model.find(context.bindings.TODOS, username, uid);
 
-	if (item) return send(200, item);
-	else return send(404, 'Missing item');
+	if (item) return reply(200, item);
+	else return reply(404, 'Missing item');
 }
 
 /**
@@ -58,12 +58,12 @@ export const update: Handler = async function (req, context) {
 	// NOTE: assumes JSON or FormData
 	const input = await utils.body<Todo>(req);
 	const title = input && (input.title || '').trim();
-	if (!input || !title) return send(422, { title: 'required' });
+	if (!input || !title) return reply(422, { title: 'required' });
 
 	const result = await Model.update(context.bindings.TODOS, username, input);
 
-	if (result) return send(201, result);
-	return send(500, 'Error updating item');
+	if (result) return reply(201, result);
+	return reply(500, 'Error updating item');
 }
 
 /**
@@ -73,6 +73,6 @@ export const destroy: Handler = async function (req, context) {
 	const { username, uid } = context.params;
 	const isDone = await Model.destroy(context.bindings.TODOS, username, uid);
 
-	if (isDone) return send(204);
-	else return send(500, 'Error removing item');
+	if (isDone) return reply(204);
+	else return reply(500, 'Error removing item');
 }

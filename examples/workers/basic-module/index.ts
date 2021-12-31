@@ -1,6 +1,6 @@
 import { Router } from 'worktop';
 import * as Cache from 'worktop/cache';
-import { send } from 'worktop/response';
+import { reply } from 'worktop/response';
 import type { Context } from 'worktop';
 
 interface Custom extends Context {
@@ -20,7 +20,7 @@ API.add('GET', '/', (req, context) => {
 	let command = `$ curl https://${context.url.hostname}/greet/lukeed`;
 	let text = `Howdy~! Please greet yourself; for example:\n\n  ${command}\n`;
 
-	return send(200, text, {
+	return reply(200, text, {
 		'Cache-Control': 'public,max-age=60'
 	});
 });
