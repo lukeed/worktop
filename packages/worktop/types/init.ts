@@ -3,8 +3,8 @@ import * as cfw from 'worktop/cfw';
 import * as sw from 'worktop/sw';
 
 import type { Strict } from 'worktop/utils';
-import type { Bindings, Module } from 'worktop/cfw';
-import type { Context, CronEvent, Router } from 'worktop';
+import type { Bindings, CronEvent, Module } from 'worktop/cfw';
+import type { Context, Router } from 'worktop';
 
 declare const API: Router;
 declare const CUSTOM: Router<MyContext>;

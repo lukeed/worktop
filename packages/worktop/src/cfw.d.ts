@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import type { Context, CronEvent, Initializer } from 'worktop';
+import type { Context, Initializer } from 'worktop';
 import type { Promisable, Strict } from 'worktop/utils';
 import type { Durable } from 'worktop/durable';
 import type { KV } from 'worktop/kv';
@@ -13,6 +13,11 @@ declare global {
 	interface FetchEvent {
 		passThroughOnException(): void;
 	}
+
+	function addEventListener(
+		type: 'scheduled',
+		handler: (event: CronEvent) => Promisable<void>
+	): void;
 }
 
 export interface Bindings {
@@ -37,6 +42,24 @@ export type CronHandler<B extends Bindings = Bindings> = (
 		waitUntil(f: any): void;
 	}
 ) => Promisable<void>;
+
+export interface CronEvent {
+	type: 'scheduled';
+	/**
+	 * The CRON trigger
+	 * @example "23 59 LW * *"
+	 */
+	cron: string;
+	/**
+	 * Milliseconds since UNIX epoch.
+	 * @example new Date(evt.scheduledTime)
+	 */
+	scheduledTime: number;
+	/**
+	 * Method wrapper for event's action handler.
+	 */
+	waitUntil(f: Promisable<any>): void;
+}
 
 /**
  * Cloudflare Request Metadata/Properties
