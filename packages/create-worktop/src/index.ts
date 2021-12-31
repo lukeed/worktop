@@ -5,6 +5,8 @@ interface Argv {
 	cwd: string;
 	force?: boolean;
 	typescript?: boolean;
+	// TODO: monorepo
+	// TODO: env+format combos
 }
 
 async function mkdir(dir: string) {
