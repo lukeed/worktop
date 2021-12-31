@@ -4,7 +4,6 @@ import * as sw from 'worktop/sw';
 
 import type { Module } from 'worktop/module';
 import type { Bindings, Context, Router, CronEvent } from 'worktop';
-import type { ResponseHandler } from 'worktop/sw';
 import type { Strict } from 'worktop/utils';
 
 declare const API: Router;
@@ -24,28 +23,11 @@ interface MyContext extends Context {
  */
 
 assert<void>(
-	sw.reply(API.run)
+	sw.start(API.run)
 );
 
 assert<void>(
-	sw.reply(CUSTOM.run)
-);
-
-// @ts-expect-error
-sw.listen(API.run);
-
-assert<ResponseHandler>(
-	sw.convert(API.run)
-);
-
-assert<ResponseHandler>(
-	sw.convert(CUSTOM.run)
-);
-
-assert<void>(
-	sw.listen(
-		sw.convert(API.run)
-	)
+	sw.start(CUSTOM.run)
 );
 
 /**
@@ -62,12 +44,6 @@ assert<Module.Worker>(
 
 // @ts-expect-error
 Cache.listen(API.run);
-
-assert<void>(
-	Cache.listen(
-		sw.convert(API.run)
-	)
-);
 
 /**
  * init: Module Worker
@@ -86,15 +62,6 @@ assert<Module.Worker>(
 modules.reply(CUSTOM.run);
 assert<Module.Worker<MyBindings>>(
 	modules.reply<MyContext, MyBindings>(CUSTOM.run)
-);
-
-// @ts-expect-error
-modules.listen(API.run);
-
-assert<Module.Worker>(
-	modules.listen(
-		sw.convert(API.run)
-	)
 );
 
 modules.define({
@@ -148,7 +115,7 @@ modules.define<MyBindings>({
 
 // @ts-expect-error
 addEventListener('fetch', API.run);
-addEventListener('fetch', sw.convert(API.run));
+
 addEventListener('fetch', event => {
 	event.respondWith(
 		Cache.lookup(event.request).then(prev => {

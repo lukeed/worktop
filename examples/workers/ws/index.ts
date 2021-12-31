@@ -201,4 +201,4 @@ API.add('GET', '/', (req, context) => {
 
 // Format: Service Worker
 // Wraps w/ addEventListener('fetch', ...)
-sworker.reply(API.run);
+sworker.start(API.run);
