@@ -1,7 +1,7 @@
 import { Router, compose } from 'worktop';
 
 import type { Params, Context } from 'worktop';
-import type { IncomingCloudflareProperties } from 'worktop';
+import type { IncomingCloudflareProperties } from 'worktop/cfw';
 import type { RouteParams } from 'worktop';
 
 declare const mcontext: Context;
