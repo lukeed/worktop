@@ -6,6 +6,15 @@ import type { Durable } from 'worktop/durable';
 import type { KV } from 'worktop/kv';
 
 declare global {
+	const WebSocketPair: {
+		new(): {
+			/** the `client` socket */
+			0: WebSocket,
+			/** the `server` socket */
+			1: WebSocket,
+		};
+	};
+
 	interface Request {
 		cf: IncomingCloudflareProperties;
 	}
@@ -63,6 +72,15 @@ export interface CronEvent {
 	 * Method wrapper for event's action handler.
 	 */
 	waitUntil(f: Promisable<any>): void;
+}
+
+export interface WebSocket {
+	accept(): void;
+	send(message: number | string): void;
+	close(code?: number, reason?: string): void;
+	addEventListener(type: 'error', listener: (this: WebSocket, ev: Event) => any): void;
+	addEventListener(type: 'close', listener: (this: WebSocket, ev: CloseEvent) => any): void;
+	addEventListener(type: 'message', listener: (this: WebSocket, ev: MessageEvent<string>) => any): void;
 }
 
 /**
