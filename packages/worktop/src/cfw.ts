@@ -9,7 +9,7 @@ export function define<B extends Bindings = Bindings>(worker: Module.Worker<B>):
 
 /**
  * Generate a Module Worker definition from a Module `Initializer` function.
- * @example export default mod.start(API.run)
+ * @example export default cfw.start(API.run)
  */
 export function start<
 	B extends Bindings = Bindings,
@@ -23,3 +23,8 @@ export function start<
 		}
 	};
 }
+
+/**
+ * Attach the `Initializer` function as a "fetch" event listener.
+ */
+export { start as listen } from 'worktop/sw';
