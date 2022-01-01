@@ -1,6 +1,6 @@
 import { connect } from 'worktop/ws';
 import type { Bindings } from 'worktop/cfw';
-import type { Durable } from 'worktop/durable';
+import type { Durable } from 'worktop/cfw.durable';
 import type { WebSocket } from 'worktop/ws';
 
 export abstract class Actor {
