@@ -71,18 +71,3 @@ connect('should now throw error if valid handshake', () => {
 });
 
 connect.run();
-
-// ---
-
-const listen = suite('listen');
-
-listen('should be a function', () => {
-	assert.type(ws.listen, 'function');
-});
-
-listen('should return a function', () => {
-	let out = ws.listen(() => {});
-	assert.type(out, 'function');
-});
-
-listen.run();

@@ -32,6 +32,10 @@
       "import": "./cfw.kv.assets/index.mjs",
       "require": "./cfw.kv.assets/index.js"
     },
+    "./cfw.ws": {
+      "import": "./cfw.ws/index.mjs",
+      "require": "./cfw.ws/index.js"
+    },
     "./cors": {
       "import": "./cors/index.mjs",
       "require": "./cors/index.js"

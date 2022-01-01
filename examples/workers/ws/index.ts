@@ -1,6 +1,6 @@
 import { Router } from 'worktop';
-import { start } from 'worktop/sw';
-import * as ws from 'worktop/ws';
+import { start } from 'worktop/cfw';
+import * as ws from 'worktop/cfw.ws';
 
 const API = new Router;
 
@@ -199,5 +199,5 @@ API.add('GET', '/', (req, context) => {
 	});
 });
 
-// Service Worker
-start(API.run);
+// Cloudflare Module Worker
+export default start(API.run);
