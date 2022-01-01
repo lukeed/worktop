@@ -3,7 +3,7 @@
 import type { Context, Initializer } from 'worktop';
 import type { Promisable, Strict } from 'worktop/utils';
 import type { Durable } from 'worktop/cfw.durable';
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 
 declare global {
 	const WebSocketPair: {

@@ -1,8 +1,8 @@
 import { HS256 } from 'worktop/jwt';
 import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
-import { read, write } from 'worktop/kv';
 import { Router, compose } from 'worktop';
+import { read, write } from 'worktop/cfw.kv';
 import { reply } from 'worktop/response';
 import * as utils from 'worktop/utils';
 import { start } from 'worktop/cfw';

@@ -1,7 +1,7 @@
 import type { IncomingCloudflareProperties } from 'worktop/cfw';
 import type { Module, Bindings, CronEvent } from 'worktop/cfw';
 import type { Strict } from 'worktop/utils';
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 
 /**
  * WORKTOP/MODULES

@@ -1,5 +1,5 @@
 import * as assets from 'worktop/cfw.kv.assets';
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 
 declare let request: Request;
 declare let binding: KV.Namespace;

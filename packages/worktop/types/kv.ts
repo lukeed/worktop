@@ -1,5 +1,5 @@
-import { Database, list, paginate, until } from 'worktop/kv';
-import type { KV } from 'worktop/kv';
+import { Database, list, paginate, until } from 'worktop/cfw.kv';
+import type { KV } from 'worktop/cfw.kv';
 
 /**
  * WORKTOP/KV

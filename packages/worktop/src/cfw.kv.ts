@@ -1,4 +1,4 @@
-import type { KV, Options, Database as DB } from 'worktop/kv';
+import type { KV, Options, Database as DB } from 'worktop/cfw.kv';
 
 export function Database<Models, I extends Record<keyof Models, string> = { [P in keyof Models]: string }>(binding: KV.Namespace): DB<Models, I> {
 	var $ = <K extends keyof I>(type: K, uid: I[K]) => `${type}__${uid}`;
