@@ -68,6 +68,10 @@
       "import": "./utils/index.mjs",
       "require": "./utils/index.js"
     },
+    "./deno": {
+      "import": "./deno/index.mjs",
+      "require": "./deno/index.js"
+    },
     "./sw": {
       "import": "./sw/index.mjs",
       "require": "./sw/index.js"
@@ -91,6 +95,7 @@
     "durable",
     "router",
     "utils",
+    "deno",
     "jwt",
     "kv",
     "sw",

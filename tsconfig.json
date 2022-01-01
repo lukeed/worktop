@@ -14,6 +14,7 @@
     "alwaysStrict": true,
     "module": "esnext",
     "checkJs": true,
+    "noEmit": true,
     "paths": {
       "worktop": ["./packages/worktop/src/router.d.ts"],
       "worktop/*": ["./packages/worktop/src/*.d.ts"]
