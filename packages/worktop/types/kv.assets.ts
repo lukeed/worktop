@@ -1,4 +1,4 @@
-import * as assets from 'worktop/kv.assets';
+import * as assets from 'worktop/cfw.kv.assets';
 import type { KV } from 'worktop/kv';
 
 declare let request: Request;
