@@ -1,4 +1,4 @@
-import * as ws from 'worktop/ws';
+import * as ws from 'worktop/cfw.ws';
 import { compose } from 'worktop';
 
 import type { Router, Context } from 'worktop';
