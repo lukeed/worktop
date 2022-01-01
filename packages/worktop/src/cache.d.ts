@@ -1,8 +1,9 @@
 /// <reference lib="webworker" />
 
-import type { Module } from 'worktop/cfw';
 import type { Context, Params } from 'worktop';
 import type { Strict } from 'worktop/utils';
+import type { Module } from 'worktop/cfw';
+// TODO: add `EventContext` something
 
 export const Cache: Cache;
 export function save(req: Request | string, res: Response, context: Module.Context): Response;

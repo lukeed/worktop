@@ -1,5 +1,5 @@
-import type { Context, Handler, Initializer } from 'worktop';
-import type { Module, Bindings } from 'worktop/cfw';
+import type { Module } from 'worktop/cfw';
+import type { Handler } from 'worktop';
 
 export const Cache = /*#__PURE__*/ caches.default;
 
