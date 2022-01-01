@@ -20,9 +20,9 @@
       "import": "./kv/index.mjs",
       "require": "./kv/index.js"
     },
-    "./kv.assets": {
-      "import": "./kv.assets/index.mjs",
-      "require": "./kv.assets/index.js"
+    "./cfw.kv.assets": {
+      "import": "./cfw.kv.assets/index.mjs",
+      "require": "./cfw.kv.assets/index.js"
     },
     "./cors": {
       "import": "./cors/index.mjs",
@@ -91,8 +91,8 @@
     "crypto",
     "cookie",
     "response",
-    "kv.assets",
     "cfw.durable",
+    "cfw.kv.assets",
     "router",
     "utils",
     "deno",
