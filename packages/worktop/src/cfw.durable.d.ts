@@ -1,6 +1,6 @@
-import type { Bindings } from 'worktop';
+import type { Bindings } from 'worktop/cfw';
+import type { WebSocket } from 'worktop/cfw.ws';
 import type { Dict, Promisable } from 'worktop/utils';
-import type { WebSocket } from 'worktop/ws';
 
 export namespace Durable {
 	export interface Namespace {

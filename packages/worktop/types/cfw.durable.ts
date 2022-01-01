@@ -4,8 +4,8 @@ import * as cookies from 'worktop/cookie';
 import * as utils from 'worktop/utils';
 
 import type { Bindings } from 'worktop/cfw';
+import type { WebSocket } from 'worktop/cfw.ws';
 import type { Durable } from 'worktop/cfw.durable';
-import type { WebSocket } from 'worktop/ws';
 import type { KV } from 'worktop/cfw.kv';
 
 interface CustomBindings extends Bindings {

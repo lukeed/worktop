@@ -3,6 +3,7 @@
 import type { Context, Initializer } from 'worktop';
 import type { Promisable, Strict } from 'worktop/utils';
 import type { Durable } from 'worktop/cfw.durable';
+import type { WebSocket } from 'worktop/cfw.ws';
 import type { KV } from 'worktop/cfw.kv';
 
 declare global {
@@ -76,15 +77,6 @@ export interface CronEvent {
 	 * Method wrapper for event's action handler.
 	 */
 	waitUntil(f: Promisable<any>): void;
-}
-
-export interface WebSocket {
-	accept(): void;
-	send(message: number | string): void;
-	close(code?: number, reason?: string): void;
-	addEventListener(type: 'error', listener: (this: WebSocket, ev: Event) => any): void;
-	addEventListener(type: 'close', listener: (this: WebSocket, ev: CloseEvent) => any): void;
-	addEventListener(type: 'message', listener: (this: WebSocket, ev: MessageEvent<string>) => any): void;
 }
 
 /**
