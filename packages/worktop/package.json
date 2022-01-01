@@ -52,9 +52,9 @@
       "import": "./crypto/index.mjs",
       "require": "./crypto/index.js"
     },
-    "./durable": {
-      "import": "./durable/index.mjs",
-      "require": "./durable/index.js"
+    "./cfw.durable": {
+      "import": "./cfw.durable/index.mjs",
+      "require": "./cfw.durable/index.js"
     },
     "./response": {
       "import": "./response/index.mjs",
@@ -92,7 +92,7 @@
     "cookie",
     "response",
     "kv.assets",
-    "durable",
+    "cfw.durable",
     "router",
     "utils",
     "deno",

@@ -5,7 +5,7 @@ import * as sw from 'worktop/sw';
 
 import type { Context } from 'worktop';
 import type { Bindings } from 'worktop/cfw';
-import type { Durable } from 'worktop/durable';
+import type { Durable } from 'worktop/cfw.durable';
 import type { KV } from 'worktop/kv';
 
 interface Custom extends Context {
