@@ -1,10 +1,10 @@
-import * as ws from 'worktop/cfw.ws';
+import * as ws from 'worktop/deno.ws';
 import { compose } from 'worktop';
 
 import type { Router, Context } from 'worktop';
 
 declare let API: Router;
-declare let websocket: ws.WebSocket;
+declare let websocket: WebSocket;
 declare let listener: EventListener;
 
 /**
@@ -19,10 +19,7 @@ const onEvent1: ws.SocketHandler = async function (req, context, socket) {
 	let { state, event } = socket;
 	assert<Event>(event);
 	assert<ws.State>(state);
-
-	// @ts-expect-error
-	assert<'open'>(event.type); // TODO(future)
-	assert<'close'|'message'|'error'>(event.type);
+	assert<'open'|'close'|'message'|'error'>(event.type);
 
 	if (event.type === 'message') {
 		assert<string>(event.data);
@@ -32,6 +29,7 @@ const onEvent1: ws.SocketHandler = async function (req, context, socket) {
 	}
 
 	// Check `event` interfaces
+	if (event.type === 'open') assert<Event>(event);
 	if (event.type === 'error') assert<Event>(event);
 	if (event.type === 'close') assert<CloseEvent>(event);
 	if (event.type === 'message') assert<MessageEvent>(event);
@@ -75,7 +73,6 @@ API.add('GET', /^[/]foobar[/]/, compose(
  * EVENTS
  */
 
-// @ts-expect-error - "open" not allowed
 websocket.addEventListener('open', listener);
 websocket.addEventListener('close', listener);
 websocket.addEventListener('error', listener);
