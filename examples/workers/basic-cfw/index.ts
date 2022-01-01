@@ -1,5 +1,4 @@
 import { Router } from 'worktop';
-import * as Cache from 'worktop/cache';
 import { reply } from 'worktop/response';
 import { start } from 'worktop/cfw';
 
@@ -13,13 +12,6 @@ interface Custom extends Context {
 
 const API = new Router<Custom>();
 
-API.prepare = Cache.sync();
-
-API.add('GET', '/greet/:name?', (req, context) => {
-	let name = context.params.name || context.bindings.FALLBACK;
-	return new Response(`Hello, ${name}!`);
-});
-
 API.add('GET', '/', (req, context) => {
 	let command = `$ curl https://${context.url.hostname}/greet/lukeed`;
 	let text = `Howdy~! Please greet yourself; for example:\n\n  ${command}\n`;
@@ -27,6 +19,10 @@ API.add('GET', '/', (req, context) => {
 	return reply(200, text, {
 		'Cache-Control': 'public,max-age=60'
 	});
+});
+
+API.add('GET', '/greet/:name', (req, context) => {
+	return new Response(`Hello, ${context.params.name}!`);
 });
 
 // Module Worker

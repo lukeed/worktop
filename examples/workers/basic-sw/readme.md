@@ -1,6 +1,6 @@
-# Example: Basic Deno Worker
+# Example: Basic Module Worker
 
-> [View in Deno Playground](https://dash.deno.com/playground/early-hedgehog-35)
+> [View in Cloudflare Playground](https://cloudflareworkers.com/#0e7ee0380c62380f7909845ffcc01fe2:https://tutorial.cloudflareworkers.com)
 
 Defines two `GET` endpoints:
 

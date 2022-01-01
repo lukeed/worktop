@@ -1,5 +1,5 @@
 {
-  "name": "worktop-demo-basic-module",
+  "name": "worktop-demo-basic-cfw",
   "zoneid": "<YOUR ZONE ID>",
   "profile": "personal",
   "entry": "index.ts",

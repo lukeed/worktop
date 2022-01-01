@@ -1,15 +1,8 @@
 import { Router } from 'worktop';
-import * as Cache from 'worktop/cache';
 import { reply } from 'worktop/response';
-import { listen } from 'worktop/cfw';
+import { start } from 'worktop/sw';
 
 const API = new Router();
-
-API.prepare = Cache.sync();
-
-API.add('GET', '/greet/:name', (req, context) => {
-	return new Response(`Hello, ${context.params.name}!`);
-});
 
 API.add('GET', '/', (req, context) => {
 	let command = `$ curl https://${context.url.hostname}/greet/lukeed`;
@@ -20,5 +13,9 @@ API.add('GET', '/', (req, context) => {
 	});
 });
 
+API.add('GET', '/greet/:name?', (req, context) => {
+	return new Response(`Hello, ${context.params.name}!`);
+});
+
 // Service Worker
-listen(API.run);
+start(API.run);

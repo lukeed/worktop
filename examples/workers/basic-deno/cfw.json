@@ -1,8 +1,4 @@
 {
   "name": "worktop-demo-basic-deno",
-  "profile": "personal",
-  "entry": "index.ts",
-  "routes": [
-    "<YOUR DOMAIN>/*"
-  ]
+  "entry": "index.ts"
 }
