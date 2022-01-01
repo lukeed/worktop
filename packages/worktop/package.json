@@ -16,6 +16,14 @@
       "import": "./router/index.mjs",
       "require": "./router/index.js"
     },
+    "./cfw": {
+      "import": "./cfw/index.mjs",
+      "require": "./cfw/index.js"
+    },
+    "./cfw.durable": {
+      "import": "./cfw.durable/index.mjs",
+      "require": "./cfw.durable/index.js"
+    },
     "./cfw.kv": {
       "import": "./cfw.kv/index.mjs",
       "require": "./cfw.kv/index.js"
@@ -40,10 +48,6 @@
       "import": "./buffer/index.mjs",
       "require": "./buffer/index.js"
     },
-    "./cfw": {
-      "import": "./cfw/index.mjs",
-      "require": "./cfw/index.js"
-    },
     "./cookie": {
       "import": "./cookie/index.mjs",
       "require": "./cookie/index.js"
@@ -51,10 +55,6 @@
     "./crypto": {
       "import": "./crypto/index.mjs",
       "require": "./crypto/index.js"
-    },
-    "./cfw.durable": {
-      "import": "./cfw.durable/index.mjs",
-      "require": "./cfw.durable/index.js"
     },
     "./response": {
       "import": "./response/index.mjs",
@@ -83,22 +83,23 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "cfw",
-    "cors",
     "base64",
     "buffer",
     "cache",
+    "cfw",
+    "cfw.durable",
+    "cfw.kv",
+    "cfw.kv.assets",
+    "cfw.ws",
     "crypto",
     "cookie",
-    "response",
-    "cfw.durable",
-    "cfw.kv.assets",
-    "router",
-    "utils",
+    "cors",
     "deno",
-    "jwt",
-    "cfw.kv",
+    "response",
+    "router",
     "sw",
+    "utils",
+    "jwt",
     "ws"
   ],
   "engines": {
