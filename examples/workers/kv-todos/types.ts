@@ -1,5 +1,5 @@
 import type * as worktop from 'worktop';
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 
 export interface Context extends worktop.Context {
 	bindings: {

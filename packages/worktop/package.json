@@ -16,9 +16,9 @@
       "import": "./router/index.mjs",
       "require": "./router/index.js"
     },
-    "./kv": {
-      "import": "./kv/index.mjs",
-      "require": "./kv/index.js"
+    "./cfw.kv": {
+      "import": "./cfw.kv/index.mjs",
+      "require": "./cfw.kv/index.js"
     },
     "./cfw.kv.assets": {
       "import": "./cfw.kv.assets/index.mjs",
@@ -97,7 +97,7 @@
     "utils",
     "deno",
     "jwt",
-    "kv",
+    "cfw.kv",
     "sw",
     "ws"
   ],

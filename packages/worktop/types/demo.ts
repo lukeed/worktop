@@ -1,7 +1,7 @@
 import { HS256 } from 'worktop/jwt';
 import * as CORS from 'worktop/cors';
 import * as Cache from 'worktop/cache';
-import { read, write } from 'worktop/kv';
+import { read, write } from 'worktop/cfw.kv';
 import { Router, compose } from 'worktop';
 import { reply } from 'worktop/response';
 import * as utils from 'worktop/utils';
@@ -9,7 +9,7 @@ import { start } from 'worktop/cfw';
 
 import type { Context } from 'worktop';
 import type { ULID } from 'worktop/utils';
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 
 interface Custom extends Context {
 	timestamp: number;

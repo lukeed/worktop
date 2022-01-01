@@ -1,8 +1,8 @@
-import * as DB from 'worktop/kv';
+import * as DB from 'worktop/cfw.kv';
 import { ulid } from 'worktop/utils';
 
 import type { ULID } from 'worktop/utils';
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 
 export interface Todo {
 	uid: ULID;

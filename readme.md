@@ -45,12 +45,12 @@ $ npm install --save worktop
 ```ts
 import { Router } from 'worktop';
 import * as utils from 'worktop/utils';
-import { read, write } from 'worktop/kv';
+import { read, write } from 'worktop/cfw.kv';
 import { reply } from 'worktop/response';
 import * as Cache from 'worktop/cache';
 import { start } from 'worktop/cfw';
 
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 import type { Context } from 'worktop';
 
 interface Bindings extends Context {
@@ -142,12 +142,12 @@ export default start(API.run);
 
 The main module – concerned with routing. <br>This is core of most applications. Exports the [`Router`](/src/router.d.ts#L66) class.
 
-### Module: `worktop/kv`
+### Module: `worktop/cfw.kv`
 
-> [View `worktop/kv` API documentation](/src/kv.d.ts)
-<!-- > [View `worktop/kv` API documentation](/docs/module.kv.md) -->
+> [View `worktop/cfw.kv` API documentation](/src/cfw.kv.d.ts)
+<!-- > [View `worktop/cfw.kv` API documentation](/docs/module.kv.md) -->
 
-The `worktop/kv` submodule contains all classes and utilities related to [Workers KV](https://www.cloudflare.com/products/workers-kv/).
+The `worktop/cfw.kv` submodule contains all classes and utilities related to [Workers KV](https://www.cloudflare.com/products/workers-kv/).
 
 ### Module: `worktop/cache`
 

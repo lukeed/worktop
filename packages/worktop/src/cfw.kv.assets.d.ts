@@ -1,4 +1,4 @@
-import type { KV } from 'worktop/kv';
+import type { KV } from 'worktop/cfw.kv';
 
 export { mimes } from 'mrmime';
 
