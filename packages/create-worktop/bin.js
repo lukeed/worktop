@@ -12,9 +12,9 @@ const argv = require('mri')(process.argv.slice(2), {
 	},
 	default: {
 		C: '.',
-		f: 'module',
-		e: 'cloudflare',
 		force: false,
+		e: 'cloudflare',
+		f: '', // ~> env-default
 	}
 });
 
