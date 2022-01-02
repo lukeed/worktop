@@ -49,7 +49,7 @@ export async function build(options: Options): Promise<void> {
 		outfile: options.output,
 		entryPoints: [options.input],
 		target: options.target || 'esnext',
-		// TODO: function|lambda with esm?
+		// TODO: do function/lambda support esm?
 		format: /(cjs|function|lambda)/.test(format) ? 'cjs' : 'esm',
 		resolveExtensions: ['.tsx', '.ts', '.jsx', '.mjs', '.js', '.json', '.htm', '.html'],
 		external: ([] as string[]).concat(external),
@@ -75,6 +75,16 @@ export async function build(options: Options): Promise<void> {
 		options.modify(config);
 	} else if (options.overrides) {
 		Object.assign(config, options.overrides);
+	}
+
+	// Must wait for overrides
+	// ---
+	if (config.format === 'cjs') {
+		// Used `build/index.mjs` by default; ".js" is loose
+		config.outfile = config.outfile!.replace(/\.mjs$/, '.js');
+	} else if (env === 'cfw' && config.format === 'esm') {
+		// Wrangler always sees ".js" as CommonJS by default
+		config.outfile = config.outfile!.replace(/\.c?js$/, '.mjs');
 	}
 
 	config.write = true;
