@@ -2,16 +2,19 @@
 const argv = require('mri')(process.argv.slice(2), {
 	alias: {
 		C: 'cwd',
-		f: 'force',
+		e: 'env',
+		f: 'format',
 		t: 'typescript',
 		// m: 'monorepo',
 		v: 'version',
 		h: 'help',
-		c: 'cfw',
+		// c: 'cfw',
 	},
 	default: {
 		C: '.',
-		f: false,
+		f: 'module',
+		e: 'cloudflare',
+		force: false,
 	}
 });
 
@@ -30,16 +33,21 @@ if (argv.help) {
 	output += '\n';
 	output += '\n  Options';
 	output += '\n    -C, --cwd          Directory to resolve from';
-	output += '\n    -f, --force        Force directory overwrite';
-	output += '\n    -t, --typescript   Force directory overwrite';
+	output += '\n    -t, --typescript   Setup project for TypeScript usage';
+	output += '\n    -e, --env          Target platform environment (default "cloudflare")';
+	output += '\n    -f, --format       Worker/Script output format (default "module")';
 	// output += '\n    -m, --monorepo     Force directory overwrite';
-	output += '\n    -c, --cfw          Force directory overwrite';
+	// output += '\n    -c, --cfw          Force directory overwrite';
+	output += '\n        --force        Force overwrite target directory';
 	output += '\n    -v, --version      Displays current version';
 	output += '\n    -h, --help         Displays this message';
 	output += '\n';
 	output += '\n  Examples';
 	output += '\n    $ npm init worktop my-worker';
 	output += '\n    $ yarn create worktop my-worker --force';
+	output += '\n    $ npm init worktop my-worker --env cloudflare';
+	output += '\n    $ npm init worktop my-worker --env cloudflare';
+	output += '\n    $ npm init worktop my-worker --env deno';
 	output += '\n';
 
 	exit(output, 0);
@@ -55,6 +63,6 @@ if (argv.version) {
 		if (!dir) return exit('Missing <name> argument', 1);
 		await require('.').setup(dir, argv);
 	} catch (err) {
-		exit(err.stack, 1);
+		exit(err && err.stack || err, 1);
 	}
 })();

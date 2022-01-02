@@ -1,13 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as combos from '../../combos';
 
-interface Argv {
+type Argv = {
 	cwd: string;
 	force?: boolean;
 	typescript?: boolean;
 	// TODO: monorepo
-	// TODO: env+format combos
-}
+} & combos.Options;
 
 async function mkdir(dir: string) {
 	fs.existsSync(dir) || await fs.promises.mkdir(dir, { recursive: true });
@@ -49,6 +49,22 @@ export async function setup(dir: string, argv: Argv) {
 		throw new Error(msg);
 	}
 
+	// TODO: may throw error; format it
+	let { env, format } = combos.normalize(argv);
+
+	let ext = argv.typescript ? 'ts' : 'js';
+	let input = `src/${env}.${format}.${ext}`;
+	let output = `src/index.${ext}`;
+	let flags = '';
+
+	if (env !== 'cfw') {
+		flags += `--env ${env}`
+	}
+	if (format !== 'esm') {
+		if (flags) flags += ' ';
+		flags += `--format ${format}`
+	}
+
 	await mkdir(target);
 
 	let root = path.join(source, 'root');
@@ -65,20 +81,19 @@ export async function setup(dir: string, argv: Argv) {
 	let file = path.join(target, 'package.json');
 	let pkg = require(file);
 
-	let input = argv.typescript ? 'index.ts' : 'index.js';
-
 	await fs.promises.mkdir(
 		path.join(target, 'src')
 	);
 
 	await fs.promises.copyFile(
 		path.join(source, input),
-		path.join(target, 'src', input),
+		path.join(target, output),
 	);
 
 	// TODO: --cfw hook
 	pkg.devDependencies['worktop.build'] = 'latest';
-	pkg.scripts['build'] = `worktop build src/${input}`;
+	pkg.scripts['build'] = `worktop build ${output}`;
+	if (flags) pkg.scripts['build'] += ' ' + flags;
 
 	await fs.promises.writeFile(
 		file, JSON.stringify(pkg, null, 2)
