@@ -1,10 +1,34 @@
-import type { Options } from 'worktop.build';
 import type { Platform, Format } from 'worktop.build';
+
+interface Input {
+	env?: Platform;
+	format?: Format;
+}
+
+// Valid env|format combos
+export type Options = {
+	env?: 'cloudflare' | 'cfw';
+	/** @default "module / esm" */
+	format?: 'module' | 'esm' | 'sw';
+} | {
+	env: 'browser' | 'web';
+	format?: 'sw';
+} | {
+	env: 'deno';
+	format?: 'esm';
+} | {
+	env: 'node';
+		/** @default "esm" */
+	format?: 'cjs' | 'esm' | 'function' | 'lambda';
+};
 
 export namespace Narrow {
 	export type Platform = 'cfw' | 'web' | 'node' | 'deno';
 	export type Format = 'function' | 'esm' | 'lambda' | 'cjs' | 'sw';
-	export type Combo = { env: Platform; format: Format }
+	export interface Pair {
+		env: Platform;
+		format: Format;
+	}
 }
 
 export function toEnv(value?: Platform|string): Narrow.Platform {
@@ -35,8 +59,8 @@ export function toFormat(env: Narrow.Platform, value?: Format|string): Narrow.Fo
 	throw new Error(`Invalid "${value}" format for "${env}" target`);
 }
 
-export function toCombo(options: Options): Narrow.Combo {
-	let env = toEnv(options.env);
-	let format = toFormat(env, options.format);
+export function normalize(input: Input): Narrow.Pair {
+	let env = toEnv(input.env);
+	let format = toFormat(env, input.format);
 	return { env, format };
 }

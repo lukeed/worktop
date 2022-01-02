@@ -22,6 +22,7 @@
     }
   },
   "include": [
+    "packages/combos.ts",
     "packages/worktop/src",
     "packages/worktop/types",
     "packages/worktop.build/src",

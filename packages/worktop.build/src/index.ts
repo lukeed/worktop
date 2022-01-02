@@ -1,6 +1,6 @@
 import { existsSync } from 'fs';
 import { dirname, join, resolve } from 'path';
-import * as utils from './utils';
+import * as combos from '../../combos';
 
 import type { BuildOptions } from 'esbuild';
 import type { Options } from '../';
@@ -36,7 +36,7 @@ export async function build(options: Options): Promise<void> {
 	}
 
 	// TODO: this can throw error; format it
-	let { env, format } = utils.toCombo(options);
+	let { env, format } = combos.normalize(options);
 
 	let { sourcemap, external=[] } = options;
 	let fields = ['worker', 'browser', 'module', 'jsnext', 'main'];
