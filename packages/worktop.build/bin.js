@@ -34,6 +34,7 @@ function help() {
 	msg += '\n  Options';
 	msg += '\n    -C, --cwd         Current working directory (default ".")';
 	msg += '\n    -c, --config      Path to config file (default "worktop.config.js")';
+	msg += '\n    -e, --env         Target platform environment (default "cloudflare")';
 	msg += '\n    -f, --format      Worker/Script output format (default "module")';
 	msg += '\n    -l, --loglevel    Logging display level (default "info")';
 	msg += '\n    -a, --analyze     Render bundle output analysis';
@@ -41,8 +42,8 @@ function help() {
 	msg += '\n    -h, --help        Displays this message\n';
 	msg += '\n  Examples';
 	msg += '\n    $ worktop build';
-	msg += '\n    $ worktop build --format sw';
-	msg += '\n    $ worktop build --minify --format sw';
+	msg += '\n    $ worktop build --env deno --minify';
+	msg += '\n    $ worktop build --env web --format sw';
 	msg += '\n    $ worktop build src/main.ts --format sw';
 	console.log(msg + '\n');
 	process.exit(0);
