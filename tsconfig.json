@@ -27,6 +27,7 @@
     "packages/worktop/types",
     "packages/worktop.build/src",
     "packages/worktop.build/bin.js",
+    "packages/create-worktop/template/src",
     "packages/create-worktop/src",
     "examples/workers/**/*"
   ],
