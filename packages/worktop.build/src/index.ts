@@ -1,5 +1,6 @@
 import { existsSync } from 'fs';
 import { dirname, join, resolve } from 'path';
+import * as combos from '../../combos';
 
 import type { BuildOptions } from 'esbuild';
 import type { Options } from '../';
@@ -13,7 +14,7 @@ async function load<T = any>(ident: string): Promise<T> {
 
 // TODO? custom config OR allow default set
 // TODO? transform typescript config file w/o -r hook
-// TODO: validate --format and/or --platform combination
+
 export async function build(options: Options): Promise<void> {
 	esbuild = esbuild || await import('esbuild');
 
@@ -34,7 +35,10 @@ export async function build(options: Options): Promise<void> {
 		});
 	}
 
-	let { platform, sourcemap, external=[] } = options;
+	// TODO: this can throw error; format it
+	let { env, format } = combos.normalize(options);
+
+	let { sourcemap, external=[] } = options;
 	let fields = ['worker', 'browser', 'module', 'jsnext', 'main'];
 	let conds = ['worker', 'browser', 'import', 'production', 'default'];
 
@@ -44,11 +48,12 @@ export async function build(options: Options): Promise<void> {
 		absWorkingDir: cwd,
 		outfile: options.output,
 		entryPoints: [options.input],
-		format: options.format || 'esm',
 		target: options.target || 'esnext',
-		sourcemap: sourcemap ? 'inline' : false,
+		// TODO: do function/lambda support esm?
+		format: /(cjs|function|lambda)/.test(format) ? 'cjs' : 'esm',
 		resolveExtensions: ['.tsx', '.ts', '.jsx', '.mjs', '.js', '.json', '.htm', '.html'],
 		external: ([] as string[]).concat(external),
+		sourcemap: sourcemap ? 'inline' : false,
 		logLevel: options.loglevel || 'info',
 		minify: !!options.minify,
 		mainFields: fields,
@@ -61,7 +66,7 @@ export async function build(options: Options): Promise<void> {
 		}
 	};
 
-	if (platform === 'node') {
+	if (env === 'node') {
 		fields = fields.slice(2);
 		conds = ['node', 'require', ...conds.slice(2)];
 	}
@@ -70,6 +75,16 @@ export async function build(options: Options): Promise<void> {
 		options.modify(config);
 	} else if (options.overrides) {
 		Object.assign(config, options.overrides);
+	}
+
+	// Must wait for overrides
+	// ---
+	if (config.format === 'cjs') {
+		// Used `build/index.mjs` by default; ".js" is loose
+		config.outfile = config.outfile!.replace(/\.mjs$/, '.js');
+	} else if (env === 'cfw' && config.format === 'esm') {
+		// Wrangler always sees ".js" as CommonJS by default
+		config.outfile = config.outfile!.replace(/\.c?js$/, '.mjs');
 	}
 
 	config.write = true;

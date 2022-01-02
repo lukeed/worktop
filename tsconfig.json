@@ -17,14 +17,18 @@
     "noEmit": true,
     "paths": {
       "worktop": ["./packages/worktop/src/router.d.ts"],
-      "worktop/*": ["./packages/worktop/src/*.d.ts"]
+      "worktop/*": ["./packages/worktop/src/*.d.ts"],
+      "worktop.build": ["./packages/worktop.build/index.d.ts"],
     }
   },
   "include": [
+    "packages/combos.ts",
     "packages/worktop/src",
     "packages/worktop/types",
     "packages/worktop.build/src",
     "packages/worktop.build/bin.js",
+    "packages/create-worktop/template/src",
+    "packages/create-worktop/src",
     "examples/workers/**/*"
   ],
   "exclude": [

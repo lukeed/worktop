@@ -1,23 +1,15 @@
 import { HS256 } from 'worktop/jwt';
 import * as CORS from 'worktop/cors';
-import * as Cache from 'worktop/cache';
 import { Router, compose } from 'worktop';
-import { read, write } from 'worktop/cfw.kv';
 import { reply } from 'worktop/response';
 import * as utils from 'worktop/utils';
-import { start } from 'worktop/cfw';
+import { start } from 'worktop/deno';
 
 import type { Context } from 'worktop';
 import type { ULID } from 'worktop/utils';
-import type { KV } from 'worktop/cfw.kv';
 
 interface Custom extends Context {
 	timestamp: number;
-	bindings: {
-		JWT_KEY: string;
-		JWT_ISS: string;
-		ACCOUNT: KV.Namespace;
-	};
 }
 
 interface Account {
@@ -43,9 +35,6 @@ API.prepare = compose(
 		});
 	},
 
-	// Attach `Cache` lookup -> save
-	Cache.sync(),
-
 	// Attach global CORS config
 	CORS.preflight({
 		maxage: 3600 * 6, // 6 hr
@@ -59,8 +48,10 @@ API.add('GET', '/', () => {
 
 API.add('GET', '/accounts/:uid', async (req, context) => {
 	try {
-		let item = await read<Account>(context.bindings.ACCOUNT, context.params.uid);
-		if (!item) return reply(404, 'Unknown account identifier');
+		let res = await fetch(`https://example.com/users/${context.params.uid}`)
+		if (!res.ok) return reply(404, 'Unknown account identifier');
+		let item = await res.json() as Account;
+
 		return reply(200, item, {
 			'Cache-Control': 'public,max-age=900'
 		});
@@ -84,16 +75,28 @@ API.add('POST', '/accounts', async (req, context) => {
 			email: input.email || '',
 		};
 
-		let isOK = await write<Account>(context.bindings.ACCOUNT, values.uid, values);
-		if (!isOK) return reply(400, 'Error saving account');
+		var Location = `https://${context.url.hostname}/accounts/${values.uid}`;
+		var Resource = `https://example.com/users/${values.uid}`;
+
+		let res = await fetch(Resource, {
+			method: 'PUT',
+			body: JSON.stringify(values),
+			headers: {
+				'Content-Type': 'application/json'
+			},
+		});
+
+		if (!res.ok) {
+			return reply(400, 'Error saving account');
+		}
 	} catch (err) {
 		return reply(500, 'Error creating account');
 	}
 
 	try {
 		let JWT = HS256<TokenPayload>({
-			key: context.bindings.JWT_KEY,
-			iss: context.bindings.JWT_ISS,
+			key: '<YOUR JWT SECRET>',
+			iss: context.url.origin,
 			expires: 3600 * 3, // 3 hours
 		});
 
@@ -102,12 +105,12 @@ API.add('POST', '/accounts', async (req, context) => {
 			email: values.email,
 		});
 
-		return reply(201, { token, values });
+		return reply(201, { token, values }, { Location });
 	} catch (err) {
-		await context.bindings.ACCOUNT.delete(values.uid);
+		await fetch(Resource, { method: 'DELETE' });
 		return reply(500, 'Error signing token');
 	}
 });
 
-// Initialize: Module Worker
-export default start(API.run);
+// Deno Worker
+await start(API.run);
