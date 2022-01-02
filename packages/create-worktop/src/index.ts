@@ -81,7 +81,7 @@ export async function setup(dir: string, argv: Argv) {
 	let file = path.join(target, 'package.json');
 	let pkg = require(file);
 
-	await fs.promises.mkdir(
+	await mkdir(
 		path.join(target, 'src')
 	);
 
