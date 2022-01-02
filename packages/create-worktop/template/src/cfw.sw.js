@@ -5,32 +5,10 @@ import { Router, compose } from 'worktop';
 import { read, write } from 'worktop/cfw.kv';
 import { reply } from 'worktop/response';
 import * as utils from 'worktop/utils';
-import { start } from 'worktop/cfw';
-
-import type { Context } from 'worktop';
-import type { ULID } from 'worktop/utils';
-import type { KV } from 'worktop/cfw.kv';
-
-interface Custom extends Context {
-	timestamp: number;
-	bindings: {
-		JWT_KEY: string;
-		JWT_ISS: string;
-		ACCOUNT: KV.Namespace;
-	};
-}
-
-interface Account {
-	uid: ULID;
-	name: string;
-	email: string;
-	// ...
-}
-
-type TokenPayload = Pick<Account, 'uid' | 'email'>;
+import { listen } from 'worktop/cfw';
 
 // Create new Router
-const API = new Router<Custom>();
+const API = new Router();
 
 API.prepare = compose(
 	// Attach global middleware
@@ -59,7 +37,7 @@ API.add('GET', '/', () => {
 
 API.add('GET', '/accounts/:uid', async (req, context) => {
 	try {
-		let item = await read<Account>(context.bindings.ACCOUNT, context.params.uid);
+		let item = await read(context.bindings.ACCOUNT, context.params.uid);
 		if (!item) return reply(404, 'Unknown account identifier');
 		return reply(200, item, {
 			'Cache-Control': 'public,max-age=900'
@@ -71,27 +49,27 @@ API.add('GET', '/accounts/:uid', async (req, context) => {
 
 API.add('POST', '/accounts', async (req, context) => {
 	try {
-		var input = await utils.body<Account>(req);
+		var input = await utils.body(req);
 		if (input == null) return reply(400, 'Missing request body');
 	} catch (err) {
 		return reply(500, 'Error parsing request');
 	}
 
 	try {
-		var values: Account = {
+		var values = {
 			uid: utils.ulid(),
 			name: input.name || '',
 			email: input.email || '',
 		};
 
-		let isOK = await write<Account>(context.bindings.ACCOUNT, values.uid, values);
+		let isOK = await write(context.bindings.ACCOUNT, values.uid, values);
 		if (!isOK) return reply(400, 'Error saving account');
 	} catch (err) {
 		return reply(500, 'Error creating account');
 	}
 
 	try {
-		let JWT = HS256<TokenPayload>({
+		let JWT = HS256({
 			key: context.bindings.JWT_KEY,
 			iss: context.bindings.JWT_ISS,
 			expires: 3600 * 3, // 3 hours
@@ -111,5 +89,5 @@ API.add('POST', '/accounts', async (req, context) => {
 	}
 });
 
-// Initialize: Module Worker
-export default start(API.run);
+// Service Worker
+listen(API.run);

@@ -5,7 +5,7 @@ import { Router, compose } from 'worktop';
 import { read, write } from 'worktop/cfw.kv';
 import { reply } from 'worktop/response';
 import * as utils from 'worktop/utils';
-import { start } from 'worktop/cfw';
+import { listen } from 'worktop/cfw';
 
 import type { Context } from 'worktop';
 import type { ULID } from 'worktop/utils';
@@ -111,5 +111,5 @@ API.add('POST', '/accounts', async (req, context) => {
 	}
 });
 
-// Initialize: Module Worker
-export default start(API.run);
+// Service Worker
+listen(API.run);

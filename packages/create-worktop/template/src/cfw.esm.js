@@ -80,7 +80,9 @@ API.add('POST', '/accounts', async (req, context) => {
 			email: values.email,
 		});
 
-		return reply(201, { token, values });
+		return reply(201, { token, values }, {
+			Location: `https://${context.url.hostname}/accounts/${values.uid}`
+		});
 	} catch (err) {
 		await context.bindings.ACCOUNT.delete(values.uid);
 		return reply(500, 'Error signing token');
