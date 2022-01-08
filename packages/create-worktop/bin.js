@@ -54,7 +54,8 @@ if (argv.help) {
 }
 
 if (argv.version) {
-	console.log('TODO, v0.0.0');
+	let pkg = require('./package.json');
+	return exit(`${pkg.name}, v${pkg.version}`, 0);
 }
 
 (async function () {
