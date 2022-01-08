@@ -68,7 +68,7 @@ export async function setup(dir: string, argv: Argv) {
 	await mkdir(target);
 
 	let root = path.join(source, 'root');
-	await list(root, function (abs, rel, isDir) {
+	await list(root, (abs, rel, isDir) => {
 		let next = path.join(target, rel);
 		return isDir ? mkdir(next) : copy(abs, next);
 	});
@@ -94,6 +94,21 @@ export async function setup(dir: string, argv: Argv) {
 	pkg.devDependencies['worktop.build'] = 'latest';
 	pkg.scripts['build'] = `worktop build ${output}`;
 	if (flags) pkg.scripts['build'] += ' ' + flags;
+
+	if (env === 'cfw') {
+		// TODO: wrangler.toml vs cfw file
+		let file = `wrangler.${format}.toml`;
+
+		await fs.promises.copyFile(
+			path.join(source, 'config', file),
+			path.join(target, 'wrangler.toml'),
+		);
+	}
+
+	// TODO: remove if not wrangler
+	if (env !== 'cfw' || format !== 'sw') {
+		delete pkg.main;
+	}
 
 	await fs.promises.writeFile(
 		file, JSON.stringify(pkg, null, 2)
