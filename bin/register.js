@@ -3,9 +3,6 @@ const { transformSync } = require('esbuild');
 
 const loadJS = require.extensions['.js'];
 
-// @ts-ignore - worktop/cache
-globalThis.caches = { default: {} };
-
 // @ts-ignore - worktop/utils, worktop/crypto
 globalThis.crypto = require('crypto').webcrypto;
 

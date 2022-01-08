@@ -71,7 +71,7 @@ const API = new Router<Bindings>();
 // Any `prepare` logic runs 1st for every request, before routing
 // ~> use `Cache` for request-matching, when permitted
 // ~> store Response in `Cache`, when permitted
-API.prepare = Cache.sync();
+API.prepare = Cache.sync(caches.default);
 
 API.add('GET', '/messages/:id', async (req, context) => {
   // Pre-parsed `context.params` object

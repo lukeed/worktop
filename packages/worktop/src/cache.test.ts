@@ -2,21 +2,13 @@ import { suite } from 'uvu';
 import * as assert from 'uvu/assert';
 import * as Cache from './cache';
 
-const Storage = (caches as any).default;
+const Storage = {} as any;
 
 const Mock = (x?: any) => {
 	let args: any[], f = (...y: any[]) => (args=y,Promise.resolve(x));
 	// @ts-ignore
 	return f.args = () => args,f;
 }
-
-const cache = suite('Cache');
-
-cache('should be a constant', () => {
-	assert.ok(Cache.Cache === Storage);
-});
-
-cache.run();
 
 // ---
 
@@ -28,13 +20,13 @@ lookup('should be a function', () => {
 
 lookup('should call `Cache.match` with arguments', async () => {
 	Storage.match = Mock();
-	await Cache.lookup(123 as any);
+	await Cache.lookup(Storage, 123 as any);
 	assert.equal(Storage.match.args(), [123]);
 });
 
 lookup('should allow custom `request` value :: string', async () => {
 	Storage.match = Mock();
-	await Cache.lookup('/foo/bar');
+	await Cache.lookup(Storage, '/foo/bar');
 	assert.equal(Storage.match.args(), ['/foo/bar']);
 });
 
@@ -42,7 +34,7 @@ lookup('should allow custom `request` value :: Request', async () => {
 	Storage.match = Mock();
 	const request = { foo: 456 } as any;
 
-	await Cache.lookup(request);
+	await Cache.lookup(Storage, request);
 	assert.equal(Storage.match.args(), [request]);
 });
 
@@ -54,7 +46,7 @@ lookup('should treat HEAD as GET', async () => {
 	}
 
 	let request = new Request('/foobar', { method: 'HEAD' });
-	let res = await Cache.lookup(request);
+	let res = await Cache.lookup(Storage, request);
 
 	assert.instance(res, Response);
 	assert.is.not(res!.body, 'hello');
@@ -148,7 +140,7 @@ save('should call `event.waitUntil` and `Cache.put` when Response is cacheable',
 	let request = new Request('/', { method: 'GET' });
 	Storage.put = Mock();
 
-	let output = Cache.save(request, res, {
+	let output = Cache.save(Storage, request, res, {
 		waitUntil() {
 			waited = 1;
 		}
@@ -170,7 +162,7 @@ save('should treat custom `request`-string as GET', () => {
 	let res = new Response;
 	Storage.put = Mock();
 
-	let output = Cache.save('/foo/bar', res, {
+	let output = Cache.save(Storage, '/foo/bar', res, {
 		waitUntil() {
 			waited = 1;
 		}
@@ -193,7 +185,7 @@ save('should not save Response if not GET method :: POST', () => {
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
 
-	const output = Cache.save(request, res, event);
+	const output = Cache.save(Storage, request, res, event);
 	assert.ok(output === res);
 
 	assert.is(saved, 0);
@@ -207,7 +199,7 @@ save('should not save Response if not GET method :: HEAD', () => {
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
 
-	const output = Cache.save(event.request, res, event);
+	const output = Cache.save(Storage, event.request, res, event);
 	assert.ok(output === res);
 
 	assert.is(saved, 0);
@@ -221,7 +213,7 @@ save('should not save Response if not cacheable', () => {
 	const event: any = { request, waitUntil: () => waited=1 };
 	Storage.put = () => saved=1;
 
-	const output = Cache.save(event.request, res, event);
+	const output = Cache.save(Storage, event.request, res, event);
 	assert.ok(output === res);
 
 	assert.is(saved, 0);
@@ -240,7 +232,7 @@ save('should mark `private=set-cookie` :: write', () => {
 	res.headers.set('set-cookie', 'foo=bar');
 	assert.ok(Cache.isCacheable(res));
 
-	let copy = Cache.save(event.request, res, event);
+	let copy = Cache.save(Storage, event.request, res, event);
 	assert.is.not(copy, res); // res = res.clone()
 
 	assert.equal(
@@ -267,7 +259,7 @@ save('should mark `private=set-cookie` :: append', () => {
 	res.headers.set('cache-control', 'public,max-age=0');
 
 	assert.ok(Cache.isCacheable(res));
-	let copy = Cache.save(event.request, res, event);
+	let copy = Cache.save(Storage, event.request, res, event);
 	assert.is.not(copy, res); // res = res.clone()
 
 	assert.equal(

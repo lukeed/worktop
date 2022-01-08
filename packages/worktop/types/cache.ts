@@ -7,49 +7,50 @@ declare const event: FetchEvent;
 declare const request: Request;
 declare const response: Response;
 declare const context: Module.Context;
+declare const cache: Cache;
 declare const API: Router;
 
 /**
  * SAVE
  */
 
-Cache.save(event.request, response, context);
-Cache.save('/foo/bar', response, context);
-Cache.save(request, response, context);
+Cache.save(cache, event.request, response, context);
+Cache.save(cache, '/foo/bar', response, context);
+Cache.save(cache, request, response, context);
 
 // event has `waitUntil` on it
-Cache.save(request, response, event);
+Cache.save(cache, request, response, event);
 
 // @ts-expect-error
-Cache.save(event, response, context);
+Cache.save(cache, event, response, context);
 
 // @ts-expect-error
-Cache.save(123, response, context);
+Cache.save(cache, 123, response, context);
 
 // @ts-expect-error
-Cache.save(request, 123, context);
+Cache.save(cache, request, 123, context);
 
 assert<Response>(
-	Cache.save(request, response, event)
+	Cache.save(cache, request, response, event)
 );
 
 /**
  * SAVE
  */
 
-Cache.lookup(request);
-Cache.lookup('/foo/bar');
-Cache.lookup(event.request);
+Cache.lookup(cache, request);
+Cache.lookup(cache, '/foo/bar');
+Cache.lookup(cache, event.request);
 
 // @ts-expect-error
-Cache.lookup(event);
+Cache.lookup(cache, event);
 
 assert<Promise<Response|void>>(
-	Cache.lookup(request)
+	Cache.lookup(cache, request)
 );
 
 assert<Response | void>(
-	await Cache.lookup(request)
+	await Cache.lookup(cache, request)
 );
 
 /**
@@ -72,8 +73,14 @@ Cache.isCacheable(request);
  * sync
  */
 
+// @ts-expect-error
+Cache.sync();
+
+// @ts-expect-error
+Cache.sync(request);
+
 assert<Handler>(
-	Cache.sync()
+	Cache.sync(cache)
 );
 
 
@@ -83,10 +90,11 @@ assert<Handler>(
 
 // @ts-expect-error
 API.prepare = Cache.sync;
-API.prepare = Cache.sync();
+
+API.prepare = Cache.sync(cache);
 
 API.prepare = compose(
-	Cache.sync(),
+	Cache.sync(cache),
 	async (req, res) => {
 		return new Response
 	}
@@ -98,9 +106,9 @@ API.prepare = compose(
 
 addEventListener('fetch', event => {
 	event.respondWith(
-		Cache.lookup(event.request).then(prev => {
+		Cache.lookup(cache, event.request).then(prev => {
 			return prev || Promise.resolve(response).then(res => {
-				return Cache.save(event.request, res, event);
+				return Cache.save(cache, event.request, res, event);
 			});
 		})
 	);
