@@ -1,6 +1,6 @@
-import * as Cache from 'worktop/cache';
 import { Router, compose } from 'worktop';
-import * as modules from 'worktop/cfw';
+import * as Cache from 'worktop/cfw.cache';
+import * as cfw from 'worktop/cfw';
 import * as sw from 'worktop/sw';
 
 import type { Context } from 'worktop';
@@ -50,9 +50,10 @@ API.add('GET', '/:foo/:bar?', async (req, context) => {
 /**
  * init: service worker
  */
+cfw.listen(API.run);
 sw.start(API.run);
 
 /**
  * init: module worker
  */
-export default modules.start(API.run);
+export default cfw.start(API.run);

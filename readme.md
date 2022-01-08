@@ -45,10 +45,12 @@ $ npm install --save worktop
 ```ts
 import { Router } from 'worktop';
 import * as utils from 'worktop/utils';
-import { read, write } from 'worktop/cfw.kv';
 import { reply } from 'worktop/response';
-import * as Cache from 'worktop/cache';
+
+// Cloudflare-specific Submodules
 import { start } from 'worktop/cfw';
+import * as Cache from 'worktop/cfw.cache';
+import { read, write } from 'worktop/cfw.kv';
 
 import type { KV } from 'worktop/cfw.kv';
 import type { Context } from 'worktop';
@@ -71,7 +73,7 @@ const API = new Router<Bindings>();
 // Any `prepare` logic runs 1st for every request, before routing
 // ~> use `Cache` for request-matching, when permitted
 // ~> store Response in `Cache`, when permitted
-API.prepare = Cache.sync(caches.default);
+API.prepare = Cache.sync();
 
 API.add('GET', '/messages/:id', async (req, context) => {
   // Pre-parsed `context.params` object

@@ -1,11 +1,12 @@
 import { HS256 } from 'worktop/jwt';
 import * as CORS from 'worktop/cors';
-import * as Cache from 'worktop/cache';
-import { Router, compose } from 'worktop';
-import { read, write } from 'worktop/cfw.kv';
-import { reply } from 'worktop/response';
 import * as utils from 'worktop/utils';
+import { reply } from 'worktop/response';
+import { Router, compose } from 'worktop';
+
 import { start } from 'worktop/cfw';
+import * as Cache from 'worktop/cfw.cache';
+import { read, write } from 'worktop/cfw.kv';
 
 // Create new Router
 const API = new Router();

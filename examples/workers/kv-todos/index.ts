@@ -1,6 +1,6 @@
 import { Router } from 'worktop';
-import * as Cache from 'worktop/cache';
 import { start } from 'worktop/cfw';
+import * as Cache from 'worktop/cfw.cache';
 import * as Todos from './routes';
 
 import type { Context } from './types';
