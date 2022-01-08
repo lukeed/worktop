@@ -1,8 +1,8 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "worktop.build",
   "repository": "lukeed/worktop",
-  "description": "wip",
+  "description": "TODO",
   "module": "index.mjs",
   "types": "index.d.ts",
   "main": "index.js",
