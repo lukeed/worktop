@@ -1,8 +1,8 @@
 {
-  "version": "0.0.4",
+  "version": "0.0.5",
   "name": "create-worktop",
   "repository": "lukeed/worktop",
-  "description": "wip",
+  "description": "TODO",
   "license": "MIT",
   "bin": "bin.js",
   "author": {
