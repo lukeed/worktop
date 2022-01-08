@@ -7,6 +7,7 @@ import type { Context, Router } from 'worktop';
 import type { Bindings, CronEvent, Module } from 'worktop/cfw';
 
 declare const API: Router;
+declare const CACHE: Cache;
 declare const CUSTOM: Router<MyContext>;
 
 interface MyBindings extends Bindings {
@@ -109,9 +110,9 @@ addEventListener('fetch', API.run);
 
 addEventListener('fetch', event => {
 	event.respondWith(
-		Cache.lookup(event.request).then(prev => {
+		Cache.lookup(CACHE, event.request).then(prev => {
 			return prev || API.run(event.request, event).then(res => {
-				return Cache.save(event.request, res, event);
+				return Cache.save(CACHE, event.request, res, event);
 			})
 		})
 	)

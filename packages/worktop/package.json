@@ -20,6 +20,10 @@
       "import": "./cfw/index.mjs",
       "require": "./cfw/index.js"
     },
+    "./cfw.cache": {
+      "import": "./cfw.cache/index.mjs",
+      "require": "./cfw.cache/index.js"
+    },
     "./cfw.durable": {
       "import": "./cfw.durable/index.mjs",
       "require": "./cfw.durable/index.js"
@@ -95,6 +99,7 @@
     "buffer",
     "cache",
     "cfw",
+    "cfw.cache",
     "cfw.durable",
     "cfw.kv",
     "cfw.kv.assets",
