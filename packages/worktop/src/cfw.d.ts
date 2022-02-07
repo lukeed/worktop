@@ -39,7 +39,7 @@ declare global {
 }
 
 export interface Bindings {
-	[name: string]: string | CryptoKey | KV.Namespace | Durable.Namespace;
+	[name: string]: string | CryptoKey | KV.Namespace | Durable.Namespace | Module.Service;
 }
 
 export type FetchHandler<B extends Bindings = Bindings> = (
@@ -186,6 +186,10 @@ export interface IncomingCloudflareProperties {
 }
 
 export namespace Module {
+	export interface Service {
+		fetch: typeof fetch;
+	}
+
 	export interface Worker<B extends Bindings = Bindings> {
 		fetch?: FetchHandler<B>;
 		scheduled?: CronHandler<B>;

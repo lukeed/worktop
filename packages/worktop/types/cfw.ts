@@ -40,6 +40,7 @@ const worker1: Module.Worker = {
 };
 
 interface CustomBindings extends Bindings {
+	AUTH: Module.Service;
 	DATAB: KV.Namespace;
 	SECRET: string;
 	// @ts-expect-error
@@ -54,9 +55,17 @@ const worker2: Module.Worker<CustomBindings> = {
 
 		// @ts-expect-error - missing
 		assert<undefined>(env.missing);
+		assert<Module.Service>(env.AUTH);
 		assert<KV.Namespace>(env.DATAB);
 		assert<string>(env.SECRET);
 		assert<number>(env.COUNT);
+
+		env.AUTH.fetch(req);
+		env.AUTH.fetch(req.url);
+		env.AUTH.fetch('https://foobar.com', {
+			method: 'POST',
+			headers: req.headers,
+		});
 
 		return new Response;
 	}
