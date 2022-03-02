@@ -15,11 +15,13 @@ export function start<
 	B extends Bindings = Bindings,
 	C extends Context = Context
 >(run: Initializer<C>): Module.Worker<B> {
-	type BC = C & { bindings: Strict<B> };
 	return {
 		fetch(req, env, ctx) {
-			(ctx as BC).bindings = env;
-			return run(req, ctx as BC);
+			return run(req, {
+				bindings: env,
+				waitUntil: ctx.waitUntil.bind(ctx),
+				passThroughOnException: ctx.passThroughOnException.bind(ctx),
+			} as C & { bindings: Strict<B> });
 		}
 	};
 }
