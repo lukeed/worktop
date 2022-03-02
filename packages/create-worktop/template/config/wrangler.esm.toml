@@ -4,6 +4,9 @@ name = "<YOUR WORKER NAME>"
 account_id = "<YOUR ACCOUNT ID>"
 zone_id = "<YOUR ZONE ID>"
 
+# https://developers.cloudflare.com/workers/platform/compatibility-dates/
+compatibility_flags = ["url_standard", "formdata_parser_supports_files"]
+
 [build]
 command = "npm run build"
 
