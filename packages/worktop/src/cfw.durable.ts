@@ -53,3 +53,57 @@ export abstract class Actor {
 		}
 	}
 }
+
+export class Model {
+    DONamespace: Durable.Namespace
+
+    constructor(DONamespace:Durable.Namespace) {
+        this.DONamespace = DONamespace
+    }
+  
+    async get(namespace:string, key:string|string[]) {
+        const res = await this.fetchDurableObject(namespace, {
+            op: "get",
+            keys: typeof key === "string" ? [key] : key
+        })
+        return typeof key === "string" ? res.result[key] : res.result
+    }
+  
+    async put(namespace:string, key:string|Record<string, Object>, value, options = undefined) {
+        const res = await this.fetchDurableObject(namespace, {
+            op: "put",
+            entries: typeof key === "string" ? {[key]: value} : key,
+            options,
+        })
+        return res.success
+    }
+
+    async delete(namespace:string, key:string|string[]) {
+        const res = await this.fetchDurableObject(namespace, {
+            op: "delete",
+            keys: typeof key === "string" ? [key] : key
+        })
+        return res.success
+    }
+  
+    async list(namespace:string, prefix="") {
+        const res = await this.fetchDurableObject(namespace, {
+            op: "list",
+            options: {
+                prefix
+            }
+        })
+        return res.success ? res.result : undefined
+    }
+
+    async fetchDurableObject(namespace:string, body) {
+        const stub = this.DONamespace.get(this.DONamespace.idFromName(namespace))
+        // TODO retries
+        const res = await stub.fetch("http://internal", {
+            method: "POST",
+            body: JSON.stringify(body)
+        })
+
+        return await res.json()
+    }
+}
