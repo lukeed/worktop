@@ -2,7 +2,6 @@
 // @see https://github.com/lukeed/bundt/blob/master/index.js
 const { white, cyan, dim } = require('kleur');
 const rimports = require('rewrite-imports');
-const { readFileSync } = require('fs');
 const { normalize } = require('path');
 const { gzipSync } = require('zlib');
 
