@@ -69,7 +69,14 @@ declare namespace Operations {
 	type DELETE = [string | string[]];
 }
 
-export class Model implements Durable.Object {
+// [[durable_objects]]
+// class = "DataGroup"
+// name = "Animals"
+
+// [[durable_objects]]
+// class = "DataGroup"
+// name = "Projects"
+export class DataGroup implements Durable.Object {
 	id: string;
 	#storage: Durable.Storage;
 

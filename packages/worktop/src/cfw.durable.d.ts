@@ -88,7 +88,7 @@ export abstract class Actor {
 	connect(req: Request): Promise<Response>;
 }
 
-export const Model: Durable.Object;
+export const DataGroup: Durable.Object;
 
 export class Database {
 	constructor(namespace: Durable.Namespace);
