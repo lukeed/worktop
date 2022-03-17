@@ -124,11 +124,10 @@ export class Issue extends Actor {
 	API = new Router;
 	receive = this.API.run;
 
-	constructor(public state: Durable.State, public bindings: Bindings) {
-    super(state, bindings)
-    this.setupRouter()
+	constructor(state: Durable.State, bindings: Bindings) {
+    super(state, bindings);
+    this.setupRouter();
   }
-
 
   setupRouter() {
     this.API.add('GET', '/', () => {
