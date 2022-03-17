@@ -2,6 +2,7 @@ import { connect } from 'worktop/ws';
 
 import type { Bindings } from 'worktop/cfw';
 import type { WebSocket } from 'worktop/cfw.ws';
+import type { Operations } from './internal/durable';
 import type { Durable, Model as M } from 'worktop/cfw.durable';
 
 export abstract class Actor {
@@ -54,60 +55,62 @@ export abstract class Actor {
 	}
 }
 
-// interface Operations {
-// 	get: Parameters<Durable.Storage['get']>;
-// }
+interface Actions {
+	get: Operations.GET;
+	list: Operations.LIST;
+	delete: Operations.DELETE;
+	put: Operations.PUT;
+}
 
 export class Model implements M {
 	#ns: Durable.Namespace
 
-	constructor(DONamespace: Durable.Namespace) {
-		this.#ns = DONamespace;
+	constructor(ns: Durable.Namespace) {
+		this.#ns = ns;
 	}
 
-	async get(namespace:string, key: string|string[]) {
-		const res = await this.fetchDurableObject(namespace, {
-			op: 'get',
-			keys: typeof key === 'string' ? [key] : key
-		});
-		return typeof key === 'string' ? res.result[key] : res.result;
+	get(type: string, key: string|string[], options?: Durable.Storage.Options.Get) {
+		let args: Operations.GET = [key, options];
+		return this.#query(type, 'get', args);
 	}
 
-	async put<T>(namespace:string, key:string|Record<string, Object>, value: T, options = undefined) {
-		const res = await this.fetchDurableObject(namespace, {
-			op: 'put',
-			entries: typeof key === 'string' ? {[key]: value} : key,
-			options,
-		});
-		return res.success;
+	put(type: string, ...x: any[]) {
+		let args = x as Operations.PUT;
+		return this.#query(type, 'put', args);
 	}
 
-	async delete(namespace:string, key:string|string[]) {
-		const res = await this.fetchDurableObject(namespace, {
-			op: 'delete',
-			keys: typeof key === 'string' ? [key] : key,
-		});
-		return res.success;
+	delete(type: string, key: string | string[]) {
+		let args = [key] as Operations.DELETE;
+		return this.#query(type, 'delete', args);
 	}
 
-	async list(namespace:string, prefix='') {
-		const res = await this.fetchDurableObject(namespace, {
-			op: 'list',
-			options: { prefix },
-		});
-		return res.success ? res.result : undefined;
+	list(type: string, prefix='') {
+		let args: Operations.LIST = [{ prefix }];
+		return this.#query(type, 'list', args);
 	}
 
-	// TODO, any & private
-	async fetchDurableObject(namespace:string, body: any) {
-		const stub = this.#ns.get(this.#ns.idFromName(namespace));
+	async #query<K extends keyof Actions>(type: string, action: K, args: Actions[K]) {
+		let uid = this.#ns.idFromName(type);
+		let stub = this.#ns.get(uid);
+
+		let url = new URL(action, 'http://internal');
 
 		// TODO retries
-		const res = await stub.fetch('http://internal', {
+		let res = await stub.fetch(url.href, {
 			method: 'POST',
-			body: JSON.stringify(body)
+			headers: {
+				'content-type': 'application/json;charset=utf-8'
+			},
+			body: JSON.stringify(args)
 		});
 
-		return res.json();
+		let body = await res.json();
+
+		if ((res.status / 100 | 0) === 2) {
+			if (body.result != null) return body.result;
+			return body.results && new Map(body.results) || null;
+		}
+
+		throw new Error(body.error || 'Error executing query');
 	}
 }

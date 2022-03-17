@@ -1,68 +1,95 @@
 import { reply } from 'worktop/response';
-import type { Bindings } from 'worktop/cfw';
 import type { Durable } from 'worktop/cfw.durable';
+import type { Dict } from 'worktop/utils';
 
-export class DurableKVObject implements Durable.Object {
-	state: Durable.State;
-	storage: Durable.Storage;
-	env: Bindings;
+// redeclare storage param types
+export namespace Operations {
+	export type GET = [string | string[], Durable.Storage.Options.Get?];
+	export type LIST = [Durable.Storage.Options.List?];
+	export type PUT =
+		| [Dict<unknown>, Durable.Storage.Options.Put?]
+		| [string, unknown, Durable.Storage.Options.Put?];
+
+	// TODO: options
+	export type DELETE = [string | string[]];
+}
+
+export class Query implements Durable.Object {
 	id: string;
+	#storage: Durable.Storage;
 
-	constructor(state: Durable.State, env: Bindings) {
+	constructor(state: Durable.State) {
 		this.id = state.id.toString();
-		this.storage = state.storage;
-		this.state = state;
-		this.env = env;
+		this.#storage = state.storage;
 	}
 
 	async fetch(input: Request|string, init?: RequestInit) {
 		try {
-			let request = new Request(input, init);
-			return await this.handle(request);
-		} catch (err) {
-			return reply(500, {
-				success: false,
-				error: String(err)
-			});
-		}
-	}
+			let req = new Request(input, init);
+			let { pathname } = new URL(req.url);
 
-	async handle(req: Request) {
-		const body = await req.json();
+			if (pathname === 'get') {
+				let [k, o] = await req.json() as Operations.GET;
+				let result = await this.#storage.get(k as string, o);
 
-		switch (body.op) {
-			case 'get': {
-				// TODO: one vs many
-				let result = await this.storage.get(body.keys)
-
-				return reply(200, {
-					success: true,
-					result: result
-				});
-			}
-
-			case 'put': {
-				if (body.options?.denyOverwrite) {
-					const existing = await this.storage.get(Object.keys(body.entries))
-					if (existing.size > 0) return reply(409, {success: false, error: 'conflict: cannot write to an existing key with denyOverwrite'})
+				if (result instanceof Map) {
+					let results = [...result];
+					return reply(200, { results });
 				}
-				const opRes = await this.storage.put(body.entries);
-				return reply(200, {success: true});
+
+				return reply(200, { result });
 			}
 
-			case 'list': {
-				const opRes = await this.storage.list({prefix: body.options.prefix});
-				return reply(200, {success:true, result: Array.from(opRes.values())});
+			if (pathname === 'list') {
+				let [options] = await req.json() as Operations.LIST;
+				let result = await this.#storage.list(options);
+
+				let results = [...result];
+				return reply(200, { results });
 			}
 
-			case 'delete': {
-				const opRes = await this.storage.delete(body.keys);
-				return reply(200, {success: true});
+			if (pathname === 'put') {
+				let [k, v, o] = await req.json() as Operations.PUT;
+				let isEntries = k && typeof k === 'object';
+
+				if (isEntries) {
+					o = v as Durable.Storage.Options.Put;
+				}
+
+				o = o || {};
+
+				// @ts-ignore – TODO: types
+				let { overwrite=true, ...options } = o;
+
+				if (!overwrite) {
+					let kk = isEntries ? Object.keys(k) : k;
+					let prev = await this.#storage.get(kk as string);
+					if ((prev instanceof Map && prev.size > 0) || prev != null) {
+						let error = 'cannot overwrite existing key';
+						return reply(409, { error });
+					}
+				}
+
+				if (isEntries) {
+					await this.#storage.put(k as Dict<unknown>, options);
+				} else {
+					await this.#storage.put(k as string, v, options);
+				}
+
+				return reply(200, { result: true });
 			}
 
-			default: {
-				return reply(400);
+			if (pathname === 'delete') {
+				// TODO: options
+				let [k] = await req.json() as Operations.DELETE;
+				let result = await this.#storage.delete(k as string);
+				return reply(200, { result });
 			}
+
+			return reply(400);
+		} catch (err) {
+			let error = String(err);
+			return reply(500, { error });
 		}
 	}
 }
