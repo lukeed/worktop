@@ -91,19 +91,19 @@ export abstract class Actor {
 export const Model: Durable.Object;
 
 export class Database {
-	constructor(Model: Durable.Namespace);
+	constructor(namespace: Durable.Namespace);
 
-	get<T>(type: string, key: string): Promise<T|void>;
-	get<T>(type: string, keys: string[]): Promise<Map<string, T>>;
+	get<T>(shard: string, key: string): Promise<T|void>;
+	get<T>(shard: string, keys: string[]): Promise<Map<string, T>>;
 
 	// TODO: match options to actual Storage.Options
-	put<T extends string>(type: string, key: string, value: T, overwrite?: boolean): Promise<boolean>;
-	put<T>(type: string, entries: Dict<T>, overwrite?: boolean): Promise<boolean>;
+	put<T>(shard: string, key: string, value: T, overwrite?: boolean): Promise<boolean>;
+	put<T>(shard: string, entries: Dict<T>, overwrite?: boolean): Promise<boolean>;
 
-	delete(type: string, key: string): Promise<boolean>;
-	delete(type: string, key: string[]): Promise<number>;
+	delete(shard: string, key: string): Promise<boolean>;
+	delete(shard: string, key: string[]): Promise<number>;
 
 	// TODO
-	// list<T>(type: string, options?: Storage.Options.List): Promise<Map<string, T>>;
-	list<T>(type: string, prefix?: string): Promise<Map<string, T>>;
+	// list<T>(shard: string, options?: Storage.Options.List): Promise<Map<string, T>>;
+	list<T>(shard: string, prefix?: string): Promise<Map<string, T>>;
 }

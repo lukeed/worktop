@@ -163,28 +163,28 @@ export class Database implements DB {
 		this.#ns = ns;
 	}
 
-	get(type: string, key: string|string[], options?: Durable.Storage.Options.Get) {
+	get(shard: string, key: string|string[], options?: Durable.Storage.Options.Get) {
 		let args: Operations.GET = [key, options];
-		return this.#query(type, 'get', args);
+		return this.#query(shard, 'get', args);
 	}
 
-	put(type: string, ...x: any[]) {
+	put(shard: string, ...x: any[]) {
 		let args = x as Operations.PUT;
-		return this.#query(type, 'put', args);
+		return this.#query(shard, 'put', args);
 	}
 
-	delete(type: string, key: string | string[]) {
+	delete(shard: string, key: string | string[]) {
 		let args = [key] as Operations.DELETE;
-		return this.#query(type, 'delete', args);
+		return this.#query(shard, 'delete', args);
 	}
 
-	list(type: string, prefix='') {
+	list(shard: string, prefix='') {
 		let args: Operations.LIST = [{ prefix }];
-		return this.#query(type, 'list', args);
+		return this.#query(shard, 'list', args);
 	}
 
-	async #query<K extends keyof Actions>(type: string, action: K, args: Actions[K]) {
-		let uid = this.#ns.idFromName(type);
+	async #query<K extends keyof Actions>(shard: string, action: K, args: Actions[K]) {
+		let uid = this.#ns.idFromName(shard);
 		let stub = this.#ns.get(uid);
 
 		let url = new URL(action, 'http://internal');
