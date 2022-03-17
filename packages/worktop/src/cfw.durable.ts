@@ -62,54 +62,52 @@ export class Model implements M {
 	#ns: Durable.Namespace
 
 	constructor(DONamespace: Durable.Namespace) {
-		this.#ns = DONamespace
+		this.#ns = DONamespace;
 	}
 
 	async get(namespace:string, key: string|string[]) {
 		const res = await this.fetchDurableObject(namespace, {
-				op: 'get',
-				keys: typeof key === 'string' ? [key] : key
-		})
-		return typeof key === 'string' ? res.result[key] : res.result
+			op: 'get',
+			keys: typeof key === 'string' ? [key] : key
+		});
+		return typeof key === 'string' ? res.result[key] : res.result;
 	}
 
 	async put<T>(namespace:string, key:string|Record<string, Object>, value: T, options = undefined) {
-			const res = await this.fetchDurableObject(namespace, {
-					op: 'put',
-					entries: typeof key === 'string' ? {[key]: value} : key,
-					options,
-			})
-			return res.success
+		const res = await this.fetchDurableObject(namespace, {
+			op: 'put',
+			entries: typeof key === 'string' ? {[key]: value} : key,
+			options,
+		});
+		return res.success;
 	}
 
-		async delete(namespace:string, key:string|string[]) {
-				const res = await this.fetchDurableObject(namespace, {
-						op: 'delete',
-						keys: typeof key === 'string' ? [key] : key
-				})
-				return res.success
-		}
+	async delete(namespace:string, key:string|string[]) {
+		const res = await this.fetchDurableObject(namespace, {
+			op: 'delete',
+			keys: typeof key === 'string' ? [key] : key,
+		});
+		return res.success;
+	}
 
-		async list(namespace:string, prefix='') {
-				const res = await this.fetchDurableObject(namespace, {
-						op: 'list',
-						options: {
-								prefix
-						}
-				})
-				return res.success ? res.result : undefined
-		}
+	async list(namespace:string, prefix='') {
+		const res = await this.fetchDurableObject(namespace, {
+			op: 'list',
+			options: { prefix },
+		});
+		return res.success ? res.result : undefined;
+	}
 
-		// TODO, any & private
-		async fetchDurableObject(namespace:string, body: any) {
-				const stub = this.#ns.get(this.#ns.idFromName(namespace))
+	// TODO, any & private
+	async fetchDurableObject(namespace:string, body: any) {
+		const stub = this.#ns.get(this.#ns.idFromName(namespace));
 
-				// TODO retries
-				const res = await stub.fetch('http://internal', {
-						method: 'POST',
-						body: JSON.stringify(body)
-				})
+		// TODO retries
+		const res = await stub.fetch('http://internal', {
+			method: 'POST',
+			body: JSON.stringify(body)
+		});
 
-				return await res.json()
-		}
+		return res.json();
+	}
 }

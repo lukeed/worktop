@@ -108,7 +108,7 @@ export class Counter4 extends Actor {
 
 		this.#router.add('POST', '/', async (req, ctx) => {
 			let input = await utils.body<number[]>(req);
-			return new Response('' + Math.max(...input!));
+			return new Response(JSON.stringify(input));
 		});
 	}
 
