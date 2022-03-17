@@ -1,4 +1,5 @@
 import { Router, compose } from 'worktop';
+import { Database } from 'worktop/cfw.durable';
 import * as Cache from 'worktop/cfw.cache';
 import * as cfw from 'worktop/cfw';
 import * as sw from 'worktop/sw';
@@ -14,6 +15,7 @@ interface Custom extends Context {
 		SECRETZ: string;
 		ANIMALS: KV.Namespace;
 		COUNTER: Durable.Namespace;
+		STORAGE: Durable.Namespace;
 		HASHKEY: CryptoKey;
 	};
 }
@@ -45,6 +47,11 @@ API.add('GET', '/:foo/:bar?', async (req, context) => {
 	assert<KV.Namespace>(context.bindings.ANIMALS);
 	assert<Durable.Namespace>(context.bindings.COUNTER);
 	assert<CryptoKey>(context.bindings.HASHKEY);
+
+	let { foo, bar='default' } = context.params;
+	let database = new Database(context.bindings.STORAGE);
+	let item = await database.get<string>('foo:' + foo, bar);
+	assert<string|void>(item);
 });
 
 /**
