@@ -88,8 +88,10 @@ export abstract class Actor {
 	connect(req: Request): Promise<Response>;
 }
 
+export const Model: Durable.Object;
+
 export class Database {
-	constructor(namespace: Durable.Namespace);
+	constructor(Model: Durable.Namespace);
 
 	get<T>(type: string, key: string): Promise<T|void>;
 	get<T>(type: string, keys: string[]): Promise<Map<string, T>>;
