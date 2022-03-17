@@ -61,12 +61,10 @@ export abstract class Actor {
 declare namespace Operations {
 	type GET = [string | string[], Durable.Storage.Options.Get?];
 	type LIST = [Durable.Storage.Options.List?];
+	type DELETE = [string | string[], Durable.Storage.Options.Put?];
 	type PUT =
 		| [Dict<unknown>, Durable.Storage.Options.Put?]
 		| [string, unknown, Durable.Storage.Options.Put?];
-
-	// TODO: options
-	type DELETE = [string | string[]];
 }
 
 // [[durable_objects]]
@@ -120,8 +118,9 @@ export class DataGroup implements Durable.Object {
 
 				o = o || {};
 
-				// @ts-ignore – TODO: types
-				let { overwrite=true, ...options } = o;
+				let { overwrite=true, ...options } = o as Durable.Storage.Options.Put & {
+					overwrite?: boolean;
+				};
 
 				if (!overwrite) {
 					let kk = isEntries ? Object.keys(k) : k;
@@ -142,9 +141,8 @@ export class DataGroup implements Durable.Object {
 			}
 
 			if (pathname === 'delete') {
-				// TODO: options
-				let [k] = await req.json() as Operations.DELETE;
-				let result = await this.#storage.delete(k as string);
+				let [k, o] = await req.json() as Operations.DELETE;
+				let result = await this.#storage.delete(k as string, o);
 				return reply(200, { result });
 			}
 
@@ -180,13 +178,13 @@ export class Database implements DB {
 		return this.#query(shard, 'put', args);
 	}
 
-	delete(shard: string, key: string | string[]) {
-		let args = [key] as Operations.DELETE;
+	delete(shard: string, key: string | string[], options?: Durable.Storage.Options.Put) {
+		let args = [key, options] as Operations.DELETE;
 		return this.#query(shard, 'delete', args);
 	}
 
-	list(shard: string, prefix='') {
-		let args: Operations.LIST = [{ prefix }];
+	list(shard: string, options?: Durable.Storage.Options.List) {
+		let args: Operations.LIST = [options];
 		return this.#query(shard, 'list', args);
 	}
 

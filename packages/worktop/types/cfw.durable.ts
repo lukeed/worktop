@@ -160,6 +160,11 @@ await database.get(ns, '123');
 // @ts-expect-error
 await database.get(kv, '123');
 
+await database.get('projects', '123', {
+	allowConcurrency: false,
+	noCache: true,
+});
+
 assert<unknown>(
 	await database.get('projects', 'key')
 );
@@ -174,8 +179,21 @@ await database.put('projects', 'key');
 // @ts-expect-error
 await database.put<string>('projects', 'key', 123);
 
-// @ts-expect-error - invalid `overwrite` value
+// @ts-expect-error - invalid `options` value
 await database.put<number>('projects', 'key', 123, 'invalid');
+
+await database.put<number>('projects', 'key', 123, {
+	// @ts-expect-error
+	overwrite: 'asd',
+	// @ts-expect-error
+	noCache: 123
+});
+
+await database.put<number>('projects', 'key', 123, {
+	allowUnconfirmed: true,
+	overwrite: true,
+	noCache: true,
+});
 
 assert<string>(
 	// @ts-expect-error - return type
@@ -189,6 +207,23 @@ assert<boolean>(
 await database.put('projects', {
 	foo: 123,
 	bar: 'value',
+});
+
+await database.put('projects', {
+	foo: 123,
+	bar: 'value',
+}, {
+	overwrite: true,
+	allowUnconfirmed: true,
+});
+
+// @ts-expect-error
+await database.put('projects', {
+	foo: 123,
+	bar: 'value',
+}, {
+	overwrite: 123,
+	allowUnconfirmed: 123,
 });
 
 await database.put<string>('projects', {
@@ -216,6 +251,10 @@ await database.delete(kv, 123);
 // @ts-expect-error - return type
 await database.delete('projects', [1, 2, 3]);
 
+await database.delete('projects', 'foobar', {
+	allowUnconfirmed: true
+});
+
 assert<boolean>(
 	// @ts-expect-error - return type
 	await database.delete('projects', ['key1', 'key2'])
@@ -230,11 +269,17 @@ assert<number>(
 );
 
 assert<Map<string, unknown>>(
-	await database.list('projects', 'user:123:')
+	await database.list('projects', {
+		allowConcurrency: false,
+		prefix: 'user:123:',
+	})
 );
 
 assert<Map<string, number>>(
-	await database.list<number>('projects', 'user:123:')
+	await database.list<number>('projects', {
+		prefix: 'user:123:',
+		limit: 10,
+	})
 );
 
 assert<Map<string, number>>(
