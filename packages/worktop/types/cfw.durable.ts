@@ -1,5 +1,5 @@
 import { Router } from 'worktop';
-import { Actor } from 'worktop/cfw.durable';
+import { Actor, Model } from 'worktop/cfw.durable';
 import * as cookies from 'worktop/cookie';
 import * as utils from 'worktop/utils';
 
@@ -136,6 +136,111 @@ export class Issue extends Actor {
     })
   }
 }
+
+/**
+ * MODEL
+ */
+
+declare let ns: Durable.Namespace;
+declare let kv: KV.Namespace;
+
+// @ts-expect-error
+new Model();
+// @ts-expect-error
+new Model('foobar');
+// @ts-expect-error
+new Model(kv);
+
+let database = new Model(ns);
+
+// @ts-expect-error
+await database.get('projects', 123);
+// @ts-expect-error
+await database.get(ns, '123');
+// @ts-expect-error
+await database.get(kv, '123');
+
+assert<unknown>(
+	await database.get('projects', 'key')
+);
+
+assert<string | void>(
+	await database.get<string>('projects', 'key')
+);
+
+// @ts-expect-error
+await database.put('projects', 'key');
+
+// @ts-expect-error
+await database.put<string>('projects', 'key', 123);
+
+// @ts-expect-error - invalid `overwrite` value
+await database.put<number>('projects', 'key', 123, 'invalid');
+
+assert<string>(
+	// @ts-expect-error - return type
+	await database.put('projects', 'key', 123)
+);
+
+assert<boolean>(
+	await database.put('projects', 'key', 'value')
+);
+
+await database.put('projects', {
+	foo: 123,
+	bar: 'value',
+});
+
+await database.put<string>('projects', {
+	bar: 'value',
+	// @ts-expect-error
+	foo: 123,
+});
+
+assert<boolean>(
+	await database.put('projects', {
+		foo: 123,
+		bar: 'value',
+	})
+);
+
+// @ts-expect-error
+await database.delete('projects', 123);
+
+// @ts-expect-error
+await database.delete(ns, 123);
+
+// @ts-expect-error
+await database.delete(kv, 123);
+
+// @ts-expect-error - return type
+await database.delete('projects', [1, 2, 3]);
+
+assert<boolean>(
+	// @ts-expect-error - return type
+	await database.delete('projects', ['key1', 'key2'])
+);
+
+assert<boolean>(
+	await database.delete('projects', 'key')
+);
+
+assert<number>(
+	await database.delete('projects', ['key1', 'key2'])
+);
+
+assert<Map<string, unknown>>(
+	await database.list('projects', 'user:123:')
+);
+
+assert<Map<string, number>>(
+	await database.list<number>('projects', 'user:123:')
+);
+
+assert<Map<string, number>>(
+	// @ts-expect-error - return type
+	await database.list<string>('projects', 'user:123:')
+);
 
 /**
  * NATIVE
