@@ -1,5 +1,5 @@
 import { Router } from 'worktop';
-import { Actor, Model } from 'worktop/cfw.durable';
+import { Actor, Database } from 'worktop/cfw.durable';
 import * as cookies from 'worktop/cookie';
 import * as utils from 'worktop/utils';
 
@@ -138,20 +138,20 @@ export class Issue extends Actor {
 }
 
 /**
- * MODEL
+ * DATABASE
  */
 
 declare let ns: Durable.Namespace;
 declare let kv: KV.Namespace;
 
 // @ts-expect-error
-new Model();
+new Database();
 // @ts-expect-error
-new Model('foobar');
+new Database('foobar');
 // @ts-expect-error
-new Model(kv);
+new Database(kv);
 
-let database = new Model(ns);
+let database = new Database(ns);
 
 // @ts-expect-error
 await database.get('projects', 123);

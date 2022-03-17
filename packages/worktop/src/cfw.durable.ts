@@ -3,7 +3,8 @@ import { connect } from 'worktop/ws';
 import type { Bindings } from 'worktop/cfw';
 import type { WebSocket } from 'worktop/cfw.ws';
 import type { Operations } from './internal/durable';
-import type { Durable, Model as M } from 'worktop/cfw.durable';
+import type { Database as DB } from 'worktop/cfw.durable';
+import type { Durable } from 'worktop/cfw.durable';
 
 export abstract class Actor {
 	DEBUG: boolean;
@@ -62,7 +63,7 @@ interface Actions {
 	put: Operations.PUT;
 }
 
-export class Model implements M {
+export class Database implements DB {
 	#ns: Durable.Namespace
 
 	constructor(ns: Durable.Namespace) {
