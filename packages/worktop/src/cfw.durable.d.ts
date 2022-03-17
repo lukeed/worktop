@@ -65,8 +65,8 @@ export namespace Durable {
 		get<T>(key: string, options?: Storage.Options.Get): Promise<T | void>;
 		get<T>(keys: string[], options?: Storage.Options.Get): Promise<Map<string, T>>;
 
-		put<T>(key: string, value: T, options?: Storage.Options.Put): Promise<void>;
 		put<T>(entries: Dict<T>, options?: Storage.Options.Put): Promise<void>;
+		put<T>(key: string, value: T, options?: Storage.Options.Put): Promise<void>;
 
 		delete(key: string, options?: Storage.Options.Put): Promise<boolean>;
 		delete(keys: string[], options?: Storage.Options.Put): Promise<number>;
@@ -86,4 +86,21 @@ export abstract class Actor {
 
 	onconnect?(req: Request, ws: WebSocket): Promise<void> | void;
 	connect(req: Request): Promise<Response>;
+}
+
+export const DataGroup: Durable.Object;
+
+export class Database {
+	constructor(namespace: Durable.Namespace);
+
+	get<T>(shard: string, key: string, options?: Durable.Storage.Options.Get): Promise<T|void>;
+	get<T>(shard: string, keys: string[], options?: Durable.Storage.Options.Get): Promise<Map<string, T>>;
+
+	put<T>(shard: string, entries: Dict<T>, options?: { overwrite?: boolean } & Durable.Storage.Options.Put): Promise<boolean>;
+	put<T>(shard: string, key: string, value: T, options?: { overwrite?: boolean } & Durable.Storage.Options.Put): Promise<boolean>;
+
+	delete(shard: string, key: string, options?: Durable.Storage.Options.Put): Promise<boolean>;
+	delete(shard: string, key: string[], options?: Durable.Storage.Options.Put): Promise<number>;
+
+	list<T>(shard: string, options?: Durable.Storage.Options.List): Promise<Map<string, T>>;
 }

@@ -1,4 +1,5 @@
 import { Router, compose } from 'worktop';
+import { Database } from 'worktop/cfw.durable';
 import * as Cache from 'worktop/cfw.cache';
 import * as cfw from 'worktop/cfw';
 import * as sw from 'worktop/sw';
@@ -8,12 +9,19 @@ import type { Bindings } from 'worktop/cfw';
 import type { Durable } from 'worktop/cfw.durable';
 import type { KV } from 'worktop/cfw.kv';
 
+// [[durable_objects]]
+// class = "DataGroup"
+// name = "STORAGE"
+export { DataGroup } from 'worktop/cfw.durable';
+
 interface Custom extends Context {
 	start?: number;
+	database: Database;
 	bindings: {
 		SECRETZ: string;
 		ANIMALS: KV.Namespace;
 		COUNTER: Durable.Namespace;
+		STORAGE: Durable.Namespace;
 		HASHKEY: CryptoKey;
 	};
 }
@@ -21,10 +29,22 @@ interface Custom extends Context {
 const API = new Router<Custom>();
 
 API.prepare = compose(
-	Cache.sync(),
 	function (req, context) {
+		// timing response header
 		context.start = Date.now();
+		context.defer(res => {
+			let ms = Date.now() - context.start!;
+			res.headers.set('x-timing', '' + ms);
+		});
 	},
+
+	// lookup (and/or save) request->response in cache
+	Cache.sync(),
+
+	// setup the database
+	function (req, context) {
+		context.database = new Database(context.bindings.STORAGE);
+	}
 );
 
 API.add('GET', '/:foo/:bar?', async (req, context) => {
@@ -45,6 +65,11 @@ API.add('GET', '/:foo/:bar?', async (req, context) => {
 	assert<KV.Namespace>(context.bindings.ANIMALS);
 	assert<Durable.Namespace>(context.bindings.COUNTER);
 	assert<CryptoKey>(context.bindings.HASHKEY);
+
+	let { database } = context;
+	let { foo, bar='default' } = context.params;
+	let item = await database.get<string>('foo:' + foo, bar);
+	assert<string|void>(item);
 });
 
 /**

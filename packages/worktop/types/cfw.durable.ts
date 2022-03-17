@@ -1,5 +1,5 @@
 import { Router } from 'worktop';
-import { Actor } from 'worktop/cfw.durable';
+import { Actor, Database } from 'worktop/cfw.durable';
 import * as cookies from 'worktop/cookie';
 import * as utils from 'worktop/utils';
 
@@ -108,7 +108,7 @@ export class Counter4 extends Actor {
 
 		this.#router.add('POST', '/', async (req, ctx) => {
 			let input = await utils.body<number[]>(req);
-			return new Response('' + Math.max(...input!));
+			return new Response(JSON.stringify(input));
 		});
 	}
 
@@ -124,11 +124,10 @@ export class Issue extends Actor {
 	API = new Router;
 	receive = this.API.run;
 
-	constructor(public state: Durable.State, public bindings: Bindings) {
-    super(state, bindings)
-    this.setupRouter()
+	constructor(state: Durable.State, bindings: Bindings) {
+    super(state, bindings);
+    this.setupRouter();
   }
-
 
   setupRouter() {
     this.API.add('GET', '/', () => {
@@ -136,6 +135,156 @@ export class Issue extends Actor {
     })
   }
 }
+
+/**
+ * DATABASE
+ */
+
+declare let ns: Durable.Namespace;
+declare let kv: KV.Namespace;
+
+// @ts-expect-error
+new Database();
+// @ts-expect-error
+new Database('foobar');
+// @ts-expect-error
+new Database(kv);
+
+let database = new Database(ns);
+
+// @ts-expect-error
+await database.get('projects', 123);
+// @ts-expect-error
+await database.get(ns, '123');
+// @ts-expect-error
+await database.get(kv, '123');
+
+await database.get('projects', '123', {
+	allowConcurrency: false,
+	noCache: true,
+});
+
+assert<unknown>(
+	await database.get('projects', 'key')
+);
+
+assert<string | void>(
+	await database.get<string>('projects', 'key')
+);
+
+// @ts-expect-error
+await database.put('projects', 'key');
+
+// @ts-expect-error
+await database.put<string>('projects', 'key', 123);
+
+// @ts-expect-error - invalid `options` value
+await database.put<number>('projects', 'key', 123, 'invalid');
+
+await database.put<number>('projects', 'key', 123, {
+	// @ts-expect-error
+	overwrite: 'asd',
+	// @ts-expect-error
+	noCache: 123
+});
+
+await database.put<number>('projects', 'key', 123, {
+	allowUnconfirmed: true,
+	overwrite: true,
+	noCache: true,
+});
+
+assert<string>(
+	// @ts-expect-error - return type
+	await database.put('projects', 'key', 123)
+);
+
+assert<boolean>(
+	await database.put('projects', 'key', 'value')
+);
+
+await database.put('projects', {
+	foo: 123,
+	bar: 'value',
+});
+
+await database.put('projects', {
+	foo: 123,
+	bar: 'value',
+}, {
+	overwrite: true,
+	allowUnconfirmed: true,
+});
+
+// @ts-expect-error
+await database.put('projects', {
+	foo: 123,
+	bar: 'value',
+}, {
+	overwrite: 123,
+	allowUnconfirmed: 123,
+});
+
+await database.put<string>('projects', {
+	bar: 'value',
+	// @ts-expect-error
+	foo: 123,
+});
+
+assert<boolean>(
+	await database.put('projects', {
+		foo: 123,
+		bar: 'value',
+	})
+);
+
+// @ts-expect-error
+await database.delete('projects', 123);
+
+// @ts-expect-error
+await database.delete(ns, 123);
+
+// @ts-expect-error
+await database.delete(kv, 123);
+
+// @ts-expect-error - return type
+await database.delete('projects', [1, 2, 3]);
+
+await database.delete('projects', 'foobar', {
+	allowUnconfirmed: true
+});
+
+assert<boolean>(
+	// @ts-expect-error - return type
+	await database.delete('projects', ['key1', 'key2'])
+);
+
+assert<boolean>(
+	await database.delete('projects', 'key')
+);
+
+assert<number>(
+	await database.delete('projects', ['key1', 'key2'])
+);
+
+assert<Map<string, unknown>>(
+	await database.list('projects', {
+		allowConcurrency: false,
+		prefix: 'user:123:',
+	})
+);
+
+assert<Map<string, number>>(
+	await database.list<number>('projects', {
+		prefix: 'user:123:',
+		limit: 10,
+	})
+);
+
+assert<Map<string, number>>(
+	// @ts-expect-error - return type
+	await database.list<string>('projects', 'user:123:')
+);
 
 /**
  * NATIVE
