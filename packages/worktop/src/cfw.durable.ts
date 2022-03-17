@@ -1,5 +1,6 @@
 import { connect } from 'worktop/ws';
 import { reply } from 'worktop/response';
+import { lookup } from 'worktop/cache';
 
 import type { Dict } from 'worktop/utils';
 import type { Bindings } from 'worktop/cfw';
@@ -161,6 +162,11 @@ interface Actions {
 	put: Operations.PUT;
 }
 
+interface CacheOptions {
+	cacheKey?: string;
+	cacheTtl?: number;
+}
+
 export class Database implements DB {
 	#ns: Durable.Namespace
 
@@ -168,41 +174,106 @@ export class Database implements DB {
 		this.#ns = ns;
 	}
 
-	get(shard: string, key: string|string[], options?: Durable.Storage.Options.Get) {
+	async get(shard: string, key: string|string[], options?: Durable.Storage.Options.Get) {
 		let args: Operations.GET = [key, options];
-		return this.#query(shard, 'get', args);
+
+		type Options = Durable.Storage.Options.Get & CacheOptions;
+
+		let opts: Options = options || {};
+		let toCache = !opts.noCache && opts.cacheTtl;
+		let cachekey = toCache && (opts.cacheKey || typeof key === 'string' && key);
+
+		if (cachekey) {
+			cachekey = this.#cachekey(shard, cachekey);
+			let res = await lookup(caches.default, cachekey);
+			if (res) return this.#parse(res);
+		}
+
+		let res = await this.#query(shard, 'get', args);
+		if (cachekey) await caches.default.put(cachekey, res.clone());
+
+		return this.#parse(res);
 	}
 
-	put(shard: string, ...x: any[]) {
-		let args = x as Operations.PUT;
-		return this.#query(shard, 'put', args);
+	async put(shard: string, ...x: any) {
+		let args = [x] as Operations.PUT;
+		let res = await this.#query(shard, 'put', args);
+		if (res.status !== 200) return this.#parse(res);
+
+		type Options = Durable.Storage.Options.Put & CacheOptions;
+		let options: Options = {};
+		let [k, v, o] = x;
+
+		let isDict = k && typeof k === 'object';
+		if (isDict) options = v || o || {};
+		else options = o || {};
+
+		let toCache = !options.noCache && options.cacheTtl;
+		let cachekey = toCache && (options.cacheKey || !isDict && (k as string));
+
+		if (cachekey) {
+			let value = isDict
+				? { results: Object.entries(k) }
+				: { result: v };
+
+			let res = reply(200, value, {
+				'cache-control': `public,max-age=${options.cacheTtl}`
+			});
+
+			await caches.default.put(cachekey, res);
+		}
+
+		return this.#parse(res);
 	}
 
-	delete(shard: string, key: string | string[], options?: Durable.Storage.Options.Put) {
+	async delete(shard: string, key: string | string[], options?: Durable.Storage.Options.Put) {
 		let args = [key, options] as Operations.DELETE;
-		return this.#query(shard, 'delete', args);
+
+		let res = await this.#query(shard, 'delete', args);
+		let output = await this.#parse(res);
+		if (!output) return output; // 0 or false
+
+		type Options = Durable.Storage.Options.Put & CacheOptions;
+		let opts: Options = options || {};
+
+		let toCache = !opts.noCache || !!opts.cacheKey;
+		let cachekey = toCache && (opts.cacheKey || typeof key === 'string' && key);
+
+		if (cachekey) {
+			cachekey = this.#cachekey(shard, cachekey);
+			await caches.default.delete(cachekey);
+		}
+
+		return output;
 	}
 
 	list(shard: string, options?: Durable.Storage.Options.List) {
 		let args: Operations.LIST = [options];
-		return this.#query(shard, 'list', args);
+		return this.#query(shard, 'list', args).then(this.#parse);
 	}
 
-	async #query<K extends keyof Actions>(shard: string, action: K, args: Actions[K]) {
+	#cachekey(shard: string, key: string): string {
+		let path = shard + '~' + key;
+		return new URL(path, 'http://cache').href;
+	}
+
+	#query<K extends keyof Actions>(shard: string, action: K, args: Actions[K]): Promise<Response> {
 		let uid = this.#ns.idFromName(shard);
 		let stub = this.#ns.get(uid);
 
 		let url = new URL(action, 'http://internal');
 
 		// TODO retries
-		let res = await stub.fetch(url.href, {
+		return stub.fetch(url.href, {
 			method: 'POST',
+			body: JSON.stringify(args),
 			headers: {
 				'content-type': 'application/json;charset=utf-8'
 			},
-			body: JSON.stringify(args)
 		});
+	}
 
+	async #parse(res: Response) {
 		let body = await res.json();
 
 		if ((res.status / 100 | 0) === 2) {

@@ -68,7 +68,19 @@ API.add('GET', '/:foo/:bar?', async (req, context) => {
 
 	let { database } = context;
 	let { foo, bar='default' } = context.params;
-	let item = await database.get<string>('foo:' + foo, bar);
+
+	let shard = `foo:${foo}`;
+
+	let success = await database.put<string>(shard, bar, 'hello', {
+		overwrite: true,
+		cacheTtl: 3600 // 1h
+	});
+
+	let item = await database.get<string>(shard, bar, {
+		cacheTtl: 3600, // 1h
+		noCache: false,
+	});
+
 	assert<string|void>(item);
 });
 
