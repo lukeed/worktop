@@ -90,17 +90,25 @@ export abstract class Actor {
 
 export const DataGroup: Durable.Object;
 
+// @private
+type CacheOptions = {
+	/** seconds */
+	cacheTtl?: number;
+	/** custom cache identifier; ideal for multi-key scenarios */
+	cacheKey?: string;
+};
+
 export class Database {
 	constructor(namespace: Durable.Namespace);
 
-	get<T>(shard: string, key: string, options?: Durable.Storage.Options.Get): Promise<T|void>;
-	get<T>(shard: string, keys: string[], options?: Durable.Storage.Options.Get): Promise<Map<string, T>>;
+	get<T>(shard: string, key: string, options?: Durable.Storage.Options.Get & CacheOptions): Promise<T|void>;
+	get<T>(shard: string, keys: string[], options?: Durable.Storage.Options.Get & CacheOptions): Promise<Map<string, T>>;
 
-	put<T>(shard: string, entries: Dict<T>, options?: { overwrite?: boolean } & Durable.Storage.Options.Put): Promise<boolean>;
-	put<T>(shard: string, key: string, value: T, options?: { overwrite?: boolean } & Durable.Storage.Options.Put): Promise<boolean>;
+	put<T>(shard: string, entries: Dict<T>, options?: { overwrite?: boolean } & Durable.Storage.Options.Put & CacheOptions): Promise<boolean>;
+	put<T>(shard: string, key: string, value: T, options?: { overwrite?: boolean } & Durable.Storage.Options.Put & CacheOptions): Promise<boolean>;
 
-	delete(shard: string, key: string, options?: Durable.Storage.Options.Put): Promise<boolean>;
-	delete(shard: string, key: string[], options?: Durable.Storage.Options.Put): Promise<number>;
+	delete(shard: string, key: string, options?: Durable.Storage.Options.Put & CacheOptions): Promise<boolean>;
+	delete(shard: string, key: string[], options?: Durable.Storage.Options.Put & CacheOptions): Promise<number>;
 
 	list<T>(shard: string, options?: Durable.Storage.Options.List): Promise<Map<string, T>>;
 }

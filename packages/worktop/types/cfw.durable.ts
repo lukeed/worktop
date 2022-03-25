@@ -164,6 +164,26 @@ await database.get('projects', '123', {
 	noCache: true,
 });
 
+await database.get('projects', '123', {
+	noCache: false,
+	cacheTtl: 86400, // 1d
+});
+
+assert<Map<string, number>>(
+	await database.get<number>('projects', ['foo', 'bar'], {
+		cacheKey: 'foobar',
+		cacheTtl: 86400, // 1d
+	})
+);
+
+assert<Map<string, number>>(
+	// @ts-expect-error - map value-type mismatch
+	await database.get<string>('projects', ['foo', 'bar'], {
+		cacheKey: 'foobar',
+		cacheTtl: 86400, // 1d
+	})
+);
+
 assert<unknown>(
 	await database.get('projects', 'key')
 );
@@ -194,6 +214,11 @@ await database.put<number>('projects', 'key', 123, {
 	noCache: true,
 });
 
+await database.put<number>('projects', 'key', 123, {
+	cacheTtl: 86400, // 1d
+	noCache: false,
+});
+
 assert<string>(
 	// @ts-expect-error - return type
 	await database.put('projects', 'key', 123)
@@ -214,6 +239,15 @@ await database.put('projects', {
 }, {
 	overwrite: true,
 	allowUnconfirmed: true,
+});
+
+await database.put('projects', {
+	foo: 123,
+	bar: 'value',
+}, {
+	cacheTtl: 86400, // 1d
+	overwrite: false,
+	cacheKey: 'foobar',
 });
 
 // @ts-expect-error
@@ -254,6 +288,11 @@ await database.delete('projects', 'foobar', {
 	allowUnconfirmed: true
 });
 
+await database.delete('projects', 'foobar', {
+	cacheKey: 'howdy',
+	cacheTtl: 123, // unused but present
+});
+
 assert<boolean>(
 	// @ts-expect-error - return type
 	await database.delete('projects', ['key1', 'key2'])
@@ -265,6 +304,13 @@ assert<boolean>(
 
 assert<number>(
 	await database.delete('projects', ['key1', 'key2'])
+);
+
+assert<number>(
+	await database.delete('projects', ['key1', 'key2'], {
+		cacheKey: 'mykeys',
+		cacheTtl: 0, // unused but can be present
+	})
 );
 
 assert<Map<string, unknown>>(
