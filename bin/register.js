@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-ignore - definitions
 require('fetchy/polyfill');
 
 // @ts-ignore - worktop/cfw.cache
