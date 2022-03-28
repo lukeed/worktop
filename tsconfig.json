@@ -16,12 +16,13 @@
     "checkJs": true,
     "noEmit": true,
     "paths": {
-      "worktop": ["./packages/worktop/src/router.d.ts"],
+      "worktop": ["./packages/worktop/src/index.d.ts"],
       "worktop/*": ["./packages/worktop/src/*.d.ts"],
       "worktop.build": ["./packages/worktop.build/index.d.ts"],
     }
   },
   "include": [
+    "bin/*.ts",
     "packages/combos.ts",
     "packages/worktop/src",
     "packages/worktop/types",
