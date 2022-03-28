@@ -22,7 +22,7 @@
     }
   },
   "include": [
-    "bin",
+    "bin/*.ts",
     "packages/combos.ts",
     "packages/worktop/src",
     "packages/worktop/types",

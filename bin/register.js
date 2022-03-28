@@ -1,4 +1,4 @@
-// @ts-ignore - definitions
+// @ts-check
 require('fetchy/polyfill');
 
 // @ts-ignore - worktop/cfw.cache
@@ -8,7 +8,5 @@ globalThis.caches = { default: {} };
 globalThis.crypto = require('crypto').webcrypto;
 
 // worktop/base64
-/** @param {string} x */
 globalThis.btoa = (x) => Buffer.from(x, 'binary').toString('base64');
-/** @param {string} x */
 globalThis.atob = (x) => Buffer.from(x, 'base64').toString('binary');

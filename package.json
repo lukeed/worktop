@@ -10,7 +10,7 @@
     "node": ">=12"
   },
   "scripts": {
-    "build": "node bin/build.mjs",
+    "build": "tsm bin/build.ts",
     "test": "uvu packages \".test.ts$\" -r tsm -r ./bin/register",
     "types": "tsc --noEmit --skipLibCheck"
   },
