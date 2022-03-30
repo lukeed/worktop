@@ -61,24 +61,24 @@ interface Message {
 const API = new Router();
 
 
-API.add('GET', '/messages/:id', async (req, res) => {
+API.add('GET', '/messages/:id', async (req, context) => {
   // Pre-parsed `req.params` object
-  const key = `messages::${req.params.id}`;
+  const key = `messages::${context.params.id}`;
 
   // Assumes JSON (can override)
   const message = await read<Message>(DATA, key);
 
   // Alter response headers directly
-  res.setHeader('Cache-Control', 'public, max-age=60');
+  context.setHeader('Cache-Control', 'public, max-age=60');
 
-  // Smart `res.send()` helper
+  // Smart `context.send()` helper
   // ~> automatically stringifies JSON objects
   // ~> auto-sets `Content-Type` & `Content-Length` headers
-  res.send(200, message);
+  context.send(200, message);
 });
 
 
-API.add('POST', '/messages', async (req, res) => {
+API.add('POST', '/messages', async (req, context) => {
   try {
     // Smart `req.body` helper
     // ~> parses JSON header as JSON
