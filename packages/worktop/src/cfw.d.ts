@@ -82,13 +82,29 @@ export interface CronEvent {
 /**
  * Cloudflare Request Metadata/Properties
  * @see https://developers.cloudflare.com/workers/runtime-apis/request#incomingrequestcfproperties
+ * @see https://github.com/cloudflare/workers-types/blob/master/overrides/cf.d.ts (IncomingRequestCfProperties)
  */
 export interface IncomingCloudflareProperties {
 	/**
 	 * The ASN of the incoming request
-	 * @example "395747"
+	 * @example 395747
 	 **/
-	asn: string;
+	asn: number;
+	/**
+	 * The organisation which owns the ASN of the incoming request.
+	 * (e.g. Google Cloud)
+	 */
+	asOrganization: string;
+	botManagement?: {
+		score: number;
+		staticResource: boolean;
+		verifiedBot: boolean;
+	};
+	/**
+	 * Round-trip time (in ms) from client to the colo data center that the request hit
+	 */
+	clientTcpRtt: number;
+	clientTrustScore?: number;
 	/**
 	 * The three-letter `IATA` airport code of the data center that the request hit
 	 * @example "DFW"
