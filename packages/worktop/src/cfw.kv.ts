@@ -1,4 +1,6 @@
-import type { KV, Options, Database as DB } from 'worktop/cfw.kv';
+import * as Cache from './internal/cfw.cache';
+import type { KV, Options, Database as DB, Entity as E } from 'worktop/cfw.kv';
+import type { Promisable } from 'worktop/utils';
 
 export function Database<Models, I extends Record<keyof Models, string> = { [P in keyof Models]: string }>(binding: KV.Namespace): DB<Models, I> {
 	var $ = <K extends keyof I>(type: K, uid: I[K]) => `${type}__${uid}`;
@@ -75,5 +77,119 @@ export async function until<X extends string>(
 	while (true) {
 		exists = await toSearch(tmp = toMake());
 		if (exists == null) return tmp;
+	}
+}
+
+export class Entity implements E {
+	readonly ns: KV.Namespace;
+	readonly cache: Cache.Entity;
+
+	prefix = '';
+	ttl = 0;
+
+	onread?(key: string, value: unknown): Promisable<void>;
+	onwrite?(key: string, value: unknown): Promisable<void>;
+	ondelete?(key: string, value: unknown): Promisable<void>;
+
+	constructor(ns: KV.Namespace) {
+		this.cache = new Cache.Entity;
+		this.ns = ns;
+	}
+
+	async list(options?: KV.Options.List): Promise<string[]> {
+		options = options || {};
+		let { limit, prefix='' } = options;
+
+		if (this.prefix) {
+			options.prefix = prefix.startsWith(this.prefix) ? prefix : (this.prefix + prefix);
+		}
+
+		if (limit) {
+			options.limit = Math.min(1000, limit);
+		}
+
+		let iter = list(this.ns, {
+			...options,
+			metadata: false,
+		});
+
+		let output: string[] = [];
+
+		for await (let chunk of iter) {
+			for (let i=0, len=this.prefix.length; i < chunk.keys.length; i++) {
+				output.push((chunk.keys[i] as string).substring(len));
+				if (limit && output.length === limit) return output;
+			}
+			if (chunk.done) break;
+		}
+
+		return output;
+	}
+
+	async get<T>(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<T|null> {
+		if (this.prefix) key = this.prefix + key;
+
+		let value: T|null;
+		let res = this.ttl && await this.cache.get(key);
+
+		if (res) {
+			value = await res[format]();
+		} else {
+			// @ts-ignore - TODO fix overload types
+			value = await this.ns.get<T>(key, format);
+			if (this.ttl) await this.cache.put(key, value, this.ttl);
+		}
+
+		if (this.onread) {
+			await this.onread(key, value);
+		}
+
+		return value;
+	}
+
+	async put<T>(key: string, value: T|null): Promise<boolean> {
+		if (this.prefix) key = this.prefix + key;
+
+		let input = Cache.normalize(value);
+		let bool = await this.ns.put(key, input).then(
+			() => true,
+			() => false
+		);
+
+		if (bool && this.ttl) {
+			// allow cache to see `null` value
+			let x = value == null ? null : input;
+			bool = await this.cache.put(key, x, this.ttl);
+		}
+
+		if (bool && this.onwrite) {
+			await this.onwrite(key, value);
+		}
+
+		return bool;
+	}
+
+	async delete(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<boolean> {
+		if (this.prefix) key = this.prefix + key;
+
+		let hasHook = typeof this.ondelete === 'function';
+
+		// @ts-ignore - TODO fix overload types
+		let value = hasHook && await this.ns.get(key, format);
+
+		let bool = await this.ns.delete(key).then(
+			() => true,
+			() => false
+		);
+
+		if (bool && this.ttl) {
+			bool = await this.cache.delete(key);
+		}
+
+		if (bool && hasHook) {
+			await this.ondelete!(key, value);
+		}
+
+		return bool;
 	}
 }

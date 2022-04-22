@@ -1,4 +1,4 @@
-import type { Dict } from 'worktop/utils';
+import type { Dict, Promisable } from 'worktop/utils';
 
 export namespace KV {
 	type Metadata = Dict<any>;
@@ -106,3 +106,47 @@ export function until<X extends string>(
 	toMake: () => X,
 	toSearch: (val: X) => Promise<unknown | false>
 ): Promise<X>;
+
+export declare class Entity {
+	/**
+	 * The KV Namespace for this entity.
+	 */
+	readonly ns: KV.Namespace;
+
+	/**
+	 * Cache.Entity operations
+	 */
+	readonly cache: {
+		get(key: string): Promise<Response|void>;
+		put<T>(key: string, value: T|null, ttl: number): Promise<boolean>;
+		delete(key: string): Promise<boolean>;
+	};
+
+	/**
+	 * cache ttl (seconds)
+	 * @default 0
+	 */
+	ttl?: number;
+
+	/**
+	 * key prefix
+	 * @default ""
+	 */
+	prefix?: string;
+
+	constructor(binding: KV.Namespace);
+
+	onread?(key: string, value: unknown): Promisable<void>;
+	onwrite?(key: string, value: unknown): Promisable<void>;
+	ondelete?(key: string, value: unknown): Promisable<void>;
+
+	list(options?: KV.Options.List): Promise<string[]>;
+
+	get(key: string, type: 'text'): Promise<string|null>;
+	get<T=unknown>(key: string, type?: 'json'): Promise<T|null>;
+	get(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer|null>;
+
+	put<T>(key: string, value: T|null): Promise<boolean>;
+
+	delete(key: string, format?: 'text' | 'json' | 'arrayBuffer'): Promise<boolean>;
+}
