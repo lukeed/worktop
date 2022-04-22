@@ -82,7 +82,7 @@ export interface CronEvent {
 /**
  * Cloudflare Request Metadata/Properties
  * @see https://developers.cloudflare.com/workers/runtime-apis/request#incomingrequestcfproperties
- * @see https://github.com/cloudflare/workers-types/blob/master/overrides/cf.d.ts (IncomingRequestCfProperties)
+ * @see https://github.com/cloudflare/workers-types/blob/master/overrides/cf.d.ts
  */
 export interface IncomingCloudflareProperties {
 	/**
@@ -92,7 +92,7 @@ export interface IncomingCloudflareProperties {
 	asn: number;
 	/**
 	 * The organisation which owns the ASN of the incoming request.
-	 * (e.g. Google Cloud)
+	 * @example "Google Cloud"
 	 */
 	asOrganization: string;
 	botManagement?: {
