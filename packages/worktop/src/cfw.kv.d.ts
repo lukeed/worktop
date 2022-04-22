@@ -1,4 +1,4 @@
-import type { Dict } from 'worktop/utils';
+import type { Dict, Promisable } from 'worktop/utils';
 
 export namespace KV {
 	type Metadata = Dict<any>;
@@ -136,6 +136,10 @@ export declare class Entity {
 
 	constructor(binding: KV.Namespace);
 
+	onread?(key: string, value: unknown): Promisable<void>;
+	onwrite?(key: string, value: unknown): Promisable<void>;
+	ondelete?(key: string, value: unknown): Promisable<void>;
+
 	list(options?: KV.Options.List): Promise<string[]>;
 
 	get(key: string, type: 'text'): Promise<string|null>;
@@ -143,5 +147,6 @@ export declare class Entity {
 	get(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer|null>;
 
 	put<T>(key: string, value: T|null): Promise<boolean>;
-	delete(key: string): Promise<boolean>;
+
+	delete(key: string, format?: 'text' | 'json' | 'arrayBuffer'): Promise<boolean>;
 }

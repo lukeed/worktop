@@ -1,5 +1,6 @@
 import * as Cache from './internal/cfw.cache';
-import type { KV, Options, Database as DB } from 'worktop/cfw.kv';
+import type { KV, Options, Database as DB, Entity as E } from 'worktop/cfw.kv';
+import type { Promisable } from 'worktop/utils';
 
 export function Database<Models, I extends Record<keyof Models, string> = { [P in keyof Models]: string }>(binding: KV.Namespace): DB<Models, I> {
 	var $ = <K extends keyof I>(type: K, uid: I[K]) => `${type}__${uid}`;
@@ -79,12 +80,16 @@ export async function until<X extends string>(
 	}
 }
 
-export class Entity {
+export class Entity implements E {
 	readonly ns: KV.Namespace;
 	readonly cache: Cache.Entity;
 
 	prefix = '';
 	ttl = 0;
+
+	onread?(key: string, value: unknown): Promisable<void>;
+	onwrite?(key: string, value: unknown): Promisable<void>;
+	ondelete?(key: string, value: unknown): Promisable<void>;
 
 	constructor(ns: KV.Namespace) {
 		this.cache = new Cache.Entity;
@@ -124,42 +129,67 @@ export class Entity {
 	async get<T>(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<T|null> {
 		if (this.prefix) key = this.prefix + key;
 
+		let value: T|null;
 		let res = this.ttl && await this.cache.get(key);
-		if (res) return res[format]();
 
-		// @ts-ignore - TODO fix overload types
-		let value = await this.ns.get<T>(key, format);
-		if (this.ttl) await this.cache.put(key, value, this.ttl);
+		if (res) {
+			value = await res[format]();
+		} else {
+			// @ts-ignore - TODO fix overload types
+			value = await this.ns.get<T>(key, format);
+			if (this.ttl) await this.cache.put(key, value, this.ttl);
+		}
+
+		if (this.onread) {
+			await this.onread(key, value);
+		}
 
 		return value;
 	}
 
-	async put<T extends KV.Value>(key: string, value: T|null): Promise<boolean> {
+	async put<T>(key: string, value: T|null): Promise<boolean> {
 		if (this.prefix) key = this.prefix + key;
 
 		let input = Cache.normalize(value);
+		let bool = await this.ns.put(key, input).then(
+			() => true,
+			() => false
+		);
 
-		// allow cache to see `null` value
-		if (value != null) value = input as T;
-
-		try {
-			await this.ns.put(key, input);
-		} catch (err) {
-			return false;
+		if (bool && this.ttl) {
+			// allow cache to see `null` value
+			let x = value == null ? null : input;
+			bool = await this.cache.put(key, x, this.ttl);
 		}
 
-		return !this.ttl || this.cache.put(key, value, this.ttl);
+		if (bool && this.onwrite) {
+			await this.onwrite(key, value);
+		}
+
+		return bool;
 	}
 
-	async delete(key: string): Promise<boolean> {
+	async delete(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<boolean> {
 		if (this.prefix) key = this.prefix + key;
 
-		try {
-			await this.ns.delete(key);
-		} catch (err) {
-			return false;
+		let hasHook = typeof this.ondelete === 'function';
+
+		// @ts-ignore - TODO fix overload types
+		let value = hasHook && await this.ns.get(key, format);
+
+		let bool = await this.ns.delete(key).then(
+			() => true,
+			() => false
+		);
+
+		if (bool && this.ttl) {
+			bool = await this.cache.delete(key);
 		}
 
-		return !this.ttl || this.cache.delete(key)
+		if (bool && hasHook) {
+			await this.ondelete!(key, value);
+		}
+
+		return bool;
 	}
 }

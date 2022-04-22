@@ -201,6 +201,10 @@ assert<string>(apps.prefix!);
 class User extends Entity {
 	ttl = 3600; // 1hr
 	prefix = 'user';
+
+	async onread(key: string, value: IApp) {
+		// do something with the value
+	}
 }
 
 declare let ns: KV.Namespace;
