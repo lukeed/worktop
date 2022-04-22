@@ -339,3 +339,51 @@ until('should loop until first `nullish` value', async () => {
 });
 
 until.run();
+
+// ---
+
+const Entity = suite('Entity');
+
+Entity('should be a function', () => {
+	assert.type(KV.Entity, 'function');
+});
+
+Entity('should return `Entity` interface', () => {
+	let binding = Namespace();
+	let thing = new KV.Entity(binding);
+
+	assert.type(thing.get, 'function');
+	assert.type(thing.list, 'function');
+	assert.type(thing.delete, 'function');
+	assert.type(thing.put, 'function');
+
+	assert.type(thing.cache, 'object');
+	assert.type(thing.cache.get, 'function');
+	assert.type(thing.cache.delete, 'function');
+	assert.type(thing.cache.put, 'function');
+
+	assert.type(thing.ttl, 'number');
+	assert.is(thing.ns, binding);
+});
+
+Entity('should include property defaults', () => {
+	let binding = Namespace();
+	let thing = new KV.Entity(binding);
+	assert.is(thing.prefix, '');
+	assert.is(thing.ttl, 0);
+});
+
+Entity('should allow class extension', () => {
+	class User extends KV.Entity {
+		ttl = 3600;
+		prefix = 'user';
+	}
+
+	let binding = Namespace();
+	let thing = new User(binding);
+
+	assert.is(thing.prefix, 'user');
+	assert.is(thing.ttl, 3600);
+});
+
+Entity.run();

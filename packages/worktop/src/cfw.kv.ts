@@ -1,3 +1,4 @@
+import * as Cache from './internal/cfw.cache';
 import type { KV, Options, Database as DB } from 'worktop/cfw.kv';
 
 export function Database<Models, I extends Record<keyof Models, string> = { [P in keyof Models]: string }>(binding: KV.Namespace): DB<Models, I> {
@@ -75,5 +76,90 @@ export async function until<X extends string>(
 	while (true) {
 		exists = await toSearch(tmp = toMake());
 		if (exists == null) return tmp;
+	}
+}
+
+export class Entity {
+	readonly ns: KV.Namespace;
+	readonly cache: Cache.Entity;
+
+	prefix = '';
+	ttl = 0;
+
+	constructor(ns: KV.Namespace) {
+		this.cache = new Cache.Entity;
+		this.ns = ns;
+	}
+
+	async list(options?: KV.Options.List): Promise<string[]> {
+		options = options || {};
+		let { limit, prefix='' } = options;
+
+		if (this.prefix) {
+			options.prefix = prefix.startsWith(this.prefix) ? prefix : (this.prefix + prefix);
+		}
+
+		if (limit) {
+			options.limit = Math.min(1000, limit);
+		}
+
+		let iter = list(this.ns, {
+			...options,
+			metadata: false,
+		});
+
+		let output: string[] = [];
+
+		for await (let chunk of iter) {
+			for (let i=0, len=this.prefix.length; i < chunk.keys.length; i++) {
+				output.push((chunk.keys[i] as string).substring(len));
+				if (limit && output.length === limit) return output;
+			}
+			if (chunk.done) break;
+		}
+
+		return output;
+	}
+
+	async get<T>(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<T|null> {
+		if (this.prefix) key = this.prefix + key;
+
+		let res = this.ttl && await this.cache.get(key);
+		if (res) return res[format]();
+
+		// @ts-ignore - TODO fix overload types
+		let value = await this.ns.get<T>(key, format);
+		if (this.ttl) await this.cache.put(key, value, this.ttl);
+
+		return value;
+	}
+
+	async put<T extends KV.Value>(key: string, value: T|null): Promise<boolean> {
+		if (this.prefix) key = this.prefix + key;
+
+		let input = Cache.normalize(value);
+
+		// allow cache to see `null` value
+		if (value != null) value = input as T;
+
+		try {
+			await this.ns.put(key, input);
+		} catch (err) {
+			return false;
+		}
+
+		return !this.ttl || this.cache.put(key, value, this.ttl);
+	}
+
+	async delete(key: string): Promise<boolean> {
+		if (this.prefix) key = this.prefix + key;
+
+		try {
+			await this.ns.delete(key);
+		} catch (err) {
+			return false;
+		}
+
+		return !this.ttl || this.cache.delete(key)
 	}
 }

@@ -1,4 +1,4 @@
-import { Database, list, paginate, until } from 'worktop/cfw.kv';
+import { Database, Entity, list, paginate, until } from 'worktop/cfw.kv';
 import type { KV } from 'worktop/cfw.kv';
 
 /**
@@ -137,3 +137,112 @@ async function storage() {
 	let keys = await paginate(APPS, { page: 2, limit: 12, prefix: 'hello' });
 	assert<string>(keys[0]);
 }
+
+/**
+ * Entity
+ */
+
+let apps = new Entity(APPS);
+
+assert<unknown>(
+	await apps.get('abc123')
+);
+
+assert<IApp|null>(
+	await apps.get<IApp>('abc123')
+);
+
+assert<IApp|null>(
+	await apps.get<IApp>('abc123', 'json')
+);
+
+assert<string|null>(
+	await apps.get('abc123', 'text')
+);
+
+assert<ArrayBuffer|null>(
+	await apps.get('abc123', 'arrayBuffer')
+);
+
+// @ts-expect-error - T w/ "text"
+await apps.get<number>('abc123', 'text');
+
+// @ts-expect-error - T w/ "arrayBuffer"
+await apps.get<number>('abc123', 'arrayBuffer');
+
+assert<boolean>(
+	await apps.put('abc123', null)
+);
+
+assert<boolean>(
+	await apps.put('abc123', 'foobar')
+);
+
+assert<boolean>(
+	await apps.put<IApp>('abc123', {
+		uid: toUID(),
+		name: 'foobar'
+	})
+);
+
+assert<boolean>(
+	await apps.put('abc123', new ArrayBuffer(1))
+);
+
+assert<boolean>(
+	await apps.delete('abc123')
+);
+
+assert<number>(apps.ttl!);
+assert<string>(apps.prefix!);
+
+// ---
+
+class User extends Entity {
+	ttl = 3600; // 1hr
+	prefix = 'user';
+}
+
+declare let ns: KV.Namespace;
+let users = new User(ns);
+
+assert<unknown>(
+	await users.get('abc123')
+);
+
+assert<string|null>(
+	await users.get('abc123', 'text')
+);
+
+assert<ArrayBuffer|null>(
+	await users.get('abc123', 'arrayBuffer')
+);
+
+// @ts-expect-error - T w/ "text"
+await users.get<number>('abc123', 'text');
+
+// @ts-expect-error - T w/ "arrayBuffer"
+await users.get<number>('abc123', 'arrayBuffer');
+
+assert<boolean>(
+	await users.put('abc123', null)
+);
+
+assert<boolean>(
+	await users.put('abc123', 'foobar')
+);
+
+assert<boolean>(
+	await users.put<IApp>('abc123', {
+		uid: toUID(),
+		name: 'foobar'
+	})
+);
+
+assert<boolean>(
+	await users.put('abc123', new ArrayBuffer(1))
+);
+
+assert<boolean>(
+	await users.delete('abc123')
+);
