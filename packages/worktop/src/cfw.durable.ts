@@ -1,12 +1,12 @@
 import { connect } from 'worktop/ws';
 import { reply } from 'worktop/response';
-import { lookup } from 'worktop/cache';
+// import { lookup } from 'worktop/cache';
 
 import type { Dict } from 'worktop/utils';
 import type { Bindings } from 'worktop/cfw';
 import type { WebSocket } from 'worktop/cfw.ws';
-import type { Database as DB } from 'worktop/cfw.durable';
 import type { Durable } from 'worktop/cfw.durable';
+// import type { Database as DB } from 'worktop/cfw.durable';
 
 export abstract class Actor {
 	DEBUG: boolean;
@@ -155,132 +155,132 @@ export class DataGroup implements Durable.Object {
 	}
 }
 
-interface Actions {
-	get: Operations.GET;
-	list: Operations.LIST;
-	delete: Operations.DELETE;
-	put: Operations.PUT;
-}
+// interface Actions {
+// 	get: Operations.GET;
+// 	list: Operations.LIST;
+// 	delete: Operations.DELETE;
+// 	put: Operations.PUT;
+// }
 
-interface CacheOptions {
-	cacheKey?: string;
-	cacheTtl?: number;
-}
+// interface CacheOptions {
+// 	cacheKey?: string;
+// 	cacheTtl?: number;
+// }
 
-export class Database implements DB {
-	#ns: Durable.Namespace
+// export class Database implements DB {
+// 	#ns: Durable.Namespace
 
-	constructor(ns: Durable.Namespace) {
-		this.#ns = ns;
-	}
+// 	constructor(ns: Durable.Namespace) {
+// 		this.#ns = ns;
+// 	}
 
-	async get(shard: string, key: string|string[], options?: Durable.Storage.Options.Get) {
-		let args: Operations.GET = [key, options];
+// 	async get(shard: string, key: string|string[], options?: Durable.Storage.Options.Get) {
+// 		let args: Operations.GET = [key, options];
 
-		type Options = Durable.Storage.Options.Get & CacheOptions;
+// 		type Options = Durable.Storage.Options.Get & CacheOptions;
 
-		let opts: Options = options || {};
-		let toCache = !opts.noCache && opts.cacheTtl;
-		let cachekey = toCache && (opts.cacheKey || typeof key === 'string' && key);
+// 		let opts: Options = options || {};
+// 		let toCache = !opts.noCache && opts.cacheTtl;
+// 		let cachekey = toCache && (opts.cacheKey || typeof key === 'string' && key);
 
-		if (cachekey) {
-			cachekey = this.#cachekey(shard, cachekey);
-			let res = await lookup(caches.default, cachekey);
-			if (res) return this.#parse(res);
-		}
+// 		if (cachekey) {
+// 			cachekey = this.#cachekey(shard, cachekey);
+// 			let res = await lookup(caches.default, cachekey);
+// 			if (res) return this.#parse(res);
+// 		}
 
-		let res = await this.#query(shard, 'get', args);
-		if (cachekey) await caches.default.put(cachekey, res.clone());
+// 		let res = await this.#query(shard, 'get', args);
+// 		if (cachekey) await caches.default.put(cachekey, res.clone());
 
-		return this.#parse(res);
-	}
+// 		return this.#parse(res);
+// 	}
 
-	async put(shard: string, ...x: any) {
-		let args = [x] as Operations.PUT;
-		let res = await this.#query(shard, 'put', args);
-		if (res.status !== 200) return this.#parse(res);
+// 	async put(shard: string, ...x: any) {
+// 		let args = [x] as Operations.PUT;
+// 		let res = await this.#query(shard, 'put', args);
+// 		if (res.status !== 200) return this.#parse(res);
 
-		type Options = Durable.Storage.Options.Put & CacheOptions;
-		let options: Options = {};
-		let [k, v, o] = x;
+// 		type Options = Durable.Storage.Options.Put & CacheOptions;
+// 		let options: Options = {};
+// 		let [k, v, o] = x;
 
-		let isDict = k && typeof k === 'object';
-		if (isDict) options = v || o || {};
-		else options = o || {};
+// 		let isDict = k && typeof k === 'object';
+// 		if (isDict) options = v || o || {};
+// 		else options = o || {};
 
-		let toCache = !options.noCache && options.cacheTtl;
-		let cachekey = toCache && (options.cacheKey || !isDict && (k as string));
+// 		let toCache = !options.noCache && options.cacheTtl;
+// 		let cachekey = toCache && (options.cacheKey || !isDict && (k as string));
 
-		if (cachekey) {
-			let value = isDict
-				? { results: Object.entries(k) }
-				: { result: v };
+// 		if (cachekey) {
+// 			let value = isDict
+// 				? { results: Object.entries(k) }
+// 				: { result: v };
 
-			let res = reply(200, value, {
-				'cache-control': `public,max-age=${options.cacheTtl}`
-			});
+// 			let res = reply(200, value, {
+// 				'cache-control': `public,max-age=${options.cacheTtl}`
+// 			});
 
-			await caches.default.put(cachekey, res);
-		}
+// 			await caches.default.put(cachekey, res);
+// 		}
 
-		return this.#parse(res);
-	}
+// 		return this.#parse(res);
+// 	}
 
-	async delete(shard: string, key: string | string[], options?: Durable.Storage.Options.Put) {
-		let args = [key, options] as Operations.DELETE;
+// 	async delete(shard: string, key: string | string[], options?: Durable.Storage.Options.Put) {
+// 		let args = [key, options] as Operations.DELETE;
 
-		let res = await this.#query(shard, 'delete', args);
-		let output = await this.#parse(res);
-		if (!output) return output; // 0 or false
+// 		let res = await this.#query(shard, 'delete', args);
+// 		let output = await this.#parse(res);
+// 		if (!output) return output; // 0 or false
 
-		type Options = Durable.Storage.Options.Put & CacheOptions;
-		let opts: Options = options || {};
+// 		type Options = Durable.Storage.Options.Put & CacheOptions;
+// 		let opts: Options = options || {};
 
-		let toCache = !opts.noCache || !!opts.cacheKey;
-		let cachekey = toCache && (opts.cacheKey || typeof key === 'string' && key);
+// 		let toCache = !opts.noCache || !!opts.cacheKey;
+// 		let cachekey = toCache && (opts.cacheKey || typeof key === 'string' && key);
 
-		if (cachekey) {
-			cachekey = this.#cachekey(shard, cachekey);
-			await caches.default.delete(cachekey);
-		}
+// 		if (cachekey) {
+// 			cachekey = this.#cachekey(shard, cachekey);
+// 			await caches.default.delete(cachekey);
+// 		}
 
-		return output;
-	}
+// 		return output;
+// 	}
 
-	list(shard: string, options?: Durable.Storage.Options.List) {
-		let args: Operations.LIST = [options];
-		return this.#query(shard, 'list', args).then(this.#parse);
-	}
+// 	list(shard: string, options?: Durable.Storage.Options.List) {
+// 		let args: Operations.LIST = [options];
+// 		return this.#query(shard, 'list', args).then(this.#parse);
+// 	}
 
-	#cachekey(shard: string, key: string): string {
-		let path = shard + '~' + key;
-		return new URL(path, 'http://cache').href;
-	}
+// 	#cachekey(shard: string, key: string): string {
+// 		let path = shard + '~' + key;
+// 		return new URL(path, 'http://cache').href;
+// 	}
 
-	#query<K extends keyof Actions>(shard: string, action: K, args: Actions[K]): Promise<Response> {
-		let uid = this.#ns.idFromName(shard);
-		let stub = this.#ns.get(uid);
+// 	#query<K extends keyof Actions>(shard: string, action: K, args: Actions[K]): Promise<Response> {
+// 		let uid = this.#ns.idFromName(shard);
+// 		let stub = this.#ns.get(uid);
 
-		let url = new URL(action, 'http://internal');
+// 		let url = new URL(action, 'http://internal');
 
-		// TODO retries
-		return stub.fetch(url.href, {
-			method: 'POST',
-			body: JSON.stringify(args),
-			headers: {
-				'content-type': 'application/json;charset=utf-8'
-			},
-		});
-	}
+// 		// TODO retries
+// 		return stub.fetch(url.href, {
+// 			method: 'POST',
+// 			body: JSON.stringify(args),
+// 			headers: {
+// 				'content-type': 'application/json;charset=utf-8'
+// 			},
+// 		});
+// 	}
 
-	async #parse(res: Response) {
-		let body = await res.json();
+// 	async #parse(res: Response) {
+// 		let body = await res.json();
 
-		if ((res.status / 100 | 0) === 2) {
-			if (body.result != null) return body.result;
-			return body.results && new Map(body.results) || null;
-		}
+// 		if ((res.status / 100 | 0) === 2) {
+// 			if (body.result != null) return body.result;
+// 			return body.results && new Map(body.results) || null;
+// 		}
 
-		throw new Error(body.error || 'Error executing query');
-	}
-}
+// 		throw new Error(body.error || 'Error executing query');
+// 	}
+// }

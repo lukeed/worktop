@@ -1,5 +1,5 @@
 import { Router, compose } from 'worktop';
-import { Database } from 'worktop/cfw.durable';
+// import { Database } from 'worktop/cfw.durable';
 import * as Cache from 'worktop/cfw.cache';
 import * as cfw from 'worktop/cfw';
 import * as sw from 'worktop/sw';
@@ -16,7 +16,7 @@ export { DataGroup } from 'worktop/cfw.durable';
 
 interface Custom extends Context {
 	start?: number;
-	database: Database;
+	// database: Database;
 	bindings: {
 		SECRETZ: string;
 		ANIMALS: KV.Namespace;
@@ -41,10 +41,10 @@ API.prepare = compose(
 	// lookup (and/or save) request->response in cache
 	Cache.sync(),
 
-	// setup the database
-	function (req, context) {
-		context.database = new Database(context.bindings.STORAGE);
-	}
+	// // setup the database
+	// function (req, context) {
+	// 	context.database = new Database(context.bindings.STORAGE);
+	// }
 );
 
 API.add('GET', '/:foo/:bar?', async (req, context) => {
@@ -66,22 +66,22 @@ API.add('GET', '/:foo/:bar?', async (req, context) => {
 	assert<Durable.Namespace>(context.bindings.COUNTER);
 	assert<CryptoKey>(context.bindings.HASHKEY);
 
-	let { database } = context;
-	let { foo, bar='default' } = context.params;
+	// let { database } = context;
+	// let { foo, bar='default' } = context.params;
 
-	let shard = `foo:${foo}`;
+	// let shard = `foo:${foo}`;
 
-	let success = await database.put<string>(shard, bar, 'hello', {
-		overwrite: true,
-		cacheTtl: 3600 // 1h
-	});
+	// let success = await database.put<string>(shard, bar, 'hello', {
+	// 	overwrite: true,
+	// 	cacheTtl: 3600 // 1h
+	// });
 
-	let item = await database.get<string>(shard, bar, {
-		cacheTtl: 3600, // 1h
-		noCache: false,
-	});
+	// let item = await database.get<string>(shard, bar, {
+	// 	cacheTtl: 3600, // 1h
+	// 	noCache: false,
+	// });
 
-	assert<string|void>(item);
+	// assert<string|void>(item);
 });
 
 /**

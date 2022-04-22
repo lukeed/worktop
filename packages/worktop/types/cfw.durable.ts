@@ -1,5 +1,6 @@
 import { Router } from 'worktop';
-import { Actor, Database } from 'worktop/cfw.durable';
+import { Actor } from 'worktop/cfw.durable';
+// import { Actor, Database } from 'worktop/cfw.durable';
 import * as cookies from 'worktop/cookie';
 import * as utils from 'worktop/utils';
 
@@ -140,197 +141,197 @@ export class Issue extends Actor {
  * DATABASE
  */
 
-declare let ns: Durable.Namespace;
-declare let kv: KV.Namespace;
+// declare let ns: Durable.Namespace;
+// declare let kv: KV.Namespace;
 
-// @ts-expect-error
-new Database();
-// @ts-expect-error
-new Database('foobar');
-// @ts-expect-error
-new Database(kv);
+// // @ts-expect-error
+// new Database();
+// // @ts-expect-error
+// new Database('foobar');
+// // @ts-expect-error
+// new Database(kv);
 
-let database = new Database(ns);
+// let database = new Database(ns);
 
-// @ts-expect-error
-await database.get('projects', 123);
-// @ts-expect-error
-await database.get(ns, '123');
-// @ts-expect-error
-await database.get(kv, '123');
+// // @ts-expect-error
+// await database.get('projects', 123);
+// // @ts-expect-error
+// await database.get(ns, '123');
+// // @ts-expect-error
+// await database.get(kv, '123');
 
-await database.get('projects', '123', {
-	allowConcurrency: false,
-	noCache: true,
-});
+// await database.get('projects', '123', {
+// 	allowConcurrency: false,
+// 	noCache: true,
+// });
 
-await database.get('projects', '123', {
-	noCache: false,
-	cacheTtl: 86400, // 1d
-});
+// await database.get('projects', '123', {
+// 	noCache: false,
+// 	cacheTtl: 86400, // 1d
+// });
 
-assert<Map<string, number>>(
-	await database.get<number>('projects', ['foo', 'bar'], {
-		cacheKey: 'foobar',
-		cacheTtl: 86400, // 1d
-	})
-);
+// assert<Map<string, number>>(
+// 	await database.get<number>('projects', ['foo', 'bar'], {
+// 		cacheKey: 'foobar',
+// 		cacheTtl: 86400, // 1d
+// 	})
+// );
 
-assert<Map<string, number>>(
-	// @ts-expect-error - map value-type mismatch
-	await database.get<string>('projects', ['foo', 'bar'], {
-		cacheKey: 'foobar',
-		cacheTtl: 86400, // 1d
-	})
-);
+// assert<Map<string, number>>(
+// 	// @ts-expect-error - map value-type mismatch
+// 	await database.get<string>('projects', ['foo', 'bar'], {
+// 		cacheKey: 'foobar',
+// 		cacheTtl: 86400, // 1d
+// 	})
+// );
 
-assert<unknown>(
-	await database.get('projects', 'key')
-);
+// assert<unknown>(
+// 	await database.get('projects', 'key')
+// );
 
-assert<string | void>(
-	await database.get<string>('projects', 'key')
-);
+// assert<string | void>(
+// 	await database.get<string>('projects', 'key')
+// );
 
-// @ts-expect-error
-await database.put('projects', 'key');
+// // @ts-expect-error
+// await database.put('projects', 'key');
 
-// @ts-expect-error
-await database.put<string>('projects', 'key', 123);
+// // @ts-expect-error
+// await database.put<string>('projects', 'key', 123);
 
-// @ts-expect-error - invalid `options` value
-await database.put<number>('projects', 'key', 123, 'invalid');
+// // @ts-expect-error - invalid `options` value
+// await database.put<number>('projects', 'key', 123, 'invalid');
 
-await database.put<number>('projects', 'key', 123, {
-	// @ts-expect-error
-	overwrite: 'asd',
-	// @ts-expect-error
-	noCache: 123
-});
+// await database.put<number>('projects', 'key', 123, {
+// 	// @ts-expect-error
+// 	overwrite: 'asd',
+// 	// @ts-expect-error
+// 	noCache: 123
+// });
 
-await database.put<number>('projects', 'key', 123, {
-	allowUnconfirmed: true,
-	overwrite: true,
-	noCache: true,
-});
+// await database.put<number>('projects', 'key', 123, {
+// 	allowUnconfirmed: true,
+// 	overwrite: true,
+// 	noCache: true,
+// });
 
-await database.put<number>('projects', 'key', 123, {
-	cacheTtl: 86400, // 1d
-	noCache: false,
-});
+// await database.put<number>('projects', 'key', 123, {
+// 	cacheTtl: 86400, // 1d
+// 	noCache: false,
+// });
 
-assert<string>(
-	// @ts-expect-error - return type
-	await database.put('projects', 'key', 123)
-);
+// assert<string>(
+// 	// @ts-expect-error - return type
+// 	await database.put('projects', 'key', 123)
+// );
 
-assert<boolean>(
-	await database.put('projects', 'key', 'value')
-);
+// assert<boolean>(
+// 	await database.put('projects', 'key', 'value')
+// );
 
-await database.put('projects', {
-	foo: 123,
-	bar: 'value',
-});
+// await database.put('projects', {
+// 	foo: 123,
+// 	bar: 'value',
+// });
 
-await database.put('projects', {
-	foo: 123,
-	bar: 'value',
-}, {
-	overwrite: true,
-	allowUnconfirmed: true,
-});
+// await database.put('projects', {
+// 	foo: 123,
+// 	bar: 'value',
+// }, {
+// 	overwrite: true,
+// 	allowUnconfirmed: true,
+// });
 
-await database.put('projects', {
-	foo: 123,
-	bar: 'value',
-}, {
-	cacheTtl: 86400, // 1d
-	overwrite: false,
-	cacheKey: 'foobar',
-});
+// await database.put('projects', {
+// 	foo: 123,
+// 	bar: 'value',
+// }, {
+// 	cacheTtl: 86400, // 1d
+// 	overwrite: false,
+// 	cacheKey: 'foobar',
+// });
 
-// @ts-expect-error
-await database.put('projects', {
-	foo: 123,
-	bar: 'value',
-}, {
-	overwrite: 123,
-	allowUnconfirmed: 123,
-});
+// // @ts-expect-error
+// await database.put('projects', {
+// 	foo: 123,
+// 	bar: 'value',
+// }, {
+// 	overwrite: 123,
+// 	allowUnconfirmed: 123,
+// });
 
-await database.put<string>('projects', {
-	bar: 'value',
-	// @ts-expect-error
-	foo: 123,
-});
+// await database.put<string>('projects', {
+// 	bar: 'value',
+// 	// @ts-expect-error
+// 	foo: 123,
+// });
 
-assert<boolean>(
-	await database.put('projects', {
-		foo: 123,
-		bar: 'value',
-	})
-);
+// assert<boolean>(
+// 	await database.put('projects', {
+// 		foo: 123,
+// 		bar: 'value',
+// 	})
+// );
 
-// @ts-expect-error
-await database.delete('projects', 123);
+// // @ts-expect-error
+// await database.delete('projects', 123);
 
-// @ts-expect-error
-await database.delete(ns, 123);
+// // @ts-expect-error
+// await database.delete(ns, 123);
 
-// @ts-expect-error
-await database.delete(kv, 123);
+// // @ts-expect-error
+// await database.delete(kv, 123);
 
-// @ts-expect-error - return type
-await database.delete('projects', [1, 2, 3]);
+// // @ts-expect-error - return type
+// await database.delete('projects', [1, 2, 3]);
 
-await database.delete('projects', 'foobar', {
-	allowUnconfirmed: true
-});
+// await database.delete('projects', 'foobar', {
+// 	allowUnconfirmed: true
+// });
 
-await database.delete('projects', 'foobar', {
-	cacheKey: 'howdy',
-	cacheTtl: 123, // unused but present
-});
+// await database.delete('projects', 'foobar', {
+// 	cacheKey: 'howdy',
+// 	cacheTtl: 123, // unused but present
+// });
 
-assert<boolean>(
-	// @ts-expect-error - return type
-	await database.delete('projects', ['key1', 'key2'])
-);
+// assert<boolean>(
+// 	// @ts-expect-error - return type
+// 	await database.delete('projects', ['key1', 'key2'])
+// );
 
-assert<boolean>(
-	await database.delete('projects', 'key')
-);
+// assert<boolean>(
+// 	await database.delete('projects', 'key')
+// );
 
-assert<number>(
-	await database.delete('projects', ['key1', 'key2'])
-);
+// assert<number>(
+// 	await database.delete('projects', ['key1', 'key2'])
+// );
 
-assert<number>(
-	await database.delete('projects', ['key1', 'key2'], {
-		cacheKey: 'mykeys',
-		cacheTtl: 0, // unused but can be present
-	})
-);
+// assert<number>(
+// 	await database.delete('projects', ['key1', 'key2'], {
+// 		cacheKey: 'mykeys',
+// 		cacheTtl: 0, // unused but can be present
+// 	})
+// );
 
-assert<Map<string, unknown>>(
-	await database.list('projects', {
-		allowConcurrency: false,
-		prefix: 'user:123:',
-	})
-);
+// assert<Map<string, unknown>>(
+// 	await database.list('projects', {
+// 		allowConcurrency: false,
+// 		prefix: 'user:123:',
+// 	})
+// );
 
-assert<Map<string, number>>(
-	await database.list<number>('projects', {
-		prefix: 'user:123:',
-		limit: 10,
-	})
-);
+// assert<Map<string, number>>(
+// 	await database.list<number>('projects', {
+// 		prefix: 'user:123:',
+// 		limit: 10,
+// 	})
+// );
 
-assert<Map<string, number>>(
-	// @ts-expect-error - return type
-	await database.list<string>('projects', 'user:123:')
-);
+// assert<Map<string, number>>(
+// 	// @ts-expect-error - return type
+// 	await database.list<string>('projects', 'user:123:')
+// );
 
 /**
  * NATIVE
