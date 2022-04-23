@@ -32,10 +32,12 @@ export function save(
 	return response;
 }
 
-// TODO: Check if other codes (eg 500) actually work in CF cache
 // @see https://datatracker.ietf.org/doc/html/rfc7231#section-6.1
+// @see (-206) https://developers.cloudflare.com/workers/runtime-apis/cache/#invalid-parameters
+const CACHE_CODES = /*#__PURE__*/ new Set([200, 203, 204, 300, 301, 404, 405, 410, 414, 501]);
+
 export function isCacheable(res: Response): boolean {
-	if (res.status === 101 || res.status === 206) return false;
+	if (!CACHE_CODES.has(res.status)) return false;
 
 	let vary = res.headers.get('Vary') || '';
 	if (!!~vary.indexOf('*')) return false;

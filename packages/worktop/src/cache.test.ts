@@ -68,18 +68,70 @@ isCacheable('should be a function', () => {
 	assert.type(Cache.isCacheable, 'function');
 });
 
-isCacheable('status code :: 200', () => {
-	const res = new Response();
-	assert.is(Cache.isCacheable(res), true);
-});
+isCacheable('status code :: 1xx', () => {
+	let res = new Response(null, { status: 100 });
+	assert.is(Cache.isCacheable(res), false);
 
-isCacheable('status code :: 206', () => {
-	const res = new Response(null, { status: 206 });
+	res = new Response(null, { status: 101 });
 	assert.is(Cache.isCacheable(res), false);
 });
 
-isCacheable('status code :: 101', () => {
-	const res = new Response(null, { status: 101 });
+isCacheable('status code :: 2xx', () => {
+	let res = new Response(); // 200
+	assert.is(Cache.isCacheable(res), true);
+
+	res = new Response(null, { status: 200 });
+	assert.is(Cache.isCacheable(res), true);
+
+	res = new Response(null, { status: 201 });
+	assert.is(Cache.isCacheable(res), false);
+
+	res = new Response(null, { status: 204 });
+	assert.is(Cache.isCacheable(res), true);
+
+	res = new Response(null, { status: 206 });
+	assert.is(Cache.isCacheable(res), false);
+});
+
+isCacheable('status code :: 3xx', () => {
+	let res = new Response(null, { status: 300 });
+	assert.is(Cache.isCacheable(res), true);
+
+	res = new Response(null, { status: 301 });
+	assert.is(Cache.isCacheable(res), true);
+
+	res = new Response(null, { status: 302 });
+	assert.is(Cache.isCacheable(res), false);
+
+	res = new Response(null, { status: 303 });
+	assert.is(Cache.isCacheable(res), false);
+});
+
+isCacheable('status code :: 4xx', () => {
+	let res = new Response(null, { status: 400 });
+	assert.is(Cache.isCacheable(res), false);
+
+	res = new Response(null, { status: 401 });
+	assert.is(Cache.isCacheable(res), false);
+
+	res = new Response(null, { status: 404 });
+	assert.is(Cache.isCacheable(res), true);
+
+	res = new Response(null, { status: 405 });
+	assert.is(Cache.isCacheable(res), true);
+
+	res = new Response(null, { status: 418 });
+	assert.is(Cache.isCacheable(res), false);
+});
+
+isCacheable('status code :: 5xx', () => {
+	let res = new Response(null, { status: 500 });
+	assert.is(Cache.isCacheable(res), false);
+
+	res = new Response(null, { status: 501 });
+	assert.is(Cache.isCacheable(res), true);
+
+	res = new Response(null, { status: 502 });
 	assert.is(Cache.isCacheable(res), false);
 });
 
