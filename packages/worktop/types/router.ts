@@ -69,7 +69,7 @@ API.add('POST', '/items', async (req, context) => {
 	// Assert `req.cf` properties
 	assert<IncomingCloudflareProperties>(req.cf);
 	assert<string>(req.cf.httpProtocol);
-	assert<string>(req.cf.asn);
+	assert<number>(req.cf.asn);
 
 	// @ts-expect-error -> string | undefined
 	assert<string>(req.cf.city);
