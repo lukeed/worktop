@@ -80,6 +80,10 @@ export async function until<X extends string>(
 	}
 }
 
+function keyname(prefix: string, key: string): string {
+	return !prefix || key.startsWith(prefix + '~') ? key : (prefix + '~' + key);
+}
+
 export class Entity implements E {
 	readonly ns: KV.Namespace;
 	readonly cache: Cache.Entity;
@@ -101,7 +105,7 @@ export class Entity implements E {
 		let { limit, prefix='' } = options;
 
 		if (this.prefix) {
-			options.prefix = prefix.startsWith(this.prefix) ? prefix : (this.prefix + prefix);
+			options.prefix = keyname(this.prefix, prefix);
 		}
 
 		if (limit) {
@@ -127,7 +131,7 @@ export class Entity implements E {
 	}
 
 	async get<T>(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<T|null> {
-		if (this.prefix) key = this.prefix + key;
+		key = keyname(this.prefix, key);
 
 		let value: T|null;
 		let res = this.ttl && await this.cache.get(key);
@@ -148,7 +152,7 @@ export class Entity implements E {
 	}
 
 	async put<T>(key: string, value: T|null): Promise<boolean> {
-		if (this.prefix) key = this.prefix + key;
+		key = keyname(this.prefix, key);
 
 		let input = Cache.normalize(value);
 		let bool = await this.ns.put(key, input).then(
@@ -170,7 +174,7 @@ export class Entity implements E {
 	}
 
 	async delete(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<boolean> {
-		if (this.prefix) key = this.prefix + key;
+		key = keyname(this.prefix, key);
 
 		let hasHook = typeof this.ondelete === 'function';
 
