@@ -139,28 +139,28 @@ export default start(API.run);
 
 ### Module: `worktop`
 
-> [View `worktop` API documentation](/src/router.d.ts)
+> [View `worktop` API documentation](/packages/worktop/src/index.d.ts)
 <!-- > [View `worktop` API documentation](/docs/module.router.md) -->
 
-The main module – concerned with routing. <br>This is core of most applications. Exports the [`Router`](/src/router.d.ts#L66) class.
+The main module – concerned with routing. <br>This is core of most applications. Exports the [`Router`](/packages/worktop/src/index.d.ts#L62) class.
 
 ### Module: `worktop/cfw.kv`
 
-> [View `worktop/cfw.kv` API documentation](/src/cfw.kv.d.ts)
+> [View `worktop/cfw.kv` API documentation](/packages/worktop/src/cfw.kv.d.ts)
 <!-- > [View `worktop/cfw.kv` API documentation](/docs/module.kv.md) -->
 
 The `worktop/cfw.kv` submodule contains all classes and utilities related to [Workers KV](https://www.cloudflare.com/products/workers-kv/).
 
 ### Module: `worktop/cache`
 
-> [View `worktop/cache` API documentation](/src/cache.d.ts)
+> [View `worktop/cache` API documentation](/packages/worktop/src/cache.d.ts)
 <!-- > [View `worktop/cache` API documentation](/docs/module.cache.md) -->
 
 The `worktop/cache` submodule contains all utilities related to [Cloudflare's Cache](https://developers.cloudflare.com/workers/learning/how-the-cache-works).
 
 ### Module: `worktop/cfw.durable`
 
-> [View `worktop/cfw.durable` API documentation](/src/cfw.durable.d.ts)
+> [View `worktop/cfw.durable` API documentation](/packages/worktop/src/cfw.durable.d.ts)
 <!-- > [View `worktop/cfw.durable` API documentation](/docs/module.cfw.durable.md) -->
 
 The `worktop/cfw.durable` submodule includes native types for Cloudflare's [Durable Objects](https://developers.cloudflare.com/workers/runtime-apis/durable-objects) as well as an `Actor` abstract class that provides a blueprint for authoring a Durable Object that handles WebSocket connections.
@@ -169,70 +169,61 @@ The `worktop/cfw.durable` submodule includes native types for Cloudflare's [Dura
 
 ### Module: `worktop/cfw`
 
-> [View `worktop/cfw` API documentation](/src/cfw.d.ts)
+> [View `worktop/cfw` API documentation](/packages/worktop/src/cfw.d.ts)
 <!-- > [View `worktop/cfw` API documentation](/docs/module.cfw.md) -->
 
 The `worktop/cfw` submodule includes two utilities related to Cloudflare's Module Worker format. Most notably, it includes TypeScript annotations specific to Cloudflare's environment.
 
-### Module: `worktop/request`
-
-> [View `worktop/request` API documentation](/src/request.d.ts)
-<!-- > [View `worktop/request` API documentation](/docs/module.request.md) -->
-
-The `worktop/request` submodule contains the [`ServerRequest`](/src/request.d.ts#L117) class, which provides an interface similar to the request instance(s) found in most other Node.js frameworks.
-
-> **Note:** This module is used internally and will (very likely) never be imported by your application.
-
 ### Module: `worktop/response`
 
-> [View `worktop/response` API documentation](/src/response.d.ts)
+> [View `worktop/response` API documentation](/packages/worktop/src/response.d.ts)
 <!-- > [View `worktop/response` API documentation](/docs/module.response.md) -->
 
-The `worktop/response` submodule contains the [`ServerResponse`](/src/response.d.ts#L6) class, which provides an interface similar to the [`IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) (aka, "response") object that Node.js provides.
+The `worktop/response` submodule contains the [`ServerResponse`](/packages/worktop/src/response.d.ts#L20) class, which provides an interface similar to the [`IncomingMessage`](https://nodejs.org/api/http.html#http_class_http_incomingmessage) (aka, "response") object that Node.js provides.
 
 > **Note:** This module is used internally and will (very likely) never be imported by your application.
 
 ### Module: `worktop/base64`
 
-> [View `worktop/base64` API documentation](/src/base64.d.ts)
+> [View `worktop/base64` API documentation](/packages/worktop/src/base64.d.ts)
 <!-- > [View `worktop/base64` API documentation](/docs/module.base64.md) -->
 
 The `worktop/base64` submodule contains a few utilities related to the [Base 64 encoding](https://tools.ietf.org/html/rfc4648#section-4).
 
 ### Module: `worktop/cookie`
 
-> [View `worktop/cookie` API documentation](/src/cookie.d.ts)
+> [View `worktop/cookie` API documentation](/packages/worktop/src/cookie.d.ts)
 <!-- > [View `worktop/cookie` API documentation](/docs/module.cookie.md) -->
 
 The `worktop/cookie` submodule contains `parse` and `stringify` utilities for dealing with cookie header(s).
 
 ### Module: `worktop/cors`
 
-> [View `worktop/cors` API documentation](/src/cors.d.ts)
+> [View `worktop/cors` API documentation](/packages/worktop/src/cors.d.ts)
 <!-- > [View `worktop/cors` API documentation](/docs/module.cors.md) -->
 
 The `worktop/cors` submodule offers utilities for dealing with [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) headers.
 
 ### Module: `worktop/crypto`
 
-> [View `worktop/crypto` API documentation](/src/crypto.d.ts)
+> [View `worktop/crypto` API documentation](/packages/worktop/src/crypto.d.ts)
 <!-- > [View `worktop/crypto` API documentation](/docs/module.crypto.md) -->
 
 The `worktop/crypto` submodule is a collection of cryptographic functionalities.
 
 ### Module: `worktop/utils`
 
-> [View `worktop/utils` API documentation](/src/utils.d.ts)
+> [View `worktop/utils` API documentation](/packages/worktop/src/utils.d.ts)
 <!-- > [View `worktop/utils` API documentation](/docs/module.utils.md) -->
 
 The `worktop/utils` submodule is a collection of standalone, general-purpose utilities that you may find useful. These may include – but are not limited to – hashing functions and unique identifier generators.
 
-### Module: `worktop/ws`
+### Module: `worktop/cfw.ws`
 
-> [View `worktop/ws` API documentation](/src/ws.d.ts)
-<!-- > [View `worktop/ws` API documentation](/docs/module.ws.md) -->
+> [View `worktop/cfw.ws` API documentation](/packages/worktop/src/cfw.ws.d.ts)
+<!-- > [View `worktop/cfw.ws` API documentation](/docs/module.cfw.ws.md) -->
 
-The `worktop/ws` submodule contains the [`WebSocket`](/src/ws.d.ts#L18) and [`WebSocketPair`](/src/ws.d.ts#L4) class definitions, as well as two middleware handlers for validating and/or setting up a [`SocketHandler`](/src/ws.d.ts#L38) for the WebSocket connection.
+The `worktop/cfw.ws` submodule contains the [`WebSocket`](/packages/worktop/src/cfw.ws.d.ts#L11) class definition, as well as middleware handler for validating and/or setting up a [`SocketHandler`](/packages/worktop/src/cfw.ws.d.ts#L32) for the WebSocket connection.
 
 
 ## License
