@@ -118,7 +118,7 @@ export declare class Entity<Data=unknown> {
 	 */
 	readonly cache: {
 		get(key: string): Promise<Response|void>;
-		put<T=Data>(key: string, value: T|null, ttl: number): Promise<boolean>;
+		put(key: string, value: Data|null, ttl: number): Promise<boolean>;
 		delete(key: string): Promise<boolean>;
 	};
 
@@ -136,17 +136,12 @@ export declare class Entity<Data=unknown> {
 
 	constructor(binding: KV.Namespace);
 
-	onread?(key: string, value: Data): Promisable<void>;
-	onwrite?(key: string, value: Data): Promisable<void>;
-	ondelete?(key: string, value: Data): Promisable<void>;
+	onread?(key: string, value: Data|null): Promisable<void>;
+	onwrite?(key: string, value: Data|null): Promisable<void>;
+	ondelete?(key: string, value: Data|null): Promisable<void>;
 
+	get(key: string): Promise<Data|null>;
 	list(options?: KV.Options.List): Promise<string[]>;
-
-	get(key: string, type: 'text'): Promise<string|null>;
-	get<T=Data>(key: string, type?: 'json'): Promise<T|null>;
-	get(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer|null>;
-
-	put<T=Data>(key: string, value: T|null): Promise<boolean>;
-
-	delete(key: string, format?: 'text' | 'json' | 'arrayBuffer'): Promise<boolean>;
+	put(key: string, value: Data|null): Promise<boolean>;
+	delete(key: string): Promise<boolean>;
 }
