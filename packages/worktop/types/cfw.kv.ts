@@ -149,43 +149,42 @@ assert<unknown>(
 );
 
 assert<IApp|null>(
-	await apps.get<IApp>('abc123')
+	await apps.get('abc123') as IApp
 );
 
-assert<IApp|null>(
-	await apps.get<IApp>('abc123', 'json')
+assert<string>(
+	// @ts-expect-error - cannot be string w/o override
+	await apps.get('abc123')
 );
 
-assert<string|null>(
-	await apps.get('abc123', 'text')
-);
+// @ts-expect-error - no type args
+await apps.get<IApp>('abc123')
 
-assert<ArrayBuffer|null>(
-	await apps.get('abc123', 'arrayBuffer')
-);
+// @ts-expect-error - no type arg
+await apps.get<number>('abc123');
 
-// @ts-expect-error - T w/ "text"
-await apps.get<number>('abc123', 'text');
-
-// @ts-expect-error - T w/ "arrayBuffer"
-await apps.get<number>('abc123', 'arrayBuffer');
+// @ts-expect-error - no type arg
+await apps.get<number>('abc123');
 
 assert<boolean>(
 	await apps.put('abc123', null)
 );
 
 assert<boolean>(
+	// unknown allows anything
 	await apps.put('abc123', 'foobar')
 );
 
 assert<boolean>(
-	await apps.put<IApp>('abc123', {
+	// unknown allows anything
+	await apps.put('abc123', {
 		uid: toUID(),
 		name: 'foobar'
 	})
 );
 
 assert<boolean>(
+	// unknown allows anything
 	await apps.put('abc123', new ArrayBuffer(1))
 );
 
@@ -198,7 +197,7 @@ assert<string>(apps.prefix!);
 
 // ---
 
-class User extends Entity {
+class User extends Entity<IApp> {
 	ttl = 3600; // 1hr
 	prefix = 'user';
 
@@ -210,99 +209,43 @@ class User extends Entity {
 declare let ns: KV.Namespace;
 let users = new User(ns);
 
-assert<unknown>(
+assert<IApp|null>(
 	await users.get('abc123')
 );
 
-assert<string|null>(
-	await users.get('abc123', 'text')
+assert<string>(
+	// @ts-expect-error - should be IApp
+	await users.get('abc123')
 );
 
-assert<ArrayBuffer|null>(
-	await users.get('abc123', 'arrayBuffer')
-);
-
-// @ts-expect-error - T w/ "text"
-await users.get<number>('abc123', 'text');
-
-// @ts-expect-error - T w/ "arrayBuffer"
-await users.get<number>('abc123', 'arrayBuffer');
+// @ts-expect-error - no format arg
+await users.get('abc123', 'text');
+// @ts-expect-error - no format arg
+await users.get('abc123', 'arrayBuffer');
+// @ts-expect-error - no format arg
+await users.get('abc123', 'json');
 
 assert<boolean>(
 	await users.put('abc123', null)
 );
 
-assert<boolean>(
-	await users.put('abc123', 'foobar')
-);
+// @ts-expect-error - is not IApp
+await users.put('abc123', 123456789);
+// @ts-expect-error - is not IApp data
+await users.put('abc123', new ArrayBuffer(1));
+// @ts-expect-error - is not IApp
+await users.put('abc123', 'foobar');
 
 assert<boolean>(
-	await users.put<IApp>('abc123', {
+	await users.put('abc123', {
 		uid: toUID(),
 		name: 'foobar'
 	})
-);
-
-assert<boolean>(
-	await users.put('abc123', new ArrayBuffer(1))
 );
 
 assert<boolean>(
 	await users.delete('abc123')
 );
 
-// ---
-
-class App extends Entity<IApp> {
-	prefix = 'apps';
-}
-
-let apps2 = new App(ns);
-
-assert<IApp|null>(
-	await apps2.get('abc123')
-);
-
-assert<IApp|null>(
-	await apps2.get<IApp>('abc123', 'json')
-);
-
-assert<string|null>(
-	await apps2.get('abc123', 'text')
-);
-
-assert<ArrayBuffer|null>(
-	await apps2.get('abc123', 'arrayBuffer')
-);
-
-// @ts-expect-error - T w/ "text"
-await apps2.get<number>('abc123', 'text');
-
-// @ts-expect-error - T w/ "arrayBuffer"
-await apps2.get<number>('abc123', 'arrayBuffer');
-
-assert<boolean>(
-	await apps2.put('abc123', null)
-);
-
-assert<boolean>(
-	await apps2.put('abc123', 'foobar')
-);
-
-assert<boolean>(
-	await apps2.put<IApp>('abc123', {
-		uid: toUID(),
-		name: 'foobar'
-	})
-);
-
-assert<boolean>(
-	await apps2.put('abc123', new ArrayBuffer(1))
-);
-
-assert<boolean>(
-	await apps2.delete('abc123')
-);
-
-assert<number>(apps2.ttl!);
-assert<string>(apps2.prefix!);
+assert<number>(users.ttl!);
+assert<string>(users.prefix!);

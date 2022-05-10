@@ -84,16 +84,16 @@ function keyname(prefix: string, key: string): string {
 	return !prefix || key.startsWith(prefix + '~') ? key : (prefix + '~' + key);
 }
 
-export class Entity implements E {
+export class Entity<T=unknown> implements E {
 	readonly ns: KV.Namespace;
 	readonly cache: Cache.Entity;
 
 	prefix = '';
 	ttl = 0;
 
-	onread?(key: string, value: unknown): Promisable<void>;
-	onwrite?(key: string, value: unknown): Promisable<void>;
-	ondelete?(key: string, value: unknown): Promisable<void>;
+	onread?(key: string, value: T|null): Promisable<void>;
+	onwrite?(key: string, value: T|null): Promisable<void>;
+	ondelete?(key: string, value: T|null): Promisable<void>;
 
 	constructor(ns: KV.Namespace) {
 		this.cache = new Cache.Entity;
@@ -130,17 +130,16 @@ export class Entity implements E {
 		return output;
 	}
 
-	async get<T>(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<T|null> {
+	async get(key: string): Promise<T|null> {
 		key = keyname(this.prefix, key);
 
 		let value: T|null;
 		let res = this.ttl && await this.cache.get(key);
 
 		if (res) {
-			value = await res[format]();
+			value = await res.json();
 		} else {
-			// @ts-ignore - TODO fix overload types
-			value = await this.ns.get<T>(key, format);
+			value = await this.ns.get<T>(key, 'json');
 			if (this.ttl) await this.cache.put(key, value, this.ttl);
 		}
 
@@ -151,7 +150,7 @@ export class Entity implements E {
 		return value;
 	}
 
-	async put<T>(key: string, value: T|null): Promise<boolean> {
+	async put(key: string, value: T|null): Promise<boolean> {
 		key = keyname(this.prefix, key);
 
 		let input = Cache.normalize(value);
@@ -173,13 +172,11 @@ export class Entity implements E {
 		return bool;
 	}
 
-	async delete(key: string, format: Exclude<KV.GetFormat, 'stream'> = 'json'): Promise<boolean> {
+	async delete(key: string): Promise<boolean> {
 		key = keyname(this.prefix, key);
 
 		let hasHook = typeof this.ondelete === 'function';
-
-		// @ts-ignore - TODO fix overload types
-		let value = hasHook && await this.ns.get(key, format);
+		let value = hasHook && await this.ns.get<T>(key, 'json');
 
 		let bool = await this.ns.delete(key).then(
 			() => true,
@@ -191,7 +188,7 @@ export class Entity implements E {
 		}
 
 		if (bool && hasHook) {
-			await this.ondelete!(key, value);
+			await this.ondelete!(key, value as T|null);
 		}
 
 		return bool;
