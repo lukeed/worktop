@@ -8,9 +8,12 @@ export function normalize(value: unknown): KV.Value {
 	) ? value : JSON.stringify(value);
 }
 
+const toCacheKey = (key: string) => `cache://${encodeURIComponent(key)}`;
+
 export class Entity {
 	get(key: string): Promise<Response|void> {
-		return caches.default.match(key);
+		let k = toCacheKey(key);
+		return caches.default.match(k);
 	}
 
 	put<T>(key: string, value: T|null, ttl: number): Promise<boolean> {
@@ -20,13 +23,15 @@ export class Entity {
 		let body = value == null ? null : normalize(value);
 		let res = new Response(body, { headers });
 
-		return caches.default.put(key, res).then(
+		let k = toCacheKey(key);
+		return caches.default.put(k, res).then(
 			() => true,
 			() => false
 		);
 	}
 
 	delete(key: string): Promise<boolean> {
-		return caches.default.delete(key);
+		let k = toCacheKey(key);
+		return caches.default.delete(k);
 	}
 }
