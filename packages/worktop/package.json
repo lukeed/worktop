@@ -1,6 +1,6 @@
 {
   "name": "worktop",
-  "version": "0.8.0-next.13",
+  "version": "0.8.0-next.14",
   "repository": "lukeed/worktop",
   "description": "The next generation web framework for Cloudflare Workers",
   "types": "router/index.d.ts",
