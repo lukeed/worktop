@@ -250,3 +250,59 @@ assert<boolean>(
 assert<boolean>(
 	await users.delete('abc123')
 );
+
+// ---
+
+class App extends Entity<IApp> {
+	prefix = 'apps';
+}
+
+let apps2 = new App(ns);
+
+assert<IApp|null>(
+	await apps2.get('abc123')
+);
+
+assert<IApp|null>(
+	await apps2.get<IApp>('abc123', 'json')
+);
+
+assert<string|null>(
+	await apps2.get('abc123', 'text')
+);
+
+assert<ArrayBuffer|null>(
+	await apps2.get('abc123', 'arrayBuffer')
+);
+
+// @ts-expect-error - T w/ "text"
+await apps2.get<number>('abc123', 'text');
+
+// @ts-expect-error - T w/ "arrayBuffer"
+await apps2.get<number>('abc123', 'arrayBuffer');
+
+assert<boolean>(
+	await apps2.put('abc123', null)
+);
+
+assert<boolean>(
+	await apps2.put('abc123', 'foobar')
+);
+
+assert<boolean>(
+	await apps2.put<IApp>('abc123', {
+		uid: toUID(),
+		name: 'foobar'
+	})
+);
+
+assert<boolean>(
+	await apps2.put('abc123', new ArrayBuffer(1))
+);
+
+assert<boolean>(
+	await apps2.delete('abc123')
+);
+
+assert<number>(apps2.ttl!);
+assert<string>(apps2.prefix!);

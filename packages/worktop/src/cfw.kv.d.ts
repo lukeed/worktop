@@ -107,7 +107,7 @@ export function until<X extends string>(
 	toSearch: (val: X) => Promise<unknown | false>
 ): Promise<X>;
 
-export declare class Entity {
+export declare class Entity<Data=unknown> {
 	/**
 	 * The KV Namespace for this entity.
 	 */
@@ -118,7 +118,7 @@ export declare class Entity {
 	 */
 	readonly cache: {
 		get(key: string): Promise<Response|void>;
-		put<T>(key: string, value: T|null, ttl: number): Promise<boolean>;
+		put<T=Data>(key: string, value: T|null, ttl: number): Promise<boolean>;
 		delete(key: string): Promise<boolean>;
 	};
 
@@ -136,17 +136,17 @@ export declare class Entity {
 
 	constructor(binding: KV.Namespace);
 
-	onread?(key: string, value: unknown): Promisable<void>;
-	onwrite?(key: string, value: unknown): Promisable<void>;
-	ondelete?(key: string, value: unknown): Promisable<void>;
+	onread?(key: string, value: Data): Promisable<void>;
+	onwrite?(key: string, value: Data): Promisable<void>;
+	ondelete?(key: string, value: Data): Promisable<void>;
 
 	list(options?: KV.Options.List): Promise<string[]>;
 
 	get(key: string, type: 'text'): Promise<string|null>;
-	get<T=unknown>(key: string, type?: 'json'): Promise<T|null>;
+	get<T=Data>(key: string, type?: 'json'): Promise<T|null>;
 	get(key: string, type: 'arrayBuffer'): Promise<ArrayBuffer|null>;
 
-	put<T>(key: string, value: T|null): Promise<boolean>;
+	put<T=Data>(key: string, value: T|null): Promise<boolean>;
 
 	delete(key: string, format?: 'text' | 'json' | 'arrayBuffer'): Promise<boolean>;
 }
