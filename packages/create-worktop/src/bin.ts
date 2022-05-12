@@ -18,8 +18,7 @@ const argv = require('mri')(process.argv.slice(2), {
 	}
 });
 
-/** @param {string} msg */
-function exit(msg, code = 1) {
+function exit(msg: string, code = 1): never {
 	if (code) process.stderr.write(msg + '\n');
 	else process.stdout.write(msg + '\n');
 	process.exit(code);
@@ -55,15 +54,13 @@ if (argv.help) {
 
 if (argv.version) {
 	let pkg = require('./package.json');
-	return exit(`${pkg.name}, v${pkg.version}`, 0);
+	exit(`${pkg.name}, v${pkg.version}`, 0);
 }
 
 (async function () {
-	try {
-		let dir = argv._.join('-').trim().replace(/[\s_]+/g, '-');
-		if (!dir) return exit('Missing <name> argument', 1);
-		await require('.').setup(dir, argv);
-	} catch (err) {
-		exit(err && err.stack || err, 1);
-	}
+	let dir = argv._.join('-').trim().replace(/[\s_]+/g, '-');
+	if (!dir) return exit('Missing <name> argument', 1);
+	await require('.').setup(dir, argv).catch((err: Error) => {
+		exit(err ? (err.stack || err.message) : err, 1);
+	});
 })();

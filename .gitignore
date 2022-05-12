@@ -7,7 +7,10 @@ node_modules
 !/packages/worktop/src/
 !/packages/worktop/types/
 
+# build outputs
+/packages/*/bin.js
 /packages/*/index.js
+/packages/*/index.d.ts
 /packages/*/index.mjs
 
 /examples/build

@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "16.11.6",
-    "bundt": "2.0.0-next.1",
+    "bundt": "2.0.0-next.5",
     "fetchy": "next",
     "is-uuid": "1.0.2",
     "tsm": "2.2.1",

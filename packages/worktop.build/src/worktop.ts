@@ -21,8 +21,9 @@ const flags = require('mri')(argv, {
 	}
 });
 
-/** @param {string} msg */
-function bail(msg, code = 1) {
+import type { BuildFailure } from 'esbuild';
+
+function bail(msg: string, code = 1): never {
 	console.error(msg);
 	process.exit(code);
 }
@@ -63,7 +64,7 @@ require('.').build({
 	analyze: flags.analyze,
 	minify: flags.minify,
 	cwd: flags.cwd,
-}).catch(err => {
+}).catch((err: BuildFailure) => {
 	if (err.errors) process.exitCode = 1;
 	else bail(err.stack || err.message);
 });
