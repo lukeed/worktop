@@ -32,6 +32,11 @@ declare global {
 		passThroughOnException(): void;
 	}
 
+	interface Headers {
+		/* @see https://github.com/whatwg/fetch/issues/973#issuecomment-560136041 */
+		getAll(name: string): string[];
+	}
+
 	function addEventListener(
 		type: 'scheduled',
 		handler: (event: CronEvent) => Promisable<void>
