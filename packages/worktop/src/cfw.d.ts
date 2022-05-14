@@ -42,6 +42,20 @@ declare global {
 		handler: (event: CronEvent) => Promisable<void>
 	): void;
 
+	function queueMicrotask(task: Function): void;
+
+	function structuredC1lone<T>(value: T, options?: {
+		transfer?: Array<
+			| ArrayBuffer
+			| MessagePort
+			| WritableStream
+			| TransformStream
+			| ReadableStream
+			| OffscreenCanvas
+			| ImageBitmap
+		>;
+	}): T;
+
 	namespace HTMLRewriter {
 		type Content = string | ReadableStream | Response;
 
