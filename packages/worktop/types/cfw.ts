@@ -8,7 +8,7 @@ import type { KV } from 'worktop/cfw.kv';
  */
 
 const worker1: Module.Worker = {
-	async fetch(req, env, ctx) {
+	fetch(req, env, ctx) {
 		assert<Request>(req);
 		assert<IncomingCloudflareProperties>(req.cf);
 
@@ -48,7 +48,7 @@ interface CustomBindings extends Bindings {
 }
 
 const worker2: Module.Worker<CustomBindings> = {
-	fetch(req, env, ctx) {
+	async fetch(req, env, ctx) {
 		assert<Request>(req);
 		assert<Module.Context>(ctx);
 		assert<Strict<CustomBindings>>(env);
@@ -62,11 +62,35 @@ const worker2: Module.Worker<CustomBindings> = {
 
 		env.AUTH.fetch(req);
 		env.AUTH.fetch(req.url);
-		env.AUTH.fetch('https://foobar.com', {
+
+		let res = await env.AUTH.fetch('https://foobar.com', {
 			method: 'POST',
 			headers: req.headers,
 		});
 
-		return new Response;
+		let rewriter = new HTMLRewriter()
+			.on('div', {
+				element(tag) {
+					tag.append('foobar');
+					assert<HTMLRewriter.Element>(tag);
+					tag.setAttribute('id', 'c'+crypto.randomUUID());
+				},
+				comments(tag) {
+					assert<HTMLRewriter.Comment>(tag);
+					tag.remove();
+				},
+			})
+			.onDocument({
+				end(tag) {
+					assert<HTMLRewriter.DocumentEnd>(tag);
+					tag.append('<!--extra-->');
+				},
+				doctype(tag) {
+					assert<HTMLRewriter.Doctype>(tag);
+				}
+			});
+
+		assert<HTMLRewriter>(rewriter);
+		return rewriter.transform(res);
 	}
 }

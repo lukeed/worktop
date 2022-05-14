@@ -41,6 +41,89 @@ declare global {
 		type: 'scheduled',
 		handler: (event: CronEvent) => Promisable<void>
 	): void;
+
+	namespace HTMLRewriter {
+		type Content = string | ReadableStream | Response;
+
+		interface Options {
+			html?: boolean;
+		}
+
+		interface Comment {
+			text: string;
+			readonly removed: boolean;
+			replace(content: Content, options?: Options): Comment;
+			before(content: Content, options?: Options): Comment;
+			after(content: Content, options?: Options): Comment;
+			remove(): Comment;
+		}
+
+		interface Text {
+			readonly text: string;
+			readonly removed: boolean;
+			readonly lastInTextNode: boolean;
+			replace(content: Content, options?: Options): Text;
+			before(content: Content, options?: Options): Text;
+			after(content: Content, options?: Options): Text;
+			remove(): Text;
+		}
+
+		interface Doctype {
+			readonly name: string | null;
+			readonly publicId: string | null;
+			readonly systemId: string | null;
+		}
+
+		interface DocumentEnd {
+			append(content: Content, options?: Options): DocumentEnd;
+		}
+
+		interface Element {
+			tagName: string;
+			readonly attributes: IterableIterator<string[]>;
+			readonly removed: boolean;
+			readonly namespaceURI: string;
+			hasAttribute(name: string): boolean;
+			removeAttribute(name: string): Element;
+			getAttribute(name: string): string | null;
+			setAttribute(name: string, value: string): Element;
+			replace(content: Content, options?: Options): Element;
+			before(content: Content, options?: Options): Element;
+			after(content: Content, options?: Options): Element;
+			prepend(content: Content, options?: Options): Element;
+			append(content: Content, options?: Options): Element;
+			remove(): Element;
+			removeAndKeepContent(): Element;
+			setInnerContent(content: Content, options?: Options): Element;
+			onEndTag(handler: (tag: EndTag) => Promisable<void>): void;
+		}
+
+		interface EndTag {
+			name: string;
+			before(content: Content, options?: Options): EndTag;
+			after(content: Content, options?: Options): EndTag;
+			remove(): EndTag;
+		}
+
+		interface Handlers {
+			element?(element: Element): Promisable<void>;
+			comments?(comment: Comment): Promisable<void>;
+			text?(text: Text): Promisable<void>;
+		}
+
+		interface DocumentHandlers extends Handlers {
+			doctype?(doctype: Doctype): Promisable<void>;
+			comments?(comment: Comment): Promisable<void>;
+			text?(text: Text): Promisable<void>;
+			end?(end: DocumentEnd): Promisable<void>;
+		}
+	}
+
+	class HTMLRewriter {
+		on(selector: string, handlers: HTMLRewriter.Handlers): HTMLRewriter;
+		onDocument(handlers: HTMLRewriter.DocumentHandlers): HTMLRewriter;
+		transform(response: Response): Response;
+	}
 }
 
 export interface Bindings {
