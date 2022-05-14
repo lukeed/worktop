@@ -44,7 +44,7 @@ declare global {
 
 	function queueMicrotask(task: Function): void;
 
-	function structuredC1lone<T>(value: T, options?: {
+	function structuredClone<T>(value: T, options?: {
 		transfer?: Array<
 			| ArrayBuffer
 			| MessagePort
