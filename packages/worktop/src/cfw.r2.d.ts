@@ -8,10 +8,10 @@ export namespace R2 {
 		uploadedAfter?: Date;
 	}
 
-	interface Range {
-		offset: number;
-		length: number;
-	}
+	type Range =
+		| { offset: number; length?: number }
+		| { offset?: number; length: number }
+		| { suffix: number };
 
 	type Value =
 		| ReadableStream
@@ -22,10 +22,8 @@ export namespace R2 {
 		| null;
 
 	namespace Options {
-		interface Head {
+		interface Get {
 			onlyIf?: R2.Conditional | Headers;
-		}
-		interface Get extends Head {
 			range?: R2.Range;
 		}
 		interface List {
@@ -43,9 +41,12 @@ export namespace R2 {
 	}
 
 	interface Bucket {
+		get<M extends R2.Metadata.Custom>(key: string): Promise<R2.Object<M> | null>;
+		get<M extends R2.Metadata.Custom>(key: string, options: R2.Options.Get): Promise<R2.Object<M> | R2.Object.Metadata<M> | null>;
+		get<M extends R2.Metadata.Custom>(key: string, options?: R2.Options.Get): Promise<R2.Object<M> | R2.Object.Metadata<M> | null>;
+
+		head<M extends R2.Metadata.Custom>(key: string): Promise<R2.Object.Metadata<M> | null>;
 		list<M extends R2.Metadata.Custom>(options?: R2.Options.List): Promise<R2.Object.List<M>>;
-		head<M extends R2.Metadata.Custom>(key: string, options?: R2.Options.Head): Promise<R2.Object.Metadata<M> | null>;
-		get<M extends R2.Metadata.Custom>(key: string, options?: R2.Options.Get): Promise<R2.Object<M> | null>;
 		put<M extends R2.Metadata.Custom>(key: string, value: R2.Value, options?: R2.Options.Put<M>): Promise<R2.Object.Metadata<M>>;
 		delete(key: string): Promise<void>;
 	}
