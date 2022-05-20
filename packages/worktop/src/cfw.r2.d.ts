@@ -96,3 +96,19 @@ export namespace R2 {
 		blob(): Promise<Blob>;
 	}
 }
+
+export function list<M extends R2.Metadata.Custom>(
+	binding: R2.Bucket,
+	options?: R2.Options.List
+): AsyncGenerator<{
+	objects: R2.Object.Metadata<M>[]
+	done: boolean;
+}>;
+
+export function paginate<M extends R2.Metadata.Custom>(
+	bucket: R2.Bucket,
+	options?: R2.Options.List & {
+		page?: number;
+		limit?: number;
+	}
+): Promise<R2.Object.Metadata<M>[]>;

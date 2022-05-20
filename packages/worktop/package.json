@@ -28,6 +28,10 @@
       "import": "./cfw.durable/index.mjs",
       "require": "./cfw.durable/index.js"
     },
+    "./cfw.r2": {
+      "import": "./cfw.r2/index.mjs",
+      "require": "./cfw.r2/index.js"
+    },
     "./cfw.kv": {
       "import": "./cfw.kv/index.mjs",
       "require": "./cfw.kv/index.js"
