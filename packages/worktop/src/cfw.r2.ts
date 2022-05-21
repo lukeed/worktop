@@ -111,6 +111,7 @@ export async function serve(bkt: R2.Bucket, req: Request | `/${string}`): Promis
 		let status = options.range ? 206 : 200;
 		let b = isHEAD ? null : (result as R2.Object).body;
 		res = new Response(b, { status, headers });
+		res.headers.set('etag', result.httpEtag);
 		result.writeHttpMetadata(res.headers);
 	} catch (err) {
 		// grab the R2 error code
