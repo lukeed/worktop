@@ -69,26 +69,9 @@ export async function serve(bkt: R2.Bucket, req: Request | `/${string}`): Promis
 
 	let tmp: string | null;
 	let headers: HeadersInit = {};
-	let options: R2.Options.Get = {};
-	let when: R2.Conditional | void;
-
-	if (tmp = request.headers.get('if-none-match')) {
-		when ||= {};
-		when.etagDoesNotMatch = tmp;
-	} else if (tmp = request.headers.get('if-modified-since')) {
-		when ||= {};
-		when.uploadedAfter = new Date(tmp);
-	}
-
-	if (tmp = request.headers.get('if-match')) {
-		when ||= {};
-		when.etagMatches = tmp;
-	}
-
-	if (tmp = request.headers.get('if-unmodified-since')) {
-		when ||= {};
-		when.uploadedBefore = new Date(tmp);
-	}
+	let options: R2.Options.Get = {
+		onlyIf: request.headers
+	};
 
 	// TODO: If-Range: <day-name>, <day> <month> <year> <hour>:<minute>:<second> GMT
 	// TODO: If-Range: <etag>
@@ -116,14 +99,13 @@ export async function serve(bkt: R2.Bucket, req: Request | `/${string}`): Promis
 	}
 
 	try {
-		if (when) options.onlyIf = when;
 		var result = await bkt.get(path.substring(1), options);
-
 		if (result == null) return reply(404);
 
 		// missing `body` key if failed precondition
-		if (when && !(result as R2.Object).body) {
-			return reply(when.etagDoesNotMatch || when.uploadedAfter ? 304 : 412);
+		if (!(result as R2.Object).body) {
+			let isMatch = request.headers.has('if-none-match') || request.headers.get('if-modified-since');
+			return reply(isMatch ? 304 : 412);
 		}
 
 		let status = options.range ? 206 : 200;
