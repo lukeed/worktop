@@ -99,7 +99,7 @@ export namespace R2 {
 }
 
 export function list<M extends R2.Metadata.Custom>(
-	binding: R2.Bucket,
+	bucket: R2.Bucket,
 	options?: R2.Options.List
 ): AsyncGenerator<{
 	objects: R2.Object.Metadata<M>[]
@@ -113,3 +113,8 @@ export function paginate<M extends R2.Metadata.Custom>(
 		limit?: number;
 	}
 ): Promise<R2.Object.Metadata<M>[]>;
+
+export function serve(
+	bucket: R2.Bucket,
+	request: Request | `/${string}`
+): Promise<Response>;
