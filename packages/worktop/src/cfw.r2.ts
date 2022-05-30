@@ -125,17 +125,24 @@ export async function serve(bkt: R2.Bucket, req: Request | `/${string}`): Promis
 		let total = result.size;
 
 		// @ts-ignore - union interfaces
-		let { suffix, offset } = options.range as Dict<number>;
-		let length = await res.clone().arrayBuffer().then(r => r.byteLength);
+		let { suffix, offset, length } = options.range as Dict<number>;
+
+		if (suffix) {
+			offset = Math.max(total - suffix, 0);
+			length = total - offset;
+		} else if (offset) {
+			length = Math.min(length ?? total, total - offset);
+		} else if (length) {
+			length = Math.min(length, total);
+			offset = 0;
+		}
 
 		res.headers.set('accept-ranges', 'bytes');
 		res.headers.set('content-length', String(length));
-		res.headers.set('content-range', suffix
-			? `bytes ${total-length}-${total}/${total}`
-			: `bytes ${offset}-${offset+length}/${total}`);
 	} else if (isGET) {
 		// TODO: context.waitUntil here?
 		caches.default.put(request, res.clone());
+		res.headers.set('content-range', `bytes ${offset}-${offset+length}/${total}`);
 	}
 
 	return res;
