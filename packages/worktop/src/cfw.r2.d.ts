@@ -98,6 +98,14 @@ export namespace R2 {
 	}
 }
 
+// options for custom methods
+export namespace Options {
+	type Paginate = R2.Options.List & {
+		page?: number;
+		limit?: number;
+	};
+}
+
 export function list<M extends R2.Metadata.Custom>(
 	bucket: R2.Bucket,
 	options?: R2.Options.List
@@ -108,10 +116,7 @@ export function list<M extends R2.Metadata.Custom>(
 
 export function paginate<M extends R2.Metadata.Custom>(
 	bucket: R2.Bucket,
-	options?: R2.Options.List & {
-		page?: number;
-		limit?: number;
-	}
+	options?: Options.Paginate
 ): Promise<R2.Object.Metadata<M>[]>;
 
 export function serve(

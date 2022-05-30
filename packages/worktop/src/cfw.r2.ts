@@ -1,6 +1,6 @@
 import { STATUS_CODES } from 'worktop/response';
 import type { Dict } from 'worktop/utils';
-import type { R2 } from 'worktop/cfw.r2';
+import type { R2, Options } from 'worktop/cfw.r2';
 
 export async function * list<M extends R2.Metadata.Custom>(
 	binding: R2.Bucket,
@@ -26,10 +26,7 @@ export async function * list<M extends R2.Metadata.Custom>(
 
 export async function paginate<M extends R2.Metadata.Custom>(
 	binding: R2.Bucket,
-	options?: R2.Options.List & {
-		page?: number;
-		limit?: number;
-	}
+	options?: Options.Paginate
 ): Promise<R2.Object.Metadata<M>[]> {
 	let { limit=50, page=1, ...rest } = options || {};
 	let pager = list<M>(binding, rest);
