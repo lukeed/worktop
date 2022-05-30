@@ -104,7 +104,6 @@ export namespace R2 {
 export namespace Options {
 	type Paginate = R2.Options.List & {
 		page?: number;
-		limit?: number;
 	};
 
 	type Sync = {
