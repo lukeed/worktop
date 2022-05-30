@@ -1,7 +1,8 @@
 import { compose } from 'worktop';
 import * as r2 from 'worktop/cfw.r2';
-import type { R2 } from 'worktop/cfw.r2';
+import * as Cache from 'worktop/cfw.cache';
 import type { Router, Context, Handler } from 'worktop';
+import type { R2 } from 'worktop/cfw.r2';
 
 declare const API: Router;
 declare const request: Request;
@@ -98,6 +99,9 @@ API.prepare = compose(
 
 interface Custom extends Context {
 	start: number;
+	bindings: {
+		BUCKET: R2.Bucket;
+	}
 }
 
 declare const API2: Router<Custom>;
@@ -118,6 +122,45 @@ API2.prepare = compose(
 		assert<Custom>(context);
 	},
 );
+
+// testing `r2.sync` in place - Request
+API2.add('GET', '/assets/foo/*', (req, context) => {
+	let bucket = context.bindings.BUCKET;
+	return r2.sync({ bucket })(req, context);
+});
+
+// testing `r2.sync` in place - string
+API2.add('GET', '/assets/bar/*', (req, context) => {
+	let keyer = () => context.params.wild;
+
+	return r2.sync({
+		bucket: context.bindings.BUCKET,
+		cache: { key: keyer },
+	})(req, context);
+});
+
+// testing `r2.serve` in place - Request
+API2.add('GET', '/assets/baz/*', (req, context) => {
+	return r2.serve(context.bindings.BUCKET, req);
+});
+
+// testing `r2.serve` in place - string
+API2.add('GET', '/assets/bat/*', (req, context) => {
+	let bucket = context.bindings.BUCKET;
+	return r2.serve(bucket, `/${context.params.wild}`);
+});
+
+// testing `r2.serve` w/ Cache API in place
+API2.add('GET', '/assets/bat/*', async (req, context) => {
+	const bucket = context.bindings.BUCKET;
+	const key = `/${context.params.wild}` as const;
+
+	let res = await Cache.lookup(key);
+	if (res) return res;
+
+	res = await r2.serve(bucket, key);
+	return Cache.save(key, res, context);
+});
 
 /**
  * LIST
