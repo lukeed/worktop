@@ -1,4 +1,6 @@
-import type { Dict } from 'worktop/utils';
+import type { Dict, Strict } from 'worktop/utils';
+import type { Context, Params } from 'worktop';
+import type { Module } from 'worktop/cfw';
 
 export namespace R2 {
 	interface Conditional {
@@ -104,6 +106,43 @@ export namespace Options {
 		page?: number;
 		limit?: number;
 	};
+
+	type Sync = {
+		/**
+		 * The R2 bucket binding.
+		 */
+		bucket: R2.Bucket | ((context: Module.Context) => R2.Bucket);
+		/**
+		 * Integrate the Cache API with R2 responses.
+		 * @example
+		 *  `false` => disables Cache usage
+		 *  `true` => use Cache with default settings
+		 *  `{ ... }` => use Cache with custom settings
+		 * @default true
+		 */
+		cache?: boolean | {
+			/**
+			 * The `Cache` for persistence.
+			 * @default caches.default
+			 */
+			storage?: Cache | (() => Promise<Cache>);
+			/**
+			 * Determine the `Cache-Control` value.
+			 * Strings are accepted as is; numbers treated as `max-age` seconds.
+			 * @note A `0` value will not cache.
+			 * @example
+			 * 	86400 => "public,max-age=86400"
+			 * 	"private,max-age=900" => "private,max-age=900"
+			 * @default "public,max-age=3600"
+			 */
+			lifetime?: string | number | ((request: Request) => number|string);
+			/**
+			 * Customize the cache key for `Cache` lookup & persistence.
+			 * @default `r2://${encodeURIComponent(new URL(request.url).pathname)}`
+			 */
+			key?(request: Request): string;
+		};
+	}
 }
 
 export function list<M extends R2.Metadata.Custom>(
@@ -123,3 +162,13 @@ export function serve(
 	bucket: R2.Bucket,
 	request: Request | `/${string}`
 ): Promise<Response>;
+
+export function sync(options: Options.Sync): <
+	C extends Context = Context,
+	P extends Params = Params,
+>(
+	request: Request,
+	context: Omit<C, 'params'> & {
+		params: Strict<P & C['params']>;
+	}
+) => Promise<Response | void>;

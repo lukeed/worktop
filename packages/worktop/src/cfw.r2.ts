@@ -1,4 +1,7 @@
+import * as Cache from 'worktop/cache';
 import { STATUS_CODES } from 'worktop/response';
+
+import type { Handler } from 'worktop';
 import type { Dict } from 'worktop/utils';
 import type { R2, Options } from 'worktop/cfw.r2';
 
@@ -44,21 +47,78 @@ function reply(status: number, msg?: string) {
 	return new Response(msg || STATUS_CODES[status], { status });
 }
 
+function $exec<T>(x: T, ...args: any[]): Exclude<T, Function> {
+	return typeof x === 'function' ? x(...args) : x;
+}
+
+type CacheSettings = Exclude<Options.Sync['cache'], boolean>;
+export function sync(options: Options.Sync): Handler {
+	const toCache = options.cache !== false;
+	const settings: CacheSettings = {
+		storage: caches.default,
+		lifetime: 'public,max-age=3600',
+		...options.cache as CacheSettings,
+	};
+
+	let cache: Cache;
+	return async function (req, context) {
+		const isGET = req.method === 'GET';
+		const isHEAD = req.method === 'HEAD';
+		if (!isGET && !isHEAD) return reply(405);
+
+		let key: Request;
+		let res: Response | void;
+
+		// TODO: not sure if this is ideal / necessary
+		let path = decodeURIComponent(context.url.pathname);
+		if (path.endsWith('/')) path += 'index.html';
+
+		if (toCache) {
+			cache ||= await $exec(settings.storage!);
+
+			let href = $exec(settings.key) || encodeURIComponent(path);
+			if (!/^\w+:\/\//.test(href)) href = `r2://${href}`;
+
+			key = new Request(href, req);
+			key.headers.delete('vary');
+
+			res = await cache.match(key, { ignoreMethod: true });
+			if (res && isHEAD) res = new Response(null, res);
+			if (res) return res;
+		}
+
+		const bkt = $exec(options.bucket, context);
+		res = await serve(bkt, req);
+
+		if (toCache) {
+			let value = $exec(settings.lifetime, req);
+			let cc = value && typeof value === 'number'
+				? `public,max-age=${value}`
+				: value;
+
+			if (cc) res.headers.set('cache-control', cc);
+
+			if (isGET && res.status !== 206) {
+				return Cache.save(cache, key!, res, context);
+			}
+		}
+
+		return res;
+	};
+}
+
 export async function serve(bkt: R2.Bucket, req: Request | `/${string}`): Promise<Response> {
 	let path = typeof req === 'string' ? req : decodeURIComponent(new URL(req.url).pathname);
 	if (path.endsWith('/')) path += 'index.html';
 
-	let href = `cache://${encodeURIComponent(path)}`;
 	let request = typeof req !== 'string'
-		? new Request(href, req)
-		: new Request(href);
+		? new Request(path, req)
+		: new Request(path);
 
-	let isGET = request.method === 'GET';
 	let isHEAD = request.method === 'HEAD';
-	if (!isGET && !isHEAD) return reply(405);
-
-	let res = await caches.default.match(request);
-	if (res) return isHEAD ? new Response(null, res) : res;
+	if (!isHEAD && request.method !== 'GET') {
+		return reply(405);
+	}
 
 	// TODO: how good is default `contentType` value?
 	// let idx = path.lastIndexOf('.');
@@ -107,7 +167,7 @@ export async function serve(bkt: R2.Bucket, req: Request | `/${string}`): Promis
 
 		let status = options.range ? 206 : 200;
 		let b = isHEAD ? null : (result as R2.Object).body;
-		res = new Response(b, { status, headers });
+		var res = new Response(b, { status, headers });
 		res.headers.set('etag', result.httpEtag);
 		result.writeHttpMetadata(res.headers);
 	} catch (err) {
@@ -139,9 +199,6 @@ export async function serve(bkt: R2.Bucket, req: Request | `/${string}`): Promis
 
 		res.headers.set('accept-ranges', 'bytes');
 		res.headers.set('content-length', String(length));
-	} else if (isGET) {
-		// TODO: context.waitUntil here?
-		caches.default.put(request, res.clone());
 		res.headers.set('content-range', `bytes ${offset}-${offset+length}/${total}`);
 	}
 
