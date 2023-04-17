@@ -13,82 +13,102 @@
   },
   "exports": {
     ".": {
+      "types": "./router/index.d.ts",
       "import": "./router/index.mjs",
       "require": "./router/index.js"
     },
     "./cfw": {
+      "types": "./cfw/index.d.ts",
       "import": "./cfw/index.mjs",
       "require": "./cfw/index.js"
     },
     "./cfw.cache": {
+      "types": "./cfw.cache/index.d.ts",
       "import": "./cfw.cache/index.mjs",
       "require": "./cfw.cache/index.js"
     },
     "./cfw.durable": {
+      "types": "./cfw.durable/index.d.ts",
       "import": "./cfw.durable/index.mjs",
       "require": "./cfw.durable/index.js"
     },
     "./cfw.kv": {
+      "types": "./cfw.kv/index.d.ts",
       "import": "./cfw.kv/index.mjs",
       "require": "./cfw.kv/index.js"
     },
     "./cfw.kv.assets": {
+      "types": "./cfw.kv.assets/index.d.ts",
       "import": "./cfw.kv.assets/index.mjs",
       "require": "./cfw.kv.assets/index.js"
     },
     "./cfw.ws": {
+      "types": "./cfw.ws/index.d.ts",
       "import": "./cfw.ws/index.mjs",
       "require": "./cfw.ws/index.js"
     },
     "./cors": {
+      "types": "./cors/index.d.ts",
       "import": "./cors/index.mjs",
       "require": "./cors/index.js"
     },
     "./jwt": {
+      "types": "./jwt/index.d.ts",
       "import": "./jwt/index.mjs",
       "require": "./jwt/index.js"
     },
     "./cache": {
+      "types": "./cache/index.d.ts",
       "import": "./cache/index.mjs",
       "require": "./cache/index.js"
     },
     "./buffer": {
+      "types": "./buffer/index.d.ts",
       "import": "./buffer/index.mjs",
       "require": "./buffer/index.js"
     },
     "./cookie": {
+      "types": "./cookie/index.d.ts",
       "import": "./cookie/index.mjs",
       "require": "./cookie/index.js"
     },
     "./crypto": {
+      "types": "./crypto/index.d.ts",
       "import": "./crypto/index.mjs",
       "require": "./crypto/index.js"
     },
     "./response": {
+      "types": "./response/index.d.ts",
       "import": "./response/index.mjs",
       "require": "./response/index.js"
     },
     "./base64": {
+      "types": "./base64/index.d.ts",
       "import": "./base64/index.mjs",
       "require": "./base64/index.js"
     },
     "./utils": {
+      "types": "./utils/index.d.ts",
       "import": "./utils/index.mjs",
       "require": "./utils/index.js"
     },
     "./deno": {
+      "types": "./deno/index.d.ts",
       "import": "./deno/index.mjs",
       "require": "./deno/index.js"
     },
     "./deno.ws": {
+      "types": "./deno.ws/index.d.ts",
       "import": "./deno.ws/index.mjs",
       "require": "./deno.ws/index.js"
     },
     "./sw": {
+      "types": "./sw/index.d.ts",
       "import": "./sw/index.mjs",
       "require": "./sw/index.js"
     },
     "./ws": {
+      "types": "./ws/index.d.ts",
       "import": "./ws/index.mjs",
       "require": "./ws/index.js"
     },
