@@ -73,6 +73,10 @@ export namespace Durable {
 		deleteAll(options?: Storage.Options.Put): Promise<void>;
 
 		list<T>(options?: Storage.Options.List): Promise<Map<string, T>>;
+			
+		getAlarm(): Promise<Number | null>;
+		setAlarm(scheduledTime: Date | number): Promise<void>;
+		deleteAlarm(): Promise<void>;
 	}
 }
 
