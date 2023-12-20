@@ -13,16 +13,17 @@ on:
 
 jobs:
   test:
-    name: Node.js v16
+    name: Node.js v18
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v3
       with:
-        node-version: 16
-
-    - name: (env) pnpm
-      run: curl -L https://pnpm.js.org/pnpm.js | node - add --global pnpm
+        node-version: 18
+    - uses: pnpm/action-setup@v2.2.4
+      with:
+        version: 7.13.5
+        run_install: false
 
     - name: (env) cache
       uses: actions/cache@v2
