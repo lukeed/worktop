@@ -140,7 +140,7 @@
     "node": ">=12"
   },
   "dependencies": {
-    "mrmime": "^1.0.0",
+    "mrmime": "^2.0.0",
     "regexparam": "^2.0.0"
   },
   "keywords": [
