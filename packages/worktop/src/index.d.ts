@@ -41,7 +41,7 @@ export type Handler<
 
 export type RouteParams<T extends string> =
 	T extends `${infer Prev}/*/${infer Rest}`
-		? RouteParams<Prev> & { wild: string } & RouteParams<Rest>
+		? RouteParams<Prev> & { "*": string } & RouteParams<Rest>
 	: T extends `${string}:${infer P}?/${infer Rest}`
 		? { [K in P]?: string } & RouteParams<Rest>
 	: T extends `${string}:${infer P}/${infer Rest}`
@@ -51,7 +51,7 @@ export type RouteParams<T extends string> =
 	: T extends `${string}:${infer P}`
 		? { [K in P]: string }
 	: T extends `${string}*`
-		? { wild: string }
+		? { "*": string }
 	: {};
 
 export type Initializer<C extends Context> = (

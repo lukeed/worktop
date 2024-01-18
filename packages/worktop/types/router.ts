@@ -88,7 +88,7 @@ API.add('POST', '/items', async (req, context) => {
  * PARAMS / RouteParams
  */
 
-let foo='', bar='', baz='', wild='';
+let foo='', bar='', baz='', wild='*';
 
 // @ts-expect-error
 assert<RouteParams<'/:foo'>>({ /*empty*/ });
@@ -139,31 +139,31 @@ assert<RouteParams<'/:foo?/baz/:bar?'>>({ bar });
 
 // @ts-expect-error
 assert<RouteParams<'/*'>>({ bar });
-assert<RouteParams<'/*'>>({ wild });
+assert<RouteParams<'/*'>>({ '*':'' });
 // @ts-expect-error
 assert<RouteParams<'/foo/*'>>({ /*empty*/ });
-assert<RouteParams<'/foo/*'>>({ wild });
+assert<RouteParams<'/foo/*'>>({ '*':'' });
 // @ts-expect-error
 assert<RouteParams<'/:foo/*'>>({ foo });
-assert<RouteParams<'/:foo/*'>>({ foo, wild });
+assert<RouteParams<'/:foo/*'>>({ foo, '*':'' });
 // @ts-expect-error
 assert<RouteParams<'/:foo?/*'>>({ /*empty*/ });
-assert<RouteParams<'/:foo?/*'>>({ foo, wild });
-assert<RouteParams<'/:foo?/*'>>({ wild });
+assert<RouteParams<'/:foo?/*'>>({ foo, '*':'' });
+assert<RouteParams<'/:foo?/*'>>({ '*':'' });
 // @ts-expect-error
-assert<RouteParams<'/:foo/*/:bar?'>>({ bar, wild});
-assert<RouteParams<'/:foo/*/:bar?'>>({ foo, bar, wild});
+assert<RouteParams<'/:foo/*/:bar?'>>({ bar, '*':'' });
+assert<RouteParams<'/:foo/*/:bar?'>>({ foo, bar, '*':'' });
 // @ts-expect-error
 assert<RouteParams<'/:foo/*/:bar/:baz?'>>({ foo, bar, baz });
-assert<RouteParams<'/:foo/*/:bar/:baz?'>>({ foo, bar, baz, wild });
+assert<RouteParams<'/:foo/*/:bar/:baz?'>>({ foo, bar, baz, '*':'' });
 // @ts-expect-error
 assert<RouteParams<'/:foo/*/:bar?/:baz'>>({ foo, baz });
-assert<RouteParams<'/:foo/*/:bar?/:baz'>>({ foo, baz, wild });
-assert<RouteParams<'/:foo/*/:bar?/:baz'>>({ foo, bar, baz, wild });
+assert<RouteParams<'/:foo/*/:bar?/:baz'>>({ foo, baz, '*':'' });
+assert<RouteParams<'/:foo/*/:bar?/:baz'>>({ foo, bar, baz, '*':'' });
 // @ts-expect-error
 assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ bar, baz });
-assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ bar, baz, wild });
-assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ foo, bar, baz, wild });
+assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ bar, baz, '*':'' });
+assert<RouteParams<'/:foo?/*/:bar/:baz'>>({ foo, bar, baz, '*':'' });
 
 /**
  * ROUTES w/ RouteParams
@@ -193,9 +193,9 @@ API.add('GET', '/foo/:bar?/:baz', (req, context) => {
 });
 
 API.add('GET', '/foo/:bar?/*/:baz', (req, context) => {
-	assert<{ bar?: string, baz: string, wild: string }>(context.params);
+	assert<{ bar?: string, baz: string, '*': string }>(context.params);
 	assert<string|undefined>(context.params.bar);
-	assert<string>(context.params.wild);
+	assert<string>(context.params['*']);
 	assert<string>(context.params.baz);
 	// @ts-expect-error
 	assert<string>(context.params.bar);

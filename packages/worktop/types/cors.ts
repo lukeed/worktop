@@ -52,8 +52,8 @@ API.add('GET', '/static/:group/*', compose(
   async (req, context) => {
 		// @ts-expect-error
 		context.params.foobar // is not defined
-		assert<{ group: string; wild: string }>(context.params);
+		assert<{ group: string; '*': string }>(context.params);
 		assert<string>(context.params.group);
-		assert<string>(context.params.wild);
+		assert<string>(context.params['*']);
   }
 ));
