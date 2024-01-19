@@ -9,6 +9,9 @@
   <a href="https://github.com/lukeed/worktop/actions?query=workflow%3ACI">
     <img src="https://github.com/lukeed/worktop/workflows/CI/badge.svg?event=push" alt="CI" />
   </a>
+  <a href="https://licenses.dev/npm/worktop">
+    <img src="https://licenses.dev/b/npm/worktop" alt="licenses" />
+  </a>
   <a href="https://npmjs.org/package/worktop">
     <img src="https://badgen.now.sh/npm/dm/worktop" alt="downloads" />
   </a>
