@@ -1,0 +1,13 @@
+{
+  "name": "worktop-demo-pages",
+  "zoneid": "<YOUR ZONE ID>",
+  "profile": "personal",
+  "entry": "index.ts",
+  "module": true,
+  "routes": [
+    "<YOUR DOMAIN>/*"
+	],
+	"globals": {
+		"TODOS": "KV:<NAMESPACEID>"
+	}
+}
