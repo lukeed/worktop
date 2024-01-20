@@ -1,10 +1,11 @@
 /// <reference lib="webworker" />
 
+import type { KV } from 'worktop/cfw.kv';
+import type { Durable } from 'worktop/cfw.durable';
 import type { Context, Initializer } from 'worktop';
 import type { Promisable, Strict } from 'worktop/utils';
-import type { Durable } from 'worktop/cfw.durable';
 import type { WebSocket } from 'worktop/cfw.ws';
-import type { KV } from 'worktop/cfw.kv';
+import type { R2 } from 'worktop/cfw.r2';
 
 declare global {
 	const WebSocketPair: {
@@ -141,7 +142,14 @@ declare global {
 }
 
 export interface Bindings {
-	[name: string]: string | CryptoKey | KV.Namespace | Durable.Namespace | Module.Service;
+	[name: string]: (
+		| string
+		| CryptoKey
+		| KV.Namespace
+		| Durable.Namespace
+		| Module.Service
+		| R2.Bucket
+	);
 }
 
 export type FetchHandler<B extends Bindings = Bindings> = (

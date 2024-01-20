@@ -32,6 +32,10 @@
       "import": "./cfw.durable/index.mjs",
       "require": "./cfw.durable/index.js"
     },
+    "./cfw.r2": {
+      "import": "./cfw.r2/index.mjs",
+      "require": "./cfw.r2/index.js"
+    },
     "./cfw.kv": {
       "types": "./cfw.kv/index.d.ts",
       "import": "./cfw.kv/index.mjs",
